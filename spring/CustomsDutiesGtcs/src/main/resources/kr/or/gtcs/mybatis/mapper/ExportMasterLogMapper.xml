@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.gtcs.log.exportlog.mapper.ExportMasterLogMapper">
+
+<insert id="insertExportMasterLog" parameterType="kr.or.gtcs.dto.ExportMasterLogDTO">
+        INSERT INTO EXPORT_MASTER_LOG (
+              LOG_ID
+            , ACTION_TYPE
+            , ACTION_DATE
+            , WORKER_ID
+            , EXPORT_ID
+            , MEM_ID
+            , EXPORTER_NAME
+            , REP_NAME
+            , BIZ_REG_NO
+            , BUYER_ID_NO
+            , CUSTOMS_ID
+            , BUYER_NAME
+            , BUYER_ADDRESS
+            , DEST_COUNTRY
+            , LOADING_PORT
+            , GOODS_LOC
+            , EXCHANGE_RATE
+            , CURRENCY_CODE
+            , PAY_AMOUNT
+            , FREIGHT_AMT
+            , INSURANCE_AMT
+            , CARGO_MGMT_NO
+            , BONDED_REP_NAME
+            , CARRIER_NAME
+            , VESSEL_NAME
+            , LOADING_LOC
+            , CONT_NO
+            , HS_CODE
+            , ITEM_NAME_DECLARED
+            , ITEM_NAME_TRADE
+            , BRAND_NAME
+            , TOTAL_WEIGHT
+            , TOTAL_PACK_CNT
+            , QTY
+            , QTY_UNIT
+            , INVOICE_NO
+            , ORIGIN_COUNTRY
+            , MODEL_NAME
+            , UNIT_PRICE
+            , TOTAL_DECL_AMT
+            , STATUS
+            , EXPORT_NUMBER
+            , DCL_TYPE
+            , TRANS_MODE
+            , EXPORT_KIND
+            , PAYMENT_METHOD
+            , INCOTERMS
+            , TRANSPORT_MODE
+            , CONTAINER_MODE
+            , GOODS_TYPE
+            , REFUND_APPLICANT
+            , REG_DATE
+            , INVOICE_SIGN
+            , ATTACH_YN
+            , ORIGIN_CRITERIA
+            , ORIGIN_MARK_YN
+            , ORIGIN_CERT_TYPE
+            , SUBMIT_DATE
+        ) VALUES (
+              SEQ_EXPORT_LOG_ID.NEXTVAL
+            , #{actionType}
+            , SYSDATE
+            , #{workerId}
+            , #{exportId}
+            , #{memId}
+            , #{exporterName}
+            , #{repName}
+            , #{bizRegNo}
+            , #{buyerIdNo}
+            , #{customsId}
+            , #{buyerName}
+            , #{buyerAddress}
+            , #{destCountry}
+            , #{loadingPort}
+            , #{goodsLoc}
+            , #{exchangeRate}
+            , #{currencyCode}
+            , #{payAmount}
+            , #{freightAmt}
+            , #{insuranceAmt}
+            , #{cargoMgmtNo}
+            , #{bondedRepName}
+            , #{carrierName}
+            , #{vesselName}
+            , #{loadingLoc}
+            , #{contNo}
+            , #{hsCode}
+            , #{itemNameDeclared}
+            , #{itemNameTrade}
+            , #{brandName}
+            , #{totalWeight}
+            , #{totalPackCnt}
+            , #{qty}
+            , #{qtyUnit}
+            , #{invoiceNo}
+            , #{originCountry}
+            , #{modelName}
+            , #{unitPrice}
+            , #{totalDeclAmt}
+            , #{status}
+            , #{exportNumber}
+            , #{dclType}
+            , #{transMode}
+            , #{exportKind}
+            , #{paymentMethod}
+            , #{incoterms}
+            , #{transportMode}
+            , #{containerMode}
+            , #{goodsType}
+            , #{refundApplicant}
+            , #{regDate}
+            , #{invoiceSign}
+            , #{attachYn}
+            , #{originCriteria}
+            , #{originMarkYn}
+            , #{originCertType}
+            , #{submitDate}
+        )
+    </insert>
+
+
+</mapper>

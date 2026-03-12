@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.gtcs.comment.mapper.CommentMapper">
+<!-- 전체 댓글 조회 -->
+<select id="selectCommentList" parameterType="int">
+SELECT
+     RE_ID,
+     BD_ID,
+     RE_CONTENT,
+     RE_WRITER,
+     PARENT_ID,
+     RE_REGDATE,
+     RE_DELYN
+FROM 
+     TBL_COMMENT
+WHERE
+     BD_ID = #{bdId}
+AND RE_DELYN = 'N'
+ORDER BY 
+     RE_ID ASC
+</select>
+
+<!-- 댓글 등록 -->
+<insert id="insertComment" parameterType="kr.or.gtcs.dto.CommentDTO">
+INSERT INTO TBL_COMMENT (
+   BD_ID,
+   RE_CONTENT,
+   RE_WRITER,
+   PARENT_ID,
+   RE_REGDATE,
+   RE_DELYN
+) VALUES (
+	#{bdId},
+	#{reContent},
+	#{reWriter},
+	#{parentId},
+	SYSDATE,
+	'N'
+)
+</insert>
+
+<!-- 댓글 수정 -->
+<update id="updateComment" parameterType="kr.or.gtcs.dto.CommentDTO">
+UPDATE TBL_COMMENT
+SET
+   RE_CONTENT = #{reContent},
+   RE_REGDATE = SYSDATE
+WHERE 
+   RE_ID = #{reId}
+</update>
+
+<!-- 댓글 삭제 -->
+<update id="deleteComment" parameterType="kr.or.gtcs.dto.CommentDTO">
+UPDATE TBL_COMMENT
+SET
+   RE_DELYN = 'Y'
+WHERE
+   RE_ID = #{reId}
+AND
+   RE_WRITER = #{reWriter}
+</update>
+</mapper>

@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.gtcs.board.mapper.BoardMapper">
+<!-- 전체 조회 -->
+
+<resultMap id="boardMap" type="kr.or.gtcs.dto.BoardDTO">
+    <id property="bdId" column="BD_ID" />
+    <result property="bdType" column="BD_TYPE" />
+    <result property="bdTitle" column="BD_TITLE" />
+    <result property="bdCont" column="BD_CONT" />
+    <result property="bdWriter" column="BD_WRITER" />
+    <result property="bdRegdate" column="BD_REGDATE" />
+    <result property="bdModdate" column="BD_MODDATE" />
+    <result property="bdViewcnt" column="BD_VIEWCNT" />
+    <result property="bdSecyn" column="BD_SECYN" />
+
+    <collection property="fileList" ofType="kr.or.gtcs.dto.AttachentsDTO">
+        <id property="fileId" column="FILE_ID" />
+        <result property="refId" column="REF_ID" />
+        <result property="refType" column="REF_TYPE" />
+        <result property="fileType" column="FILE_TYPE" />
+        <result property="fileName" column="FILE_NAME" />
+        <result property="filePath" column="FILE_PATH" />
+        <result property="saveName" column="SAVE_NAME" />
+        <result property="uploadDate" column="UPLOAD_DATE" />
+        <result property="delYn" column="DEL_YN" />
+    </collection>
+</resultMap>
+<select id="selectBoardList" parameterType="kr.or.gtcs.dto.BoardDTO" resultType="kr.or.gtcs.dto.BoardDTO">
+SELECT
+	BD_ID,
+	BD_TYPE,
+	BD_TITLE,
+	BD_WRITER,
+	BD_REGDATE,
+	BD_VIEWCNT,
+	BD_SECYN,
+	BD_CONT
+FROM 
+	TBL_BOARD
+WHERE 
+    BD_DELYN = 'N'
+    <if test="bdType != null and bdType != ''">
+    AND BD_TYPE = #{bdType}
+    </if>
+    <if test="startDate != null and startDate != ''">
+    AND BD_REGDATE >= TO_DATE(#{startDate}, 'YYYY-MM-DD')
+    </if>
+    <if test="endDate != null and endDate != ''">
+    AND BD_REGDATE <![CDATA[<=]]> TO_DATE(#{endDate}, 'YYYY-MM-DD')
+    </if>
+    <if test="searchType != null and searchType == 'title' and keyword != null and keyword != ''">
+    AND BD_TITLE LIKE '%' || #{keyword} || '%'
+    </if>
+    <if test="searchType != null and searchType == 'writer' and keyword != null and keyword != ''">
+    AND BD_WRITER LIKE '%' || #{keyword} || '%'
+    </if>
+ORDER BY 
+    BD_ID DESC
+</select>
+
+<!-- 조회수 증가 -->
+<update id="updateViewCnt" parameterType="int">
+UPDATE 
+    TBL_BOARD
+SET
+    BD_VIEWCNT = BD_VIEWCNT +1
+WHERE
+    BD_ID = #{bdId}
+</update>
+
+<!-- 단건 상세 조회 -->
+<select id="selectBoard" parameterType="int" resultMap="boardMap">
+SELECT
+    A.BD_ID,
+	A.BD_TYPE,
+	A.BD_TITLE,
+	A.BD_WRITER,
+	A.BD_CONT,
+	A.BD_REGDATE,
+	A.BD_MODDATE,
+	A.BD_VIEWCNT,
+	A.BD_SECYN,
+	B.*
+FROM 
+    TBL_BOARD A
+LEFT OUTER JOIN ATTACHMENTS B ON TO_CHAR(A.BD_ID) = B.REF_ID
+WHERE
+    A.BD_ID = #{bdId}
+AND A.BD_DELYN = 'N'
+</select>
+
+<!-- 게시판 등록 -->
+<insert id="insertBoard" parameterType="kr.or.gtcs.dto.BoardDTO">
+<selectKey keyProperty="bdId" resultType="Integer" order="BEFORE">
+	SELECT "TEAM2_202508F"."SEQ_BOARD_ID".NEXTVAL FROM DUAL
+</selectKey>
+INSERT INTO tbl_board (
+    bd_id,
+    bd_type,
+    bd_title,
+    bd_cont,
+    bd_writer,
+    bd_secyn
+) VALUES (
+    #{bdId},
+	#{bdType},
+	#{bdTitle},
+	#{bdCont},
+	#{bdWriter},
+	#{bdSecyn}
+)
+</insert>
+
+<!-- 게시판 수정 -->
+<update id="updateBoard" parameterType="kr.or.gtcs.dto.BoardDTO">
+UPDATE tbl_board
+    <set>
+        <if test="bdTitle != null"> bd_title = #{bdTitle}, </if>
+        <if test="bdCont != null"> bd_cont = #{bdCont}, </if>
+        <if test="bdSecyn != null"> bd_secyn = #{bdSecyn}, </if>
+        <if test="bdDelyn != null"> bd_delyn = #{bdDelyn}, </if>
+        bd_moddate = SYSDATE
+    </set>
+    WHERE bd_id = #{bdId}
+</update>
+
+<!-- 게시판 삭제 -->
+<update id="deleteBoard" parameterType="kr.or.gtcs.dto.BoardDTO">
+UPDATE tbl_board
+SET
+    bd_delyn='Y'
+WHERE bd_id= #{bdId}
+</update>
+
+</mapper>

@@ -1,0 +1,360 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="kr.or.gtcs.exportmaster.mapper.ExportMasterMapper">
+	
+	
+	<resultMap id="exportMasterMap" type="kr.or.gtcs.dto.ExportMasterDTO" autoMapping="true">
+    <id property="exportId" column="EXPORT_ID" />
+    
+	<association property="aiDocCheck" javaType="kr.or.gtcs.dto.AiDocCheckDTO">
+	    <result property="riskScore" column="RISK_SCORE" />
+	    <result property="riskResult" column="RISK_RESULT" />
+	    <result property="riskComment" column="RISK_COMMENT" />
+	    <result property="docScore" column="DOC_SCORE" />
+	    <result property="docComment" column="DOC_COMMENT" />
+	    <result property="checkDate" column="CHECK_DATE" />
+	</association>
+	<association property="member" javaType="kr.or.gtcs.dto.MemberDTO">
+	    <result property="memName" column="MEM_NAME" />
+	</association>
+	<collection property="fileList" ofType="kr.or.gtcs.dto.AttachentsDTO">
+        <id property="fileId" column="FILE_ID" />
+        <result property="refId" column="REF_ID" />
+        <result property="refType" column="REF_TYPE" />
+        <result property="fileName" column="FILE_NAME" />
+        <result property="filePath" column="FILE_PATH" />
+        <result property="saveName" column="SAVE_NAME" />
+        <result property="fileType" column="FILE_TYPE" />
+        <result property="uploadDate" column="UPLOAD_DATE" />
+    </collection>
+	</resultMap>
+
+
+	<insert id="insertExportMaster"
+		parameterType="kr.or.gtcs.dto.ExportMasterDTO">
+		<selectKey keyProperty="exportNumber" resultType="string"
+			order="BEFORE">
+			SELECT 'EXP-' || TO_CHAR(SYSDATE, 'YYYYMMDD') || '-' ||
+			LPAD(SEQ_EXPORT_ID.NEXTVAL, 6, '0') FROM DUAL
+		</selectKey>
+
+		INSERT INTO EXPORT_MASTER (
+			EXPORT_ID,
+			EXPORT_NUMBER,
+			MEM_ID,
+			STATUS,
+			REG_DATE,
+			EXPORTER_NAME,
+			REP_NAME,
+			BIZ_REG_NO,
+			BUYER_ID_NO,
+			CUSTOMS_ID,
+			BUYER_NAME,
+			BUYER_ADDRESS,
+			DEST_COUNTRY,
+			LOADING_PORT,
+			GOODS_LOC,
+			CARGO_MGMT_NO,
+			BONDED_REP_NAME,
+			CARRIER_NAME,
+			VESSEL_NAME,
+			LOADING_LOC,
+			CONT_NO,
+			EXCHANGE_RATE,
+			CURRENCY_CODE,
+			PAY_AMOUNT,
+			TOTAL_DECL_AMT,
+			FREIGHT_AMT,
+			INSURANCE_AMT,
+			HS_CODE,
+			ITEM_NAME_DECLARED,
+			ITEM_NAME_TRADE,
+			BRAND_NAME,
+			TOTAL_WEIGHT,
+			TOTAL_PACK_CNT,
+			QTY,
+			QTY_UNIT,
+			INVOICE_NO,
+			ORIGIN_COUNTRY,
+			MODEL_NAME,
+			UNIT_PRICE,
+			DCL_TYPE,
+			TRANS_MODE,
+			EXPORT_KIND,
+			PAYMENT_METHOD,
+			INCOTERMS,
+			TRANSPORT_MODE,
+			CONTAINER_MODE,
+			GOODS_TYPE,
+			REFUND_APPLICANT,
+			OFFICER_ID
+		) VALUES (
+			SEQ_EXPORT_ID.CURRVAL,
+			#{exportNumber},
+			#{memId},
+			#{status},
+			SYSDATE,
+			#{exporterName},
+			#{repName},
+			#{bizRegNo},
+			#{buyerIdNo},
+			#{customsId},
+			#{buyerName},
+			#{buyerAddress},
+			#{destCountry},
+			#{loadingPort},
+			#{goodsLoc},
+			#{cargoMgmtNo},
+			#{bondedRepName},
+			#{carrierName},
+			#{vesselName},
+			#{loadingLoc},
+			#{contNo},
+			#{exchangeRate},
+			#{currencyCode},
+			#{payAmount},
+			#{totalDeclAmt},
+			#{freightAmt},
+			#{insuranceAmt},
+			#{hsCode},
+			#{itemNameDeclared},
+			#{itemNameTrade},
+			#{brandName},
+			#{totalWeight},
+			#{totalPackCnt},
+			#{qty},
+			#{qtyUnit},
+			#{invoiceNo},
+			#{originCountry},
+			#{modelName},
+			#{unitPrice},
+			#{dclType},
+			#{transMode},
+			#{exportKind},
+			#{paymentMethod},
+			#{incoterms},
+			#{transportMode},
+			#{containerMode},
+			#{goodsType},
+			#{refundApplicant},
+			(
+				SELECT MEM_ID
+				FROM (
+				    SELECT A.MEM_ID
+				    FROM MEMBER A
+				    LEFT JOIN (
+				        SELECT OFFICER_ID FROM EXPORT_MASTER
+				        UNION ALL
+				        SELECT OFFICER_ID FROM IMPORT_MASTER
+				    ) B ON A.MEM_ID = B.OFFICER_ID
+				    WHERE A.MEM_ROLE = 'OFFICER'
+				    GROUP BY A.MEM_ID
+				    ORDER BY COUNT(B.OFFICER_ID) ASC, A.MEM_ID ASC
+				)
+				WHERE ROWNUM = 1
+        	)
+		)
+	</insert>
+	
+	<update id="updateExportMaster">
+		UPDATE EXPORT_MASTER
+		SET
+			EXPORTER_NAME = #{exporterName}
+			, REP_NAME = #{repName}
+			, BIZ_REG_NO = #{bizRegNo}
+			, BUYER_ID_NO = #{buyerIdNo}
+			, CUSTOMS_ID = #{customsId}
+			, BUYER_NAME = #{buyerName}
+			, BUYER_ADDRESS = #{buyerAddress}
+			, DEST_COUNTRY = #{destCountry}
+			, LOADING_PORT = #{loadingPort}
+			, GOODS_LOC = #{goodsLoc}
+			, EXCHANGE_RATE = #{exchangeRate}
+			, CURRENCY_CODE = #{currencyCode}
+			, PAY_AMOUNT = #{payAmount}
+			, FREIGHT_AMT = #{freightAmt}
+			, INSURANCE_AMT = #{insuranceAmt}
+			, CARGO_MGMT_NO = #{cargoMgmtNo}
+			, BONDED_REP_NAME = #{bondedRepName}
+			, CARRIER_NAME = #{carrierName}
+			, VESSEL_NAME = #{vesselName}
+			, LOADING_LOC = #{loadingLoc}
+			, CONT_NO = #{contNo}
+			, HS_CODE = #{hsCode}
+			, ITEM_NAME_DECLARED = #{itemNameDeclared}
+			, ITEM_NAME_TRADE = #{itemNameTrade}
+			, BRAND_NAME = #{brandName}
+			, TOTAL_WEIGHT = #{totalWeight}
+			, TOTAL_PACK_CNT = #{totalPackCnt}
+			, QTY = #{qty}
+			, QTY_UNIT = #{qtyUnit}
+			, INVOICE_NO = #{invoiceNo}
+			, ORIGIN_COUNTRY = #{originCountry}
+			, MODEL_NAME = #{modelName}
+			, UNIT_PRICE = #{unitPrice}
+			, TOTAL_DECL_AMT = #{totalDeclAmt}
+			, STATUS = #{status}
+			, EXPORT_NUMBER = #{exportNumber}
+			, DCL_TYPE = #{dclType}
+			, TRANS_MODE = #{transMode}
+			, EXPORT_KIND = #{exportKind}
+			, PAYMENT_METHOD = #{paymentMethod}
+			, INCOTERMS = #{incoterms}
+			, TRANSPORT_MODE = #{transportMode}
+			, CONTAINER_MODE = #{containerMode}
+			, GOODS_TYPE = #{goodsType}
+			, REFUND_APPLICANT = #{refundApplicant}
+			, INVOICE_SIGN = #{invoiceSign}
+			, ATTACH_YN = #{attachYn}
+			, ORIGIN_CRITERIA = #{originCriteria}
+			, ORIGIN_MARK_YN = #{originMarkYn}
+			, ORIGIN_CERT_TYPE = #{originCertType}
+		WHERE EXPORT_ID = #{exportId}
+	</update>
+	
+	<update id="updateExportMasterStatus">
+		UPDATE EXPORT_MASTER
+		SET 
+			STATUS = #{status},
+			MOD_DATE = SYSDATE
+		WHERE 
+			EXPORT_NUMBER = #{exportNumber}
+	</update>
+	
+	<select id="selectExportMaster" resultMap="exportMasterMap">
+    	SELECT 
+		    A.*,
+		    C.FILE_ID, 
+		    C.REF_ID,
+		    C.REF_TYPE,
+		    C.FILE_NAME, 
+		    C.FILE_PATH, 
+		    C.SAVE_NAME, 
+		    C.FILE_TYPE, 
+		    C.UPLOAD_DATE,
+		    C.DEL_YN
+		FROM (
+		    SELECT 
+		        IM.*,
+		        AD.RISK_SCORE,
+		        AD.RISK_COMMENT,
+		        AD.CHECK_DATE,
+		        AD.DOC_COMMENT
+		        <if test="memRole != 'SHIPPER'">
+		            ,AD.CHECK_ID         
+		            ,AD.RISK_RESULT
+		            ,AD.DOC_SCORE
+		        </if>
+		        , ROW_NUMBER() OVER (PARTITION BY IM.EXPORT_ID ORDER BY AD.CHECK_DATE DESC NULLS LAST) as RN
+		    FROM EXPORT_MASTER IM
+		    LEFT OUTER JOIN AI_DOC_CHECK AD ON IM.EXPORT_NUMBER = AD.DOC_NUMBER
+		    WHERE IM.EXPORT_ID = #{exportId}
+		) A
+		LEFT OUTER JOIN ATTACHMENTS C ON (A.EXPORT_NUMBER = C.REF_ID AND C.DEL_YN = 'N')
+		WHERE A.RN = 1
+	</select>
+	
+	<select id="selectListExportMaster" resultMap="exportMasterMap">
+    SELECT * FROM (
+        SELECT
+            ROW_NUMBER() OVER(ORDER BY A.SUBMIT_DATE DESC) AS RNUM,
+            COUNT(*) OVER() AS TOTAL_COUNT,
+            CEIL(COUNT(*) OVER() / #{cri.amount}) AS TOTAL_PAGE,
+            A.EXPORT_ID,
+            A.EXPORT_NUMBER,
+            A.STATUS,
+            A.SUBMIT_DATE,
+            A.ITEM_NAME_DECLARED,
+            A.DEST_COUNTRY,
+            A.OFFICER_ID,
+            A.DELAY_YN, C.MEM_NAME
+            <if test="memRole != 'SHIPPER'">
+                , B.RISK_SCORE
+                , B.RISK_RESULT
+                , B.RISK_COMMENT
+                , B.DOC_SCORE
+                , B.DOC_COMMENT
+                , B.CHECK_DATE
+            </if>
+        FROM EXPORT_MASTER A
+        LEFT OUTER JOIN (
+            SELECT 
+                DOC_NUMBER, RISK_SCORE, RISK_RESULT, RISK_COMMENT, DOC_SCORE, DOC_COMMENT, CHECK_DATE,
+                ROW_NUMBER() OVER(PARTITION BY DOC_NUMBER ORDER BY CHECK_DATE DESC) AS IDX
+            FROM AI_DOC_CHECK
+        ) B ON A.EXPORT_NUMBER = B.DOC_NUMBER AND B.IDX = 1
+        LEFT OUTER JOIN MEMBER C ON A.OFFICER_ID = C.MEM_ID
+        <where>
+            <choose>
+                <when test="memRole == 'SHIPPER'">
+                    AND A.MEM_ID = #{memId}
+                </when>
+                <when test="memRole == 'OFFICER'">
+                    AND A.OFFICER_ID = #{memId}
+                </when>
+                <when test="memRole == 'SUPERVISOR' or memRole == 'SENIOR' or memRole == 'SYSTEM'">
+                    AND 1=1
+                </when>
+                <otherwise>
+                    AND 1=2
+                </otherwise>
+            </choose>
+
+            <if test="cri.startDate != null and cri.startDate != ''">
+                AND A.SUBMIT_DATE &gt;= TO_DATE(#{cri.startDate}, 'YYYY-MM-DD')
+            </if>
+            <if test="cri.endDate != null and cri.endDate != ''">
+                AND A.SUBMIT_DATE &lt; TO_DATE(#{cri.endDate}, 'YYYY-MM-DD') + 1
+            </if>
+            <if test="cri.type != null and cri.keyword != null and cri.keyword != ''">
+                <choose>
+                    <when test="cri.type == 'itemNameDeclared'">
+                        AND A.ITEM_NAME_DECLARED LIKE '%' || #{cri.keyword} || '%'
+                    </when>
+                    <when test="cri.type == 'destCountry'">
+                        AND A.DEST_COUNTRY LIKE '%' || #{cri.keyword} || '%'
+                    </when>
+                    <when test="cri.type == 'exportNumber'">
+                        AND A.EXPORT_NUMBER LIKE '%' || #{cri.keyword} || '%'
+                    </when>
+                </choose>
+            </if>
+            
+            <choose>
+                <when test="status == 'unassigned'">
+                    AND A.STATUS IN ('WAITING', 'REVIEWING')
+                    AND (A.OFFICER_ID IS NULL OR A.DELAY_YN = 'Y')
+                </when>
+                <when test="status != null and status != 'ALL' and status != ''">
+                    AND A.STATUS = #{status}
+                </when>
+            </choose>
+        </where>
+    )
+    WHERE RNUM BETWEEN #{cri.startRow} AND #{cri.endRow}
+</select>
+
+<select id="selectExportMasterByNumber" resultMap="exportMasterMap">
+    SELECT * FROM EXPORT_MASTER WHERE EXPORT_NUMBER = #{exportNumber}
+</select>
+
+<update id="updateOfficer">
+	UPDATE EXPORT_MASTER
+	SET 
+		OFFICER_ID = #{officerId},
+		ASSIGN_DATE = SYSDATE
+	WHERE EXPORT_ID = #{exportId}
+</update>
+
+	<update id="updateDelayedYn">
+        UPDATE EXPORT_MASTER
+        SET DELAY_YN = 'Y'
+        WHERE STATUS != 'ACCEPTED' 
+          AND SUBMIT_DATE <![CDATA[ <= ]]> SYSDATE - 3
+          AND (DELAY_YN = 'N' OR DELAY_YN IS NULL)
+    </update>
+    
+    
+
+</mapper>

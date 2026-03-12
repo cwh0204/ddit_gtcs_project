@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.gtcs.importtaxpayment.mapper.ImportTaxPaymentMapper">
+
+    <insert id="insertImportTaxPayment" parameterType="kr.or.gtcs.dto.ImportTaxPaymentDTO">
+        <selectKey keyProperty="payId" resultType="long" order="BEFORE">
+            SELECT "TEAM2_202508F"."ISEQ$$_377611".NEXTVAL FROM DUAL
+        </selectKey>
+    
+        INSERT INTO import_tax_payment (
+              pay_id
+            , import_id
+            , mem_id
+            , officer_id
+            , pay_status
+            , total_amount
+            , tax_base
+            , duty_amt
+            , vat_amt
+            , issue_date
+            , due_date
+            , biz_reg_no
+            , del_yn
+            , remarks
+            ) VALUES (
+              #{payId}
+            , #{importId}
+            , #{memId}
+            , #{officerId}
+            , #{payStatus}
+            , #{totalAmount}
+            , #{taxBase}
+            , #{dutyAmt}
+            , #{vatAmt}
+            , SYSDATE
+            , SYSDATE + 15
+            , #{bizRegNo}
+            , 'N'
+            , #{remarks}
+        )
+    </insert>
+
+    <update id="updateVirtualAccount" parameterType="kr.or.gtcs.dto.ImportTaxPaymentDTO">
+        UPDATE import_tax_payment
+        SET 
+             bank_name = #{bankName}
+           , virtual_acct = #{virtualAcct}
+        WHERE import_id = #{importId}
+    </update>
+
+    <update id="updatePayerAndStatus" parameterType="kr.or.gtcs.dto.ImportTaxPaymentDTO">
+        UPDATE import_tax_payment
+        SET 
+              payer_name = #{payerName}
+            , pay_status = 'pay_completed'
+            , paid_date = SYSDATE
+        WHERE import_id = #{importId}
+    </update>
+
+	<select id="selectTaxPaymentByImportId" resultType="kr.or.gtcs.dto.ImportTaxPaymentDTO">
+        SELECT * FROM import_tax_payment 
+        WHERE import_id = #{importId}
+	</select>
+
+</mapper>

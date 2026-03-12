@@ -1,0 +1,303 @@
+@charset "utf-8";
+
+/* =========================================
+   공지사항 등록/수정 페이지 전용 스타일
+   ========================================= */
+
+/* 입력 필드 공통 스타일 */
+.input-text {
+	width: 100%;
+	max-width: 1500px;  /* 추가 */
+	padding: 12px 16px;
+	border: 1px solid #ddd;
+	border-radius: 6px;
+	font-size: 14px;
+	transition: all 0.3s ease;
+}
+
+.input-text:focus {
+	outline: none;
+	border-color: #4a90e2;
+	box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+}
+
+.input-text[readonly] {
+	background: #f8f9fa;
+	color: #6c757d;
+	cursor: not-allowed;
+}
+
+/* 텍스트 에어리어 스타일 */
+.textarea-field {
+	width: 100%;
+	max-width: 1500px;  /* 추가 */
+	padding: 14px 16px;
+	border: 1px solid #ddd;
+	border-radius: 6px;
+	font-size: 14px;
+	font-family: inherit;
+	resize: vertical;
+	transition: all 0.3s ease;
+	line-height: 1.6;
+}
+
+.textarea-field:focus {
+	outline: none;
+	border-color: #4a90e2;
+	box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+}
+
+/* 파일 업로드 박스 */
+.file-input-box {
+	background: #f8f9fa;
+	border: 2px dashed #dee2e6;
+	border-radius: 6px;
+	padding: 20px;
+	transition: all 0.3s ease;
+}
+
+.file-input-box:hover {
+	border-color: #4a90e2;
+	background: #f0f7ff;
+}
+
+/* 파일 추가 버튼 */
+.btn-file-add {
+	padding: 10px 20px;
+	background: #4a90e2;
+	color: white;
+	border: none;
+	border-radius: 5px;
+	font-size: 14px;
+	font-weight: 500;
+	cursor: pointer;
+	transition: all 0.3s ease;
+}
+
+.btn-file-add:hover {
+	background: #357abd;
+	transform: translateY(-1px);
+	box-shadow: 0 2px 8px rgba(74, 144, 226, 0.3);
+}
+
+.btn-file-add i {
+	margin-right: 6px;
+}
+
+/* 현재 파일 스타일 */
+.current-file {
+	display: inline-block;
+	padding: 8px 12px;
+	background: white;
+	border: 1px solid #dee2e6;
+	border-radius: 4px;
+	margin-bottom: 8px;
+	font-size: 13px;
+}
+
+.current-file i {
+	color: #4a90e2;
+	margin-right: 6px;
+}
+
+/* 등록 버튼 */
+.btn-lookups {
+	padding: 12px 32px;
+	background: #004080;
+	color: white;
+	border: none;
+	border-radius: 6px;
+	font-size: 15px;
+	font-weight: 600;
+	cursor: pointer;
+	transition: all 0.3s ease;
+	box-shadow: 0 2px 6px rgba(40, 167, 69, 0.2);
+}
+
+.btn-lookups:hover {
+	background: #003366;
+	transform: translateY(-2px);
+	box-shadow: 0 4px 10px rgba(0, 51, 102, 0.3);
+}
+
+.btn-lookups i {
+	margin-right: 6px;
+}
+
+/* 취소 버튼 */
+.btn-grays {
+	padding: 12px 32px;
+	background: #6c757d;
+	color: white;
+	border: none;
+	border-radius: 6px;
+	font-size: 15px;
+	font-weight: 600;
+	cursor: pointer;
+	transition: all 0.3s ease;
+	box-shadow: 0 2px 6px rgba(108, 117, 125, 0.2);
+}
+
+.btn-grays:hover {
+	background: #5a6268;
+	transform: translateY(-2px);
+	box-shadow: 0 4px 10px rgba(108, 117, 125, 0.3);
+}
+
+/* 푸터 */
+.footer-mini {
+	text-align: center;
+	margin-top: 30px;
+	font-size: 12px;
+	color: #999;
+}
+
+/* 버튼 그룹 */
+.btn-groups {
+	display: flex;
+	justify-content: center;
+	gap: 10px;
+	margin-top: 30px;
+}
+
+.write-box {
+    border-top: 2px solid #0f4c81;
+    border-bottom: 1px solid #ddd;
+    background: #fff;
+}
+
+.write-row {
+    display: flex;
+    border-bottom: 1px solid #eee;
+}
+.write-row:last-child { border-bottom: none; }
+
+.write-label {
+    width: 140px;
+    background: #f9fbff;
+    padding: 15px 20px;
+    font-weight: bold;
+    color: #444;
+    display: flex;
+    align-items: center;
+    border-right: 1px solid #eee;
+}
+.write-label.required::after {
+    content: '*';
+    color: #e74c3c;
+    margin-left: 4px;
+}
+
+.write-content {
+    flex: 1;
+    padding: 10px 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* 입력 필드 스타일 */
+.input-text {
+    width: 100%;
+    height: 36px;
+    padding: 0 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 13px;
+    outline: none;
+}
+.input-text:focus, .textarea-field:focus, .select-field:focus {
+    border-color: #0f4c81;
+}
+
+.select-field {
+    height: 36px;
+    padding: 0 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    min-width: 150px;
+}
+
+.textarea-field {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    resize: vertical;
+    font-size: 13px;
+    font-family: inherit;
+    outline: none;
+    line-height: 1.5;
+}
+
+/* 파일 업로드 */
+.file-input-box {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    width: 100%;
+}
+.current-file {
+    font-size: 12px;
+    color: #0f4c81;
+    background: #eef2f6;
+    padding: 5px 10px;
+    border-radius: 4px;
+    display: inline-block;
+    width: fit-content;
+}
+
+/* 선택된 파일 목록 박스 */
+.selected-file-list {
+    padding: 10px;
+    background: #f8f9fa;
+    border: 1px dashed #ccc;
+    border-radius: 4px;
+    font-size: 13px;
+    color: #555;
+}
+.selected-file-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #fff;
+    padding: 8px 10px;
+    border: 1px solid #eee;
+    margin-bottom: 5px;
+    border-radius: 4px;
+}
+.selected-file-item i {
+    color: #0f4c81;
+}
+
+/* 커스텀 파일 업로드 버튼 */
+.btn-file-add {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 13px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: #333;
+    transition: all 0.2s;
+}
+.btn-file-add:hover {
+    background-color: #f1f1f1;
+    border-color: #bbb;
+}
+
+.btn-file-remove {
+    background: none;
+    border: none;
+    color: #e74c3c;
+    cursor: pointer;
+    font-size: 14px;
+    padding: 0 5px;
+}
+.btn-file-remove:hover {
+    color: #c0392b;
+    font-weight: bold;
+}

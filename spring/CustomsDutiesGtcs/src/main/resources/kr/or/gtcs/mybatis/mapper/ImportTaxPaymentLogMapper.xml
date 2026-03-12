@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.gtcs.log.importtaxpaymentlog.mapper.ImportTaxPaymentLogMapper">
+
+
+<insert id="insertTaxPaymentLog" parameterType="kr.or.gtcs.dto.ImportTaxPaymentLogDTO">
+        INSERT INTO IMPORT_TAX_PAYMENT_LOG (
+              ACTION_TYPE
+            , ACTION_DATE
+            , WORKER_ID
+            
+            -- 원본 데이터 매핑
+            , PAY_ID
+            , MEM_ID
+            , PAY_STATUS
+            , TOTAL_AMOUNT
+            , TAX_BASE
+            , DUTY_AMT
+            , VAT_AMT
+            , ISSUE_DATE
+            , DUE_DATE
+            , PAID_DATE
+            , BANK_NAME
+            , VIRTUAL_ACCT
+            , PAYER_NAME
+            , BIZ_REG_NO
+            , DEL_YN
+            , REMARKS
+            , OFFICER_ID
+            , IMPORT_ID
+        ) VALUES (
+              #{actionType}
+            , SYSDATE
+            , #{workerId}
+            
+            , #{payId}
+            , #{memId}
+            , #{payStatus}
+            , #{totalAmount}
+            , #{taxBase}
+            , #{dutyAmt}
+            , #{vatAmt}
+            , #{issueDate}
+            , #{dueDate}
+            , #{paidDate}
+            , #{bankName}
+            , #{virtualAcct}
+            , #{payerName}
+            , #{bizRegNo}
+            , #{delYn}
+            , #{remarks}
+            , #{officerId}
+            , #{importId}
+        )
+    </insert>
+
+
+
+</mapper>

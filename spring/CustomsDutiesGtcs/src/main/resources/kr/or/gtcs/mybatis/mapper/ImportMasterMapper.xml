@@ -1,0 +1,451 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.gtcs.importmaster.mapper.ImportMasterMapper">
+
+<resultMap id="importMasterMap" type="kr.or.gtcs.dto.ImportMasterDTO">
+    <id property="importId" column="IMPORT_ID" />
+    
+    <association property="aiDocCheck" javaType="kr.or.gtcs.dto.AiDocCheckDTO">
+        <result property="riskScore" column="RISK_SCORE" />
+        <result property="riskComment" column="RISK_COMMENT" />
+        <result property="docScore" column="DOC_SCORE" />
+        <result property="docComment" column="DOC_COMMENT" />
+        <result property="checkDate" column="CHECK_DATE" />
+    </association>
+    <association property="member" javaType="kr.or.gtcs.dto.MemberDTO">
+        <result property="memName" column="SHIPPER_NAME" />
+    </association>
+    
+    <association property="officer" javaType="kr.or.gtcs.dto.MemberDTO">
+        <result property="memName" column="OFFICER_NAME" />
+    </association>
+    
+    	
+    <collection property="fileList" ofType="kr.or.gtcs.dto.AttachentsDTO">
+        <id property="fileId" column="FILE_ID" />
+        <result property="refId" column="REF_ID" />
+        <result property="refType" column="REF_TYPE" />
+        <result property="fileName" column="FILE_NAME" />
+        <result property="filePath" column="FILE_PATH" />
+        <result property="saveName" column="SAVE_NAME" />
+        <result property="fileType" column="FILE_TYPE" />
+        <result property="uploadDate" column="UPLOAD_DATE" />
+    </collection>
+</resultMap>
+
+<insert id="insertImportMaster" parameterType="kr.or.gtcs.dto.ImportMasterDTO">
+        <selectKey keyProperty="importId" resultType="string" order="BEFORE">
+        	SELECT SEQ_IMPORT_ID.NEXTVAL FROM DUAL
+    	</selectKey>
+
+        INSERT INTO IMPORT_MASTER (
+             import_id
+           , import_number
+           , mem_id
+           , status
+           , importer_name
+           , rep_name
+           , tel_no
+		   , email
+		   , biz_reg_no
+           , customs_id
+           , address
+           , overseas_biz_name 
+           , overseas_country 
+           , import_type
+           , cargo_mgmt_no
+           , trans_mode
+           , vessel_name
+           , vessel_nation 
+           , arrival_est_date 
+           , bonded_in_date 
+           , origin_country 
+           , arrival_port 
+           , bl_no, awb_no 
+           , submit_date
+           , currency_code
+           , pay_amount
+           , invoice_no
+           , invoice_date
+           , contract_no
+           , contract_date
+           , po_no
+           , po_date
+           , total_weight 
+           , origin_cert_yn
+           , incoterms
+           , freight_currency
+           , freight_amt
+           , insurance_currency
+           , insurance_amt
+           , add_amt_currency 
+           , add_amt
+           , total_tax_base 
+           , total_duty
+           , total_vat 
+           , total_tax_sum
+           , cont_no 
+           , hs_code 
+           , tax_type
+           , tax_base_type
+           , item_name_declared 
+           , item_name_trade
+           , model_name 
+           , qty 
+           , qty_unit 
+           , unit_price 
+           , total_amount 
+           , net_weight
+           , tax_base_amt_item
+           , origin_code 
+           , origin_mark_yn
+           , officer_id
+           , assign_date  
+        ) VALUES (
+             #{importId}
+           , 'IMP-' || TO_CHAR(SYSDATE, 'YYYYMMDD') || '-' || LPAD(#{importId}, 6, '0')
+           , #{memId} 
+           , #{status} 
+           , #{importerName}
+           , #{repName} 
+           , #{telNo}
+           , #{email}
+           , #{bizRegNo}
+           , #{customsId} 
+           , #{address}
+           , #{overseasBizName} 
+           , #{overseasCountry} 
+           , #{importType}
+           , #{cargoMgmtNo} 
+           , #{transMode}
+           , #{vesselName} 
+           , #{vesselNation} 
+           , #{arrivalEstDate}
+           , #{bondedInDate} 
+           , #{originCountry} 
+           , #{arrivalPort} 
+           , #{blNo} 
+           , #{awbNo} 
+           , SYSDATE
+           , #{currencyCode} 
+           , #{payAmount}
+           , #{invoiceNo}
+           , #{invoiceDate} 
+           , #{contractNo}
+           , #{contractDate} 
+           , #{poNo}
+           , #{poDate}
+           , #{totalWeight} 
+           , #{originCertYn} 
+           , #{incoterms}
+           , #{freightCurrency} 
+           , #{freightAmt}
+           , #{insuranceCurrency}
+           , #{insuranceAmt}
+           , #{addAmtCurrency} 
+           , #{addAmt}
+           , #{totalTaxBase}
+           , #{totalDuty}
+           , #{totalVat}
+           , #{totalTaxSum} 
+           , #{contNo}
+           , #{hsCode}
+           , #{taxType}
+           , #{taxBaseType}
+           , #{itemNameDeclared}
+           , #{itemNameTrade} 
+           , #{modelName}
+           , #{qty}
+           , #{qtyUnit}
+           , #{unitPrice}
+           , #{totalAmount}
+           , #{netWeight}
+           , #{taxBaseAmtItem}
+           , #{originCode}
+           , #{originMarkYn}
+           , #{officerId}
+           , #{assignDate}
+        )
+    </insert>
+    
+	<select id="selectImportMaster" resultMap="importMasterMap">
+	    SELECT 
+	        A.*,
+	        C.FILE_ID, 
+	        C.REF_ID,
+	        C.REF_TYPE,
+	        C.FILE_NAME, 
+	        C.FILE_PATH, 
+	        C.SAVE_NAME, 
+	        C.FILE_TYPE, 
+	        C.UPLOAD_DATE,
+	        C.DEL_YN
+	    FROM (
+	        SELECT 
+	            IM.*,
+	            AD.RISK_SCORE,
+	            AD.RISK_COMMENT,
+	            AD.CHECK_DATE,
+	            AD.DOC_COMMENT
+	            <if test="memRole != 'SHIPPER'">
+	            	,AD.CHECK_ID         
+	                ,AD.RISK_RESULT
+	                ,AD.DOC_SCORE
+	            </if>
+	            , ROW_NUMBER() OVER (PARTITION BY IM.IMPORT_NUMBER ORDER BY AD.CHECK_DATE DESC) as RN
+	        FROM IMPORT_MASTER IM
+	        INNER JOIN AI_DOC_CHECK AD ON IM.IMPORT_NUMBER = AD.DOC_NUMBER
+	        WHERE IM.IMPORT_ID = #{importId}
+	    ) A
+	    LEFT OUTER JOIN ATTACHMENTS C ON (A.IMPORT_NUMBER = C.REF_ID)
+	    WHERE A.RN = 1 AND C.DEL_YN = 'N'
+	</select>
+	
+	<select id="selectImportMasterImportId" resultMap="importMasterMap">
+	    
+	        SELECT 
+	            IM.*
+	        FROM IMPORT_MASTER IM
+	        WHERE IM.IMPORT_ID = #{importId}
+	</select>
+
+<select id="selectListImportMaster" resultMap="importMasterMap">
+        SELECT * FROM (
+            SELECT
+                ROW_NUMBER() OVER(ORDER BY A.SUBMIT_DATE DESC) AS RNUM,
+                COUNT(*) OVER() AS TOTAL_COUNT,
+                CEIL(COUNT(*) OVER() / #{cri.amount}) AS TOTAL_PAGE,
+                A.*,
+                S.MEM_NAME AS SHIPPER_NAME,  
+                C.MEM_NAME AS OFFICER_NAME   
+                <if test="memRole != 'SHIPPER'">
+                    , B.RISK_SCORE, B.RISK_RESULT, B.RISK_COMMENT, B.DOC_SCORE, B.DOC_COMMENT, B.CHECK_DATE
+                </if>
+            FROM IMPORT_MASTER A
+            
+            LEFT OUTER JOIN (
+                SELECT DOC_NUMBER, RISK_SCORE, RISK_RESULT, RISK_COMMENT, DOC_SCORE, DOC_COMMENT, CHECK_DATE,
+                       ROW_NUMBER() OVER(PARTITION BY DOC_NUMBER ORDER BY CHECK_DATE DESC) AS IDX
+                FROM AI_DOC_CHECK
+            ) B ON A.IMPORT_NUMBER = B.DOC_NUMBER AND B.IDX = 1
+            
+            LEFT OUTER JOIN MEMBER S ON A.MEM_ID = S.MEM_ID
+            LEFT OUTER JOIN MEMBER C ON A.OFFICER_ID = C.MEM_ID
+            
+            <where>
+                <choose>
+                    <when test="memRole == 'SHIPPER'">
+                        AND A.MEM_ID = #{memId}
+                    </when>
+                    <when test="memRole == 'OFFICER'">
+                        AND A.OFFICER_ID = #{memId}
+                    </when>
+                    <when test="memRole == 'SUPERVISOR' or memRole == 'SYSTEM'">
+                       AND 1=1
+                    </when>
+                    <otherwise>
+                        1=2
+                    </otherwise>
+                </choose>
+
+                <if test="cri.startDate != null and cri.startDate != ''">
+                    AND A.SUBMIT_DATE &gt;= TO_DATE(#{cri.startDate}, 'YYYY-MM-DD')
+                </if>
+                <if test="cri.endDate != null and cri.endDate != ''">
+                    AND A.SUBMIT_DATE &lt; TO_DATE(#{cri.endDate}, 'YYYY-MM-DD') + 1
+                </if>
+
+                <if test="cri.type != null and cri.keyword != null and cri.keyword != ''">
+                    <choose>
+                        <when test="cri.type == 'itemNameDeclared'">
+                            AND A.ITEM_NAME_DECLARED LIKE '%' || #{cri.keyword} || '%'
+                        </when>
+                        <when test="cri.type == 'originCode'">
+                            AND A.ORIGIN_CODE LIKE '%' || #{cri.keyword} || '%'
+                        </when>
+                        <when test="cri.type == 'importNumber'">
+                            AND A.IMPORT_NUMBER LIKE '%' || #{cri.keyword} || '%'
+                        </when>
+                    </choose>
+                </if>
+
+                <choose>
+                    <when test="status == 'unassigned'">
+                        AND A.STATUS IN ('WAITING', 'REVIEWING')
+                        AND (A.OFFICER_ID IS NULL OR A.DELAY_YN = 'Y')
+                    </when>
+                    <when test="status != null and status != 'ALL' and status != ''">
+                        AND A.STATUS = #{status}
+                    </when>
+                </choose>
+            </where>
+        )
+        WHERE RNUM BETWEEN #{cri.startRow} AND #{cri.endRow}
+    </select>
+
+	<update id="updateImportMasterStatus">
+        UPDATE IMPORT_MASTER
+        SET STATUS = #{status},
+            MOD_DATE = SYSDATE
+        WHERE IMPORT_NUMBER = #{importNumber}
+    </update>
+
+	<update id="updateImportMaster" parameterType="kr.or.gtcs.dto.ImportMasterDTO">
+		UPDATE IMPORT_MASTER
+		
+    SET 
+        MEM_ID = #{memId},
+        IMPORTER_NAME = #{importerName},
+        REP_NAME = #{repName},
+        TEL_NO = #{telNo},
+        EMAIL = #{email},
+        BIZ_REG_NO = #{bizRegNo},
+        CUSTOMS_ID = #{customsId},
+        ADDRESS = #{address},
+        OVERSEAS_BIZ_NAME = #{overseasBizName},
+        OVERSEAS_COUNTRY = #{overseasCountry},
+        IMPORT_TYPE = #{importType},
+        CARGO_MGMT_NO = #{cargoMgmtNo},
+        TRANS_MODE = #{transMode},
+        VESSEL_NAME = #{vesselName},
+        VESSEL_NATION = #{vesselNation},
+        ARRIVAL_EST_DATE = #{arrivalEstDate},
+        BONDED_IN_DATE = #{bondedInDate},
+        ORIGIN_COUNTRY = #{originCountry},
+        ARRIVAL_PORT = #{arrivalPort},
+        BL_NO = #{blNo},
+        AWB_NO = #{awbNo},
+        SUBMIT_DATE = #{submitDate},
+        CURRENCY_CODE = #{currencyCode},
+        PAY_AMOUNT = #{payAmount},
+        INVOICE_NO = #{invoiceNo},
+        INVOICE_DATE = #{invoiceDate},
+        CONTRACT_NO = #{contractNo},
+        CONTRACT_DATE = #{contractDate},
+        PO_NO = #{poNo},
+        PO_DATE = #{poDate},
+        TOTAL_WEIGHT = #{totalWeight},
+        ORIGIN_CERT_YN = #{originCertYn},
+        INCOTERMS = #{incoterms},
+        FREIGHT_CURRENCY = #{freightCurrency},
+        FREIGHT_AMT = #{freightAmt},
+        INSURANCE_CURRENCY = #{insuranceCurrency},
+        INSURANCE_AMT = #{insuranceAmt},
+        ADD_AMT_CURRENCY = #{addAmtCurrency},
+        ADD_AMT = #{addAmt},
+        TOTAL_TAX_BASE = #{totalTaxBase},
+        TOTAL_DUTY = #{totalDuty},
+        TOTAL_VAT = #{totalVat},
+        TOTAL_TAX_SUM = #{totalTaxSum},
+        CONT_NO = #{contNo},
+        HS_CODE = #{hsCode},
+        TAX_TYPE = #{taxType},
+        TAX_BASE_TYPE = #{taxBaseType},
+        ITEM_NAME_DECLARED = #{itemNameDeclared},
+        ITEM_NAME_TRADE = #{itemNameTrade},
+        MODEL_NAME = #{modelName},
+        QTY = #{qty},
+        QTY_UNIT = #{qtyUnit},
+        UNIT_PRICE = #{unitPrice},
+        TOTAL_AMOUNT = #{totalAmount},
+        NET_WEIGHT = #{netWeight},
+        TAX_BASE_AMT_ITEM = #{taxBaseAmtItem},
+        ORIGIN_CODE = #{originCode},
+        ORIGIN_MARK_YN = #{originMarkYn},
+        STATUS = #{status},
+        IMPORT_NUMBER = #{importNumber},
+        MOD_DATE = SYSDATE,
+        OFFICER_ID = #{officerId},
+        ASSIGN_DATE = #{assignDate}
+    WHERE IMPORT_ID = #{importId}
+		
+	</update>
+	
+	<select id="selectImportIdByNumber" resultType="String">
+        SELECT IMPORT_ID 
+        FROM IMPORT_MASTER 
+        WHERE IMPORT_NUMBER = #{importNumber}
+    </select>
+    
+    <select id="selectLeastBusyOfficer" resultType="Integer">
+        SELECT M.MEM_ID
+        FROM MEMBER M
+        WHERE M.MEM_ROLE = 'OFFICER'
+        ORDER BY (
+            -- 이 사람의 수입 일감 개수
+            (SELECT COUNT(*) 
+             FROM IMPORT_MASTER IM 
+             WHERE IM.OFFICER_ID = M.MEM_ID 
+               AND IM.STATUS IN ('WAITING', 'REVIEWING'))
+            +
+            -- 이 사람의 수출 일감 개수
+            (SELECT COUNT(*) 
+             FROM EXPORT_MASTER EM 
+             WHERE EM.OFFICER_ID = M.MEM_ID 
+               AND EM.STATUS IN ('WAITING', 'REVIEWING'))
+        ) ASC, M.MEM_ID ASC
+        FETCH FIRST 1 ROWS ONLY
+    </select>
+
+    <update id="updateAutoAssign">
+        UPDATE IMPORT_MASTER
+        SET OFFICER_ID = #{officerId},
+            ASSIGN_DATE = SYSDATE
+        WHERE IMPORT_NUMBER = #{importNumber}
+    </update>
+
+    <update id="updateDelayedYn">
+        UPDATE IMPORT_MASTER
+        SET DELAY_YN = 'Y'
+        WHERE STATUS != 'DELIVERED' 
+          AND SUBMIT_DATE <![CDATA[ <= ]]> SYSDATE - 3
+          AND (DELAY_YN = 'N' OR DELAY_YN IS NULL)
+    </update>
+	
+	<update id="updateManualAssign" parameterType="kr.or.gtcs.dto.ImportMasterDTO">
+        UPDATE IMPORT_MASTER
+        SET OFFICER_ID = #{officerId},
+            ASSIGN_DATE = SYSDATE
+        WHERE IMPORT_ID = #{importId}
+    </update>
+    
+    <select id="selectOfficerWorkloadList" resultType="java.util.Map">
+        SELECT 
+            M.MEM_ID AS "memId", 
+            M.MEM_NAME AS "memName",
+            (
+                -- 수입 일감
+                (SELECT COUNT(*) FROM IMPORT_MASTER IM 
+                 WHERE IM.OFFICER_ID = M.MEM_ID AND IM.STATUS IN ('WAITING', 'REVIEWING'))
+                +
+                -- 수출 일감
+                (SELECT COUNT(*) FROM EXPORT_MASTER EM 
+                 WHERE EM.OFFICER_ID = M.MEM_ID AND EM.STATUS IN ('WAITING', 'REVIEWING'))
+            ) AS "currentWorkload"
+        FROM MEMBER M
+        WHERE M.MEM_ROLE = 'OFFICER'
+        ORDER BY "currentWorkload" ASC, M.MEM_ID ASC
+    </select>
+    
+    <select id="selectStatusCountList" resultType="java.util.Map">
+    SELECT
+        STATUS AS "status",
+        COUNT(*) AS "count"
+    FROM IMPORT_MASTER
+    <where>
+        <choose>
+            <when test="memRole == 'OFFICER'">
+                AND OFFICER_ID = #{memId}
+            </when>
+            <when test="memRole == 'SUPERVISOR' or memRole == 'SYSTEM'">
+                AND 1=1
+            </when>
+            <otherwise>
+                AND MEM_ID = #{memId}
+            </otherwise>
+        </choose>
+    </where>
+    GROUP BY STATUS
+</select>
+
+</mapper>

@@ -1,0 +1,389 @@
+@charset "utf-8";
+
+/* =========================================
+   [6] 메인 페이지 (Index.html) 전용 스타일
+   ========================================= */
+
+/* 공통 컨테이너 내부 래퍼 */
+.container-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* 1. 히어로 섹션 (슬라이더 + 검색) */
+.hero-section {
+  display: flex;
+  height: 320px;
+  background-color: #fff;
+  border-bottom: 1px solid #ddd;
+}
+
+/* 1-1. 이미지 슬라이더 */
+.hero-slider {
+  flex: 2;
+  position: relative;
+  overflow: hidden;
+  background-color: #f0f0f0;
+}
+
+.slide {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 1s;
+  background-size: cover;
+  background-position: center;
+}
+
+.slide.active {
+  opacity: 1;
+}
+
+.slide-content {
+  text-align: center;
+  color: #333;
+  background: rgba(255, 255, 255, 0.7);
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.slide-content h2 {
+  font-size: 28px;
+  margin-bottom: 10px;
+  color: #0f4c81;
+}
+
+.slide-content p {
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.slider-controls {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 10px;
+}
+
+.dot {
+  width: 12px;
+  height: 12px;
+  background-color: rgba(0, 0, 0, 0.3);
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.dot.active {
+  background-color: #0f4c81;
+}
+
+/* 1-2. 검색 패널 */
+.hero-search-panel {
+  flex: 1;
+  background-color: #364f6b;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  gap: 15px;
+  color: #fff;
+}
+
+.search-box {
+  background-color: rgba(255, 255, 255, 0.1);
+  padding: 20px;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  min-width: 600px;
+}
+
+.search-box h3 {
+  font-size: 16px;
+  margin-bottom: 15px;
+  font-weight: bold;
+  color: #fff;
+  border-left: 3px solid #63c2de;
+  padding-left: 10px;
+}
+
+.radio-group {
+  margin-bottom: 10px;
+  font-size: 13px;
+}
+
+.radio-group label {
+  margin-right: 15px;
+  cursor: pointer;
+}
+
+.input-group {
+  display: flex;
+  gap: 5px;
+}
+
+.input-group input {
+  flex: 1;
+  padding: 8px;
+  border: none;
+  border-radius: 2px;
+  height: 34px;
+}
+
+.input-group button {
+  background-color: #20a8d8;
+  color: white;
+  border: none;
+  padding: 0 15px;
+  border-radius: 2px;
+  cursor: pointer;
+  font-weight: bold;
+  height: 34px;
+}
+
+.input-group button:hover {
+  background-color: #1985ac;
+}
+
+/* 2. 환율 정보 티커 */
+.exchange-ticker-bar {
+  background-color: #2c3e50;
+  color: #fff;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+}
+
+.ticker-label {
+  background-color: #e74c3c;
+  color: #fff;
+  padding: 0 20px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  font-weight: bold;
+  font-size: 13px;
+  z-index: 10;
+}
+
+.ticker-wrap {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+  height: 100%;
+}
+
+.ticker-move {
+  display: flex;
+  position: absolute;
+  top: 0;
+  height: 100%;
+  align-items: center;
+  white-space: nowrap;
+  animation: ticker 60s linear infinite;
+}
+
+@keyframes ticker {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+
+  100% {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+.ticker-item {
+  margin-right: 40px;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.ticker-item strong {
+  color: #f1c40f;
+  font-size: 14px;
+}
+
+.ticker-item .up {
+  color: #e74c3c;
+  font-size: 11px;
+}
+
+.ticker-item .down {
+  color: #3498db;
+  font-size: 11px;
+}
+
+.ticker-item .dash {
+  color: #ccc;
+  font-size: 11px;
+}
+
+.ticker-item .flag {
+  font-size: 16px;
+  margin-right: 2px;
+}
+
+/* 3. 퀵 메뉴 (8개 아이콘 - 투명 배경 스타일) */
+.quick-menu-section {
+  padding: 50px 0;
+  background-color: #fff;
+  border-bottom: none;
+  /* 하단 경계선 제거 */
+}
+
+.quick-grid {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 0;
+  text-align: center;
+}
+
+.quick-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  color: #333;
+  transition: all 0.3s ease;
+  padding: 10px 0;
+}
+
+/* 아이콘과 텍스트 전체가 살짝 떠오르는 효과 */
+.quick-item:hover {
+  transform: translateY(-5px);
+  color: #0f4c81;
+}
+
+/* 아이콘 원형 박스 (투명) */
+.icon-circle {
+  width: 80px;
+  height: 80px;
+  background-color: transparent;
+  /* 배경 투명 */
+  border: none;
+  /* 테두리 제거 */
+  border-radius: 0;
+  box-shadow: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 10px;
+  font-size: 40px;
+  /* 아이콘 크기 확대 */
+  color: #555;
+  transition: all 0.3s ease;
+}
+
+.icon-circle i {
+  font-style: normal;
+}
+
+/* 호버 시 아이콘 효과 (배경색 없이 확대 및 색상 변경) */
+.quick-item:hover .icon-circle {
+  background-color: transparent;
+  border-color: transparent;
+  box-shadow: none;
+  color: #0f4c81;
+  transform: scale(1.1);
+}
+
+.quick-item span {
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.5px;
+}
+
+/* 4. 게시판 섹션 */
+.board-section {
+  padding: 40px 0 60px;
+  background-color: #fff;
+}
+
+.board-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 25px;
+}
+
+.board-col {
+  background: #fff;
+  padding: 25px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e0e0e0;
+}
+
+.board-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  border-bottom: 2px solid #333;
+  padding-bottom: 10px;
+}
+
+.board-header h3 {
+  font-size: 18px;
+  font-weight: bold;
+  color: #0f4c81;
+  margin: 0;
+}
+
+.plus-btn {
+  font-size: 20px;
+  color: #999;
+  text-decoration: none;
+  line-height: 1;
+}
+
+.plus-btn:hover {
+  color: #333;
+}
+
+.board-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.board-list li {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid #f0f0f0;
+  font-size: 13px;
+}
+
+.board-list li:last-child {
+  border-bottom: none;
+}
+
+.board-list li a {
+  text-decoration: none;
+  color: #444;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 70%;
+}
+
+.board-list li a:hover {
+  text-decoration: underline;
+  color: #0f4c81;
+}
+
+.board-list li .date {
+  color: #888;
+  font-size: 12px;
+}

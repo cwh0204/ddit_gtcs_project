@@ -1,0 +1,453 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.gtcs.dashboard.mapper.DashboardMapper">
+
+<resultMap id="urgentItemMap" type="kr.or.gtcs.dto.DashboardDTO$UrgentItem">
+    <result property="id"          column="ID"/>
+    <result property="declNumber"  column="DECL_NUMBER"/>
+    <result property="status"      column="STATUS"/>
+    <result property="itemName"    column="ITEM_NAME"/>
+    <result property="submitDate"  column="SUBMIT_DATE"/>
+    <result property="statusDate"  column="STATUS_DATE"/>
+    <result property="docComment"  column="DOC_COMMENT"/>
+    <result property="type"        column="TYPE"/>
+</resultMap>
+
+<resultMap id="monthlyTaxMap" type="kr.or.gtcs.dto.DashboardDTO$MonthlyTax">
+    <result property="month"     column="MONTH"/>
+    <result property="dutyTotal" column="DUTY_TOTAL"/>
+    <result property="vatTotal"  column="VAT_TOTAL"/>
+</resultMap>
+
+<resultMap id="monthlyIssueMap" type="kr.or.gtcs.dto.DashboardDTO$MonthlyIssue">
+    <result property="month"           column="MONTH"/>
+    <result property="rejectCount"     column="REJECT_COUNT"/>
+    <result property="supplementCount" column="SUPPLEMENT_COUNT"/>
+</resultMap>
+
+<resultMap id="monthlyVolumeMap" type="kr.or.gtcs.dto.DashboardDTO$MonthlyVolume">
+    <result property="month"       column="MONTH"/>
+    <result property="importCount" column="IMPORT_COUNT"/>
+    <result property="exportCount" column="EXPORT_COUNT"/>
+</resultMap>
+
+
+<!-- =========================================================
+     1. 긴급 처리 사항 (Tab 1)
+     ========================================================= -->
+
+<select id="selectImportSupplements" resultMap="urgentItemMap">
+    SELECT * FROM (
+        SELECT
+            IM.IMPORT_ID                                              ID,
+            IM.IMPORT_NUMBER                                          DECL_NUMBER,
+            IM.STATUS                                                 STATUS,
+            IM.ITEM_NAME_DECLARED                                     ITEM_NAME,
+            TO_CHAR(IM.SUBMIT_DATE, 'YYYY-MM-DD')                    SUBMIT_DATE,
+            TO_CHAR(NVL(IM.MOD_DATE, IM.SUBMIT_DATE), 'YYYY-MM-DD') STATUS_DATE,
+            NVL(AD.DOC_COMMENT, '보완/정정 요청')                      DOC_COMMENT,
+            'IMPORT'                                                  TYPE
+        FROM IMPORT_MASTER IM
+        LEFT OUTER JOIN (
+            SELECT DOC_NUMBER, DOC_COMMENT,
+                   ROW_NUMBER() OVER(PARTITION BY DOC_NUMBER ORDER BY CHECK_DATE DESC) IDX
+            FROM AI_DOC_CHECK
+        ) AD ON IM.IMPORT_NUMBER = AD.DOC_NUMBER AND AD.IDX = 1
+        WHERE IM.STATUS = 'SUPPLEMENT'
+        <if test="memId != null">
+            AND IM.MEM_ID = #{memId}
+        </if>
+        ORDER BY NVL(IM.MOD_DATE, IM.SUBMIT_DATE) ASC
+    )
+    WHERE ROWNUM &lt;= #{limit}
+</select>
+
+<select id="countImportSupplements" resultType="int">
+    SELECT COUNT(*)
+    FROM IMPORT_MASTER
+    WHERE STATUS = 'SUPPLEMENT'
+    <if test="memId != null">AND MEM_ID = #{memId}</if>
+</select>
+
+<select id="selectExportSupplements" resultMap="urgentItemMap">
+    SELECT * FROM (
+        SELECT
+            EM.EXPORT_ID                                              ID,
+            EM.EXPORT_NUMBER                                          DECL_NUMBER,
+            EM.STATUS                                                 STATUS,
+            EM.ITEM_NAME_DECLARED                                     ITEM_NAME,
+            TO_CHAR(EM.SUBMIT_DATE, 'YYYY-MM-DD')                    SUBMIT_DATE,
+            TO_CHAR(NVL(EM.REG_DATE, EM.SUBMIT_DATE), 'YYYY-MM-DD') STATUS_DATE,
+            '보완/정정 요청'                                            DOC_COMMENT,
+            'EXPORT'                                                  TYPE
+        FROM EXPORT_MASTER EM
+        WHERE EM.STATUS = 'SUPPLEMENT'
+        <if test="memId != null">
+            AND EM.MEM_ID = #{memId}
+        </if>
+        ORDER BY NVL(EM.REG_DATE, EM.SUBMIT_DATE) ASC
+    )
+    WHERE ROWNUM &lt;= #{limit}
+</select>
+
+<select id="countExportSupplements" resultType="int">
+    SELECT COUNT(*)
+    FROM EXPORT_MASTER
+    WHERE STATUS = 'SUPPLEMENT'
+    <if test="memId != null">AND MEM_ID = #{memId}</if>
+</select>
+
+<select id="selectImportRejects" resultMap="urgentItemMap">
+    SELECT * FROM (
+        SELECT
+            IM.IMPORT_ID                                              ID,
+            IM.IMPORT_NUMBER                                          DECL_NUMBER,
+            IM.STATUS                                                 STATUS,
+            IM.ITEM_NAME_DECLARED                                     ITEM_NAME,
+            TO_CHAR(IM.SUBMIT_DATE, 'YYYY-MM-DD')                    SUBMIT_DATE,
+            TO_CHAR(NVL(IM.MOD_DATE, IM.SUBMIT_DATE), 'YYYY-MM-DD') STATUS_DATE,
+            NVL(AD.DOC_COMMENT, '반려 처리')                           DOC_COMMENT,
+            'IMPORT'                                                  TYPE
+        FROM IMPORT_MASTER IM
+        LEFT OUTER JOIN (
+            SELECT DOC_NUMBER, DOC_COMMENT,
+                   ROW_NUMBER() OVER(PARTITION BY DOC_NUMBER ORDER BY CHECK_DATE DESC) IDX
+            FROM AI_DOC_CHECK
+        ) AD ON IM.IMPORT_NUMBER = AD.DOC_NUMBER AND AD.IDX = 1
+        WHERE IM.STATUS = 'REJECTED'
+        <if test="memId != null">
+            AND IM.MEM_ID = #{memId}
+        </if>
+        ORDER BY NVL(IM.MOD_DATE, IM.SUBMIT_DATE) DESC
+    )
+    WHERE ROWNUM &lt;= #{limit}
+</select>
+
+<select id="countImportRejects" resultType="int">
+    SELECT COUNT(*)
+    FROM IMPORT_MASTER
+    WHERE STATUS = 'REJECTED'
+    <if test="memId != null">AND MEM_ID = #{memId}</if>
+</select>
+
+<select id="selectExportRejects" resultMap="urgentItemMap">
+    SELECT * FROM (
+        SELECT
+            EM.EXPORT_ID                                              ID,
+            EM.EXPORT_NUMBER                                          DECL_NUMBER,
+            EM.STATUS                                                 STATUS,
+            EM.ITEM_NAME_DECLARED                                     ITEM_NAME,
+            TO_CHAR(EM.SUBMIT_DATE, 'YYYY-MM-DD')                    SUBMIT_DATE,
+            TO_CHAR(NVL(EM.REG_DATE, EM.SUBMIT_DATE), 'YYYY-MM-DD') STATUS_DATE,
+            '반려 처리'                                                DOC_COMMENT,
+            'EXPORT'                                                  TYPE
+        FROM EXPORT_MASTER EM
+        WHERE EM.STATUS = 'REJECTED'
+        <if test="memId != null">
+            AND EM.MEM_ID = #{memId}
+        </if>
+        ORDER BY NVL(EM.REG_DATE, EM.SUBMIT_DATE) DESC
+    )
+    WHERE ROWNUM &lt;= #{limit}
+</select>
+
+<select id="countExportRejects" resultType="int">
+    SELECT COUNT(*)
+    FROM EXPORT_MASTER
+    WHERE STATUS = 'REJECTED'
+    <if test="memId != null">AND MEM_ID = #{memId}</if>
+</select>
+
+
+<!-- =========================================================
+     2. KPI (Tab 2)
+     ========================================================= -->
+
+<select id="countImportRejectToday" resultType="int">
+    SELECT COUNT(*)
+    FROM IMPORT_MASTER
+    WHERE STATUS = 'REJECTED'
+      AND TRUNC(NVL(MOD_DATE, SUBMIT_DATE)) = TRUNC(SYSDATE)
+    <if test="memId != null">AND MEM_ID = #{memId}</if>
+</select>
+
+<select id="countImportByStatus" resultType="int">
+    SELECT COUNT(*)
+    FROM IMPORT_MASTER
+    <where>
+        <choose>
+            <when test="status == 'REVIEWING'">
+                STATUS IN ('WAITING', 'REVIEWING')
+            </when>
+            <when test="status == 'ACCEPTED'">
+                STATUS = 'PAY_COMPLETED'
+            </when>
+            <otherwise>
+                STATUS = #{status}
+            </otherwise>
+        </choose>
+        <if test="memId != null">AND MEM_ID = #{memId}</if>
+    </where>
+</select>
+
+<select id="countImportCompletedToday" resultType="int">
+    SELECT COUNT(*)
+    FROM IMPORT_MASTER
+    WHERE STATUS IN ('APPROVED', 'PAY_COMPLETED', 'DELIVERED', 'WH_IN_APPROVED', 'RELEASE_APPROVED')
+      AND TRUNC(NVL(MOD_DATE, SUBMIT_DATE)) = TRUNC(SYSDATE)
+    <if test="memId != null">AND MEM_ID = #{memId}</if>
+</select>
+
+<select id="countExportRejectToday" resultType="int">
+    SELECT COUNT(*)
+    FROM EXPORT_MASTER
+    WHERE STATUS = 'REJECTED'
+      AND TRUNC(NVL(REG_DATE, SUBMIT_DATE)) = TRUNC(SYSDATE)
+    <if test="memId != null">AND MEM_ID = #{memId}</if>
+</select>
+
+<select id="countExportLoadingDeadline" resultType="int">
+    SELECT COUNT(*)
+    FROM EXPORT_MASTER
+    WHERE STATUS NOT IN ('APPROVED', 'REJECTED', 'DELIVERED')
+      AND SUBMIT_DATE &lt;= TRUNC(SYSDATE) - 4
+    <if test="memId != null">AND MEM_ID = #{memId}</if>
+</select>
+
+<select id="countExportByStatus" resultType="int">
+    SELECT COUNT(*)
+    FROM EXPORT_MASTER
+    <where>
+        <choose>
+            <when test="status == 'REVIEWING'">
+                STATUS IN ('WAITING', 'REVIEWING')
+            </when>
+            <otherwise>
+                STATUS = #{status}
+            </otherwise>
+        </choose>
+        <if test="memId != null">AND MEM_ID = #{memId}</if>
+    </where>
+</select>
+
+<select id="countExportCompletedToday" resultType="int">
+    SELECT COUNT(*)
+    FROM EXPORT_MASTER
+    WHERE STATUS IN ('APPROVED', 'DELIVERED')
+      AND TRUNC(NVL(REG_DATE, SUBMIT_DATE)) = TRUNC(SYSDATE)
+    <if test="memId != null">AND MEM_ID = #{memId}</if>
+</select>
+
+<select id="sumTaxPaymentDueToday" resultType="long">
+    SELECT NVL(SUM(NVL(T.DUTY_AMT, 0) + NVL(T.VAT_AMT, 0)), 0)
+    FROM IMPORT_TAX_PAYMENT T
+    INNER JOIN IMPORT_MASTER IM ON T.IMPORT_ID = IM.IMPORT_ID
+    WHERE T.PAY_STATUS = 'PAY_WAITING'
+      AND NVL(T.DEL_YN, 'N') = 'N'
+    <if test="memId != null">AND IM.MEM_ID = #{memId}</if>
+</select>
+
+<select id="countTaxPaymentDueToday" resultType="int">
+    SELECT COUNT(*)
+    FROM IMPORT_TAX_PAYMENT T
+    INNER JOIN IMPORT_MASTER IM ON T.IMPORT_ID = IM.IMPORT_ID
+    WHERE T.PAY_STATUS = 'PAY_WAITING'
+      AND T.DUE_DATE &lt;= SYSDATE
+      AND NVL(T.DEL_YN, 'N') = 'N'
+    <if test="memId != null">AND IM.MEM_ID = #{memId}</if>
+</select>
+
+<select id="countNewImportToday" resultType="int">
+    SELECT COUNT(*)
+    FROM IMPORT_MASTER
+    WHERE TRUNC(SUBMIT_DATE) = TRUNC(SYSDATE)
+    <if test="memId != null">AND MEM_ID = #{memId}</if>
+</select>
+
+<select id="countNewExportToday" resultType="int">
+    SELECT COUNT(*)
+    FROM EXPORT_MASTER
+    WHERE TRUNC(SUBMIT_DATE) = TRUNC(SYSDATE)
+    <if test="memId != null">AND MEM_ID = #{memId}</if>
+</select>
+
+
+<!-- =========================================================
+     3. 차트 (Tab 3)
+     ========================================================= -->
+
+<select id="countTotalApprovedImport" resultType="int">
+    SELECT COUNT(*)
+    FROM IMPORT_MASTER
+    WHERE STATUS IN ('APPROVED', 'PAY_COMPLETED', 'DELIVERED', 'WH_IN_APPROVED', 'RELEASE_APPROVED')
+    <if test="memId != null">AND MEM_ID = #{memId}</if>
+</select>
+
+<select id="countTotalApprovedExport" resultType="int">
+    SELECT COUNT(*)
+    FROM EXPORT_MASTER
+    WHERE STATUS IN ('APPROVED', 'DELIVERED')
+    <if test="memId != null">AND MEM_ID = #{memId}</if>
+</select>
+
+<select id="selectMonthlyTax" resultMap="monthlyTaxMap">
+    SELECT MON AS MONTH, 
+           SUM(DUTY_TOTAL) AS DUTY_TOTAL,
+           SUM(VAT_TOTAL) AS VAT_TOTAL
+    FROM (
+        -- 1. 최근 6개월치 기본 달력 (관세, 부가세 모두 0으로 세팅)
+        SELECT TO_CHAR(ADD_MONTHS(SYSDATE, -LEVEL+1), 'YYYY-MM') AS MON, 
+               0 AS DUTY_TOTAL,
+               0 AS VAT_TOTAL
+        FROM DUAL 
+        CONNECT BY LEVEL &lt;= 6
+        
+        UNION ALL
+        
+        -- 2. 실제 테이블 데이터 (대소문자 무시 및 관세/부가세 분리)
+        SELECT TO_CHAR(NVL(T.PAID_DATE, T.ISSUE_DATE), 'YYYY-MM') AS MON, 
+               SUM(NVL(T.DUTY_AMT, 0)) AS DUTY_TOTAL,
+               SUM(NVL(T.VAT_AMT, 0)) AS VAT_TOTAL
+        FROM IMPORT_TAX_PAYMENT T
+        INNER JOIN IMPORT_MASTER IM ON T.IMPORT_ID = IM.IMPORT_ID
+        -- ★ UPPER()를 써서 소문자 pay_completed 도 무조건 찾아냄
+        WHERE UPPER(T.PAY_STATUS) = 'PAY_COMPLETED' 
+          AND NVL(T.DEL_YN, 'N') = 'N'
+          AND NVL(T.PAID_DATE, T.ISSUE_DATE) >= ADD_MONTHS(TRUNC(SYSDATE, 'MM'), -5)
+        <if test="memId != null">
+          AND IM.MEM_ID = #{memId}
+        </if>
+        GROUP BY TO_CHAR(NVL(T.PAID_DATE, T.ISSUE_DATE), 'YYYY-MM')
+    )
+    GROUP BY MON
+    ORDER BY MON ASC
+</select>
+
+<select id="selectMonthlyIssues" resultMap="monthlyIssueMap">
+    SELECT
+        CAL.MON                   MONTH,
+        NVL(D.REJECT_CNT, 0)     REJECT_COUNT,
+        NVL(D.SUPPLEMENT_CNT, 0) SUPPLEMENT_COUNT
+    FROM (
+        SELECT TO_CHAR(ADD_MONTHS(SYSDATE, -LEVEL + 1), 'YYYY-MM') MON
+        FROM DUAL
+        CONNECT BY LEVEL &lt;= 6
+    ) CAL
+    LEFT OUTER JOIN (
+        SELECT
+            MON,
+            SUM(R_CNT) REJECT_CNT,
+            SUM(S_CNT) SUPPLEMENT_CNT
+        FROM (
+            SELECT
+                TO_CHAR(NVL(IM.MOD_DATE, IM.SUBMIT_DATE), 'YYYY-MM') MON,
+                CASE WHEN IM.STATUS = 'REJECTED'   THEN 1 ELSE 0 END R_CNT,
+                CASE WHEN IM.STATUS = 'SUPPLEMENT'  THEN 1 ELSE 0 END S_CNT
+            FROM IMPORT_MASTER IM
+            WHERE NVL(IM.MOD_DATE, IM.SUBMIT_DATE) &gt;= ADD_MONTHS(TRUNC(SYSDATE, 'MM'), -5)
+              AND IM.STATUS IN ('REJECTED', 'SUPPLEMENT')
+            <if test="memId != null">AND IM.MEM_ID = #{memId}</if>
+
+            UNION ALL
+
+            SELECT
+                TO_CHAR(NVL(EM.REG_DATE, EM.SUBMIT_DATE), 'YYYY-MM') MON,
+                CASE WHEN EM.STATUS = 'REJECTED'   THEN 1 ELSE 0 END R_CNT,
+                CASE WHEN EM.STATUS = 'SUPPLEMENT'  THEN 1 ELSE 0 END S_CNT
+            FROM EXPORT_MASTER EM
+            WHERE NVL(EM.REG_DATE, EM.SUBMIT_DATE) &gt;= ADD_MONTHS(TRUNC(SYSDATE, 'MM'), -5)
+              AND EM.STATUS IN ('REJECTED', 'SUPPLEMENT')
+            <if test="memId != null">AND EM.MEM_ID = #{memId}</if>
+        )
+        GROUP BY MON
+    ) D ON CAL.MON = D.MON
+    ORDER BY CAL.MON ASC
+</select>
+
+<select id="selectMonthlyVolume" resultMap="monthlyVolumeMap">
+    SELECT
+        CAL.MON        MONTH,
+        NVL(I.CNT, 0) IMPORT_COUNT,
+        NVL(E.CNT, 0) EXPORT_COUNT
+    FROM (
+        SELECT TO_CHAR(ADD_MONTHS(SYSDATE, -LEVEL + 1), 'YYYY-MM') MON
+        FROM DUAL
+        CONNECT BY LEVEL &lt;= 6
+    ) CAL
+    LEFT OUTER JOIN (
+        SELECT TO_CHAR(SUBMIT_DATE, 'YYYY-MM') MON, COUNT(*) CNT
+        FROM IMPORT_MASTER
+        WHERE SUBMIT_DATE &gt;= ADD_MONTHS(TRUNC(SYSDATE, 'MM'), -5)
+        <if test="memId != null">AND MEM_ID = #{memId}</if>
+        GROUP BY TO_CHAR(SUBMIT_DATE, 'YYYY-MM')
+    ) I ON CAL.MON = I.MON
+    LEFT OUTER JOIN (
+        SELECT TO_CHAR(SUBMIT_DATE, 'YYYY-MM') MON, COUNT(*) CNT
+        FROM EXPORT_MASTER
+        WHERE SUBMIT_DATE &gt;= ADD_MONTHS(TRUNC(SYSDATE, 'MM'), -5)
+        <if test="memId != null">AND MEM_ID = #{memId}</if>
+        GROUP BY TO_CHAR(SUBMIT_DATE, 'YYYY-MM')
+    ) E ON CAL.MON = E.MON
+    ORDER BY CAL.MON ASC
+</select>
+<!--
+    ============================================================
+    ★ 기존 DashboardMapper.xml 의 </mapper> 태그 바로 앞에 
+    아래 내용을 그대로 붙여넣으세요.
+    기존 쿼리는 절대 수정하지 마세요!
+    ============================================================
+-->
+
+    <select id="countImportTodayByStatus" resultType="int">
+        SELECT COUNT(*) FROM IMPORT_MASTER
+        WHERE MEM_ID = #{memId}
+          AND STATUS = #{status}
+          AND TRUNC(NVL(MOD_DATE, SUBMIT_DATE)) = TRUNC(SYSDATE)
+    </select>
+
+    <select id="countImportDeliveredToday" resultType="int">
+        SELECT COUNT(*) FROM IMPORT_MASTER
+        WHERE MEM_ID = #{memId}
+          AND STATUS = 'DELIVERED'
+          AND TRUNC(NVL(MOD_DATE, SUBMIT_DATE)) = TRUNC(SYSDATE)
+    </select>
+
+    <select id="countExportTodayByStatus" resultType="int">
+        SELECT COUNT(*) FROM EXPORT_MASTER
+        WHERE MEM_ID = #{memId}
+          AND STATUS = #{status}
+          AND TRUNC(NVL(REG_DATE, SUBMIT_DATE)) = TRUNC(SYSDATE)
+    </select>
+
+    <select id="countExportDeliveredToday" resultType="int">
+        SELECT COUNT(*) FROM EXPORT_MASTER
+        WHERE MEM_ID = #{memId}
+          AND STATUS = 'DELIVERED'
+          AND TRUNC(NVL(REG_DATE, SUBMIT_DATE)) = TRUNC(SYSDATE)
+    </select>
+
+    <select id="countImportPending" resultType="int">
+        SELECT COUNT(*) FROM IMPORT_MASTER
+        WHERE MEM_ID = #{memId}
+          AND STATUS NOT IN ('APPROVED', 'DELIVERED')
+    </select>
+
+    <select id="countExportPending" resultType="int">
+        SELECT COUNT(*) FROM EXPORT_MASTER
+        WHERE MEM_ID = #{memId}
+          AND STATUS NOT IN ('APPROVED', 'DELIVERED')
+    </select>
+
+    <select id="countYearApprovedImport" resultType="int">
+    SELECT COUNT(*) FROM IMPORT_MASTER
+    WHERE TRUNC(NVL(MOD_DATE, SUBMIT_DATE), 'YYYY') = TRUNC(SYSDATE, 'YYYY')
+    <if test="memId != null">AND MEM_ID = #{memId}</if>
+	</select>
+
+	<select id="countYearApprovedExport" resultType="int">
+	    SELECT COUNT(*) FROM EXPORT_MASTER
+	    WHERE TRUNC(NVL(REG_DATE, SUBMIT_DATE), 'YYYY') = TRUNC(SYSDATE, 'YYYY')
+	    <if test="memId != null">AND MEM_ID = #{memId}</if>
+	</select>
+
+</mapper>

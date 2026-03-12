@@ -1,0 +1,157 @@
+@charset "utf-8";
+
+/* =========================================
+   [5] 대시보드(Dashboard) 공통 요소
+   ========================================= */
+/* 대시보드 페이지 전체 */
+.dashboard-container {
+  background-color: #ffffff;
+  border: none;
+}
+
+.dash-section {
+  margin-bottom: 25px;
+}
+
+.dash-title {
+  font-size: 14px;
+  color: #0f4c81;
+  font-weight: bold;
+  margin-bottom: 10px;
+  border-left: 4px solid #0f4c81;
+  padding-left: 10px;
+}
+
+/* 대시보드 카드 */
+.dash-card {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  padding: 20px;
+  border: 1px solid #e0e0e0;
+  transition: transform 0.2s;
+}
+
+.dash-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* 웰컴 배너 (플립 애니메이션 적용) */
+.welcome-banner {
+  background-color: #fff;
+  padding: 20px 30px;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e0e0e0;
+  border-left: 6px solid #0f4c81;
+  margin-bottom: 25px;
+  display: flex;
+  align-items: center;
+}
+
+.banner-content {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.greeting {
+  font-size: 18px;
+  font-weight: bold;
+  color: #2c3e50;
+  margin: 0 15px 0 0;
+  position: relative;
+  padding-right: 15px;
+}
+
+/* .greeting::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 1px;
+  height: 14px;
+  background-color: #ccc;
+} */
+
+.vertical-divider {
+  width: 1px;
+  height: 18px;
+  background-color: #ccc;
+  margin: 0 20px;
+}
+
+/* 텍스트 롤링 애니메이션 */
+.ticker-container {
+  flex: 1;
+  height: 24px;
+  overflow: hidden;
+  perspective: 1000px;
+  display: flex;
+  align-items: center;
+}
+
+#tickerText {
+  font-size: 15px;
+  color: #555;
+  margin: 0;
+  white-space: nowrap;
+  transform-origin: top center;
+  display: inline-block;
+}
+
+.flip-animate {
+  animation: flipDown 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+}
+
+@keyframes flipDown {
+  0% {
+    transform: rotateX(-90deg);
+    opacity: 0;
+  }
+
+  100% {
+    transform: rotateX(0deg);
+    opacity: 1;
+  }
+}
+
+/* 색상 유틸리티 */
+.txt-red {
+  color: #e74c3c;
+  font-weight: bold;
+  margin: 0 2px;
+}
+
+.txt-blue {
+  color: #3498db;
+  font-weight: bold;
+  margin: 0 2px;
+}
+
+.txt-orange {
+  color: #f39c12;
+  font-weight: bold;
+  margin: 0 2px;
+}
+
+.txt-green {
+  color: #27ae60;
+  font-weight: bold;
+  margin: 0 2px;
+}
+
+.txt-bold {
+  font-weight: bold;
+  color: #333;
+  margin-right: 5px;
+}
+
+.highlight-count {
+  color: #e74c3c;
+  font-weight: bold;
+  font-size: 18px;
+  margin: 0 3px;
+}

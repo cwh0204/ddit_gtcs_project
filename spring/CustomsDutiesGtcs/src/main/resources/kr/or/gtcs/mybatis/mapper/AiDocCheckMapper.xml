@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="kr.or.gtcs.aidoccheck.mapper.AiDocCheckMapper">
+
+<insert id="insertAiDocCheck" parameterType="kr.or.gtcs.dto.AiDocCheckDTO">
+	INSERT INTO AI_DOC_CHECK (
+		CHECK_ID,
+		RISK_SCORE,
+		RISK_RESULT,
+		CHECK_DATE,
+		DOC_NUMBER,
+		DOC_SCORE,
+		DOC_COMMENT,
+		RISK_COMMENT
+	) VALUES (
+		SEQ_CHECK_ID.NEXTVAL,
+		#{riskScore},
+		<![CDATA[
+			CASE 
+				WHEN #{riskScore} >= 50 THEN 'RED' ELSE 'GREEN'
+		    END
+		]]>,
+		SYSDATE,
+		#{docNumber},
+		#{docScore},
+		#{docComment},
+		#{riskComment}
+	)
+</insert>
+
+<update id="updateAiDocComment">
+	UPDATE AI_DOC_CHECK
+	SET DOC_COMMENT = #{docComment}
+	WHERE CHECK_ID = #{checkId}
+</update>
+
+<update id="updateAiDocCheck" parameterType="kr.or.gtcs.dto.AiDocCheckDTO">
+	UPDATE ai_doc_check
+	SET
+		RISK_SCORE = #{riskScore},
+		RISK_RESULT = #{riskResult},
+		CHECK_DATE = SYSDATE,
+		DOC_SCORE = #{docScore},
+		DOC_COMMENT = #{docComment},
+		RISK_COMMENT = #{riskComment}
+	WHERE
+	    doc_number = #{docNumber}
+</update>
+
+</mapper>

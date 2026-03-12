@@ -1,0 +1,276 @@
+@charset "UTF-8";
+
+/* 기본 폰트 */
+body { 
+    font-family: 'Pretendard', 'Malgun Gothic', sans-serif; 
+    font-size: 13px; 
+    color: #333; 
+}
+
+/* --- A. 검색박스 --- */
+.search-box {
+    display: flex;
+    align-items: center;
+    background: #fff;
+    padding: 15px 10px;
+    border-top: 2px solid #333;
+    border-bottom: 1px solid #ddd;
+    margin-bottom: 20px;
+    gap: 10px;
+}
+
+.search-label { 
+    font-weight: bold; 
+    color: #333; 
+    font-size: 13px;
+    margin-right: 5px;
+}
+
+/* 입력창 스타일 통일 (높이 30px) */
+.form-input, .form-select {
+    height: 30px !important;
+    padding: 0 8px;
+    border: 1px solid #ccc;
+    border-radius: 0;
+    font-size: 12px;
+    box-sizing: border-box;
+    color: #555;
+    vertical-align: middle;
+}
+
+input[type="date"].form-input { 
+    width: 120px; 
+    font-family: inherit; 
+}
+
+/* 검색 버튼 */
+.btn-lookup {
+    margin-left: auto; 
+    height: 30px;
+    padding: 0 16px;
+    background: #0f4c81; 
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    font-weight: bold;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+}
+
+.btn-lookup:hover { 
+    background-color: #09345a; 
+}
+
+/* --- B. AG Grid 스타일 --- */
+#noticeGrid {
+    width: 100%;
+    height: 500px;
+}
+
+/* 그리드 외곽선 제거 */
+.ag-root-wrapper { 
+    border: none !important; 
+}
+
+/* 헤더 스타일 */
+.ag-header {
+    background-color: #fff !important;
+    border-top: 2px solid #0f4c81 !important;
+    border-bottom: 1px solid #333 !important;
+    font-weight: bold;
+    color: #333;
+    font-size: 13px;
+}
+
+.ag-header-cell-label { 
+    justify-content: center; 
+}
+
+/* 행(Row) 스타일 */
+.ag-row {
+    border-bottom: 1px solid #e0e0e0 !important;
+    background-color: #fff;
+}
+
+/* 셀(Cell) 스타일 */
+.ag-cell {
+    border-right: none !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    color: #333;
+    padding: 0 5px;
+    border: none !important;
+}
+
+/* 포커스 및 선택 효과 완전 제거 */
+.ag-cell-focus, .ag-cell:focus-visible {
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+/* 클릭 시 회색 배경(Selected) 제거 */
+.ag-row-selected {
+    background-color: transparent !important;
+}
+
+.ag-row-selected::before {
+    display: none !important;
+}
+
+/* 마우스 올렸을 때만 살짝 연한 파란색 */
+.ag-row-hover {
+    background-color: #f8fbff !important;
+}
+
+/* 제목 컬럼 */
+.cell-left {
+    justify-content: flex-start !important;
+    padding-left: 15px !important;
+    cursor: pointer;
+}
+
+.cell-left:hover {
+    text-decoration: underline;
+    color: #0f4c81;
+}
+
+/* 공지사항 (Pinned) */
+.ag-pinned-top-header { 
+    border-bottom: none !important; 
+}
+
+.ag-row-pinned {
+    background-color: #fff !important;
+    border-bottom: 1px solid #e0e0e0 !important;
+    font-weight: normal;
+    overflow: hidden !important;
+}
+
+.ag-body-horizontal-scroll { 
+    display: none !important; 
+}
+
+/* --- C. 페이지네이션 --- */
+.custom-pagination {
+    display: flex;
+    justify-content: center;
+    margin-top: 30px;
+    gap: 0;
+}
+
+.pg-btn {
+    width: 30px;
+    height: 30px;
+    border: 1px solid #ccc;
+    background: #fff;
+    color: #666;
+    cursor: pointer;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: -1px;
+}
+
+.pg-btn:first-child { 
+    margin-left: 0; 
+}
+
+.pg-btn:hover { 
+    background: #f1f1f1; 
+    position: relative; 
+    z-index: 2; 
+}
+
+.pg-btn.active {
+    background: #0f4c81;
+    color: #fff;
+    border-color: #0f4c81;
+    font-weight: bold;
+    position: relative; 
+    z-index: 3;
+}
+
+/* 뱃지 */
+.badge { 
+    padding: 3px 10px; 
+    border-radius: 12px; 
+    color: #fff; 
+    font-size: 11px; 
+    display: inline-block; 
+    min-width: 60px; 
+    text-align: center;
+}
+
+.badge.system { 
+    background: #6610f2; 
+}
+
+.badge.import { 
+    background: #0d6efd; 
+}
+
+.badge.export { 
+    background: #198754; 
+}
+
+.badge.logistics { 
+    background: #fd7e14; 
+}
+
+.badge.general { 
+    background: #999; 
+}
+
+.notice-label { 
+    color: #d63384; 
+    font-weight: bold; 
+}
+
+.badge-new {
+    color: #e74c3c; 
+    font-size: 9px; 
+    margin-left: 5px;
+    border: 1px solid #e74c3c; 
+    padding: 0 3px;
+    border-radius: 2px; 
+    background: #fff; 
+    font-weight: bold;
+    line-height: 1.4; 
+    vertical-align: text-top;
+}
+
+/* 글쓰기 버튼 */
+.btn-write {
+    height: 31px;
+    padding: 0 15px;
+    margin-right: 10px;
+    background: #0f4c81;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    font-weight: bold;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    transition: all 0.3s ease;
+    margin-top: -15px;
+}
+
+.btn-write:hover {
+    background: #09345a;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(15, 76, 129, 0.3);
+}
+
+.btn-write i {
+    font-size: 12px;
+}

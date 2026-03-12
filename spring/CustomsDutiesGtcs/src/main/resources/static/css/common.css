@@ -1,0 +1,127 @@
+@charset "UTF-8";
+
+/* 1. CSS 변수 정의 (:root) */
+:root {
+  /* 폰트 */
+  --font-sans: "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
+
+  /* 색상 팔레트 */
+  --color-primary: #0f4c81;
+  --color-primary-light: #34689a;
+  --color-primary-dark: #0a365c;
+
+  --color-secondary: #0a2742;
+  --color-secondary-surface: #123150;
+
+  --color-bg-base: #f4f6f8;     /* 앱 내부 배경 */
+  --color-bg-outside: #e5e7eb;  /* 앱 바깥 배경(회색) */
+
+  --color-text-main: #111827;
+  --color-text-sub: #6b7280;
+  --color-text-mute: #9ca3af;
+
+  /* 고정 해상도 설정 */
+  --width-app: 1440px;
+  --height-app: 1024px;
+}
+
+/* 2. 기본 리셋 및 전역 설정 */
+* {
+  box-sizing: border-box; /* 패딩과 테두리를 너비에 포함 */
+}
+
+body {
+  font-family: var(--font-sans);
+  color: var(--color-text-main);
+  background-color: var(--color-bg-outside);
+
+  /* 화면 중앙 정렬을 위한 Flex 설정 */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  /* 화면이 작아져도 앱 크기(1440x1024) 미만으로 줄어들지 않음 */
+  min-width: var(--width-app);
+  min-height: var(--height-app);
+  
+  width: 100%;
+  height: 100vh;
+  margin: 0;
+  
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.5;
+}
+
+/* 3. 메인 컨테이너 (#root) 설정 */
+#root {
+  width: var(--width-app);
+  height: var(--height-app);
+
+  /* Flex Item 설정: 부모 공간이 줄어도 찌그러지지 않음 */
+  flex-shrink: 0;
+
+  background-color: var(--color-bg-base);
+  
+  /* 내부 레이아웃 배치 (Flex Column) */
+  display: flex;
+  flex-direction: column;
+
+  /* 위치 기준점 설정 (자식 요소의 absolute 기준) */
+  position: relative;
+  
+  /* 컨텐츠가 넘칠 경우 숨김 */
+  overflow: hidden;
+
+  /* 그림자 효과 (Tailwind 'shadow-2xl'에 해당) */
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+/* 4. 폼 요소 포커스 스타일 공통 정의 */
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: transparent;
+  
+  /* Tailwind 'ring-2 ring-primary' 효과 구현 */
+  box-shadow: 0 0 0 2px var(--color-primary);
+}
+
+/* 5. 애니메이션 정의 (필요 시 클래스로 사용) */
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes scale-up {
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* 애니메이션 유틸리티 클래스 */
+.animate-fade-in {
+  animation: fade-in 0.3s ease-out;
+}
+
+.animate-scale-up {
+  animation: scale-up 0.3s ease-out;
+}
+
+/* 헤더, 푸터 등 자주 쓰는 유틸리티 클래스 (필요 시 추가) */
+.flex-1 {
+  flex: 1 1 0%;
+}
+.w-full {
+  width: 100%;
+}
+.h-full {
+  height: 100%;
+}
+
+

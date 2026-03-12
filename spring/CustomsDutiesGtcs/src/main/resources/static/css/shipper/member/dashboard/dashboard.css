@@ -1,0 +1,433 @@
+@charset "UTF-8";
+
+/* [1] 변수 설정 */
+:root {
+    --primary-main: #0f4c81;    /* 기본 블루 */
+    --primary-dark: #0a2e5a;
+    
+    --danger-color: #e74c3c;
+    --warning-color: #f39c12;
+    --success-color: #27ae60;
+    --info-color: #3498db;
+    
+    --text-primary: #111;
+    --text-secondary: #666;
+    
+    --bg-main: #f5f7fa;
+    --bg-card: #ffffff;
+    
+    --shadow-base: 0 2px 5px rgba(0,0,0,0.04);
+    --shadow-hover: 0 8px 20px rgba(0,0,0,0.08);
+}
+
+/* body {
+    font-family: 'Pretendard', -apple-system, sans-serif;
+    background-color: var(--bg-main);
+    color: var(--text-primary);
+    margin: 0; 기본 마진 제거
+} */
+
+/* [2] 레이아웃 - 화면 꽉 채우기 */
+.dashboard-container {
+	min-width: 1400px;
+    width: 96%;        /* 좌우 여백을 최소화하여 화면을 넓게 사용 */
+    max-width: 1800px; /* 초대형 모니터에서는 너무 퍼지지 않게 제한 */
+    margin: 0 auto;
+    padding: 30px 0;   /* 위아래 패딩 */
+}
+
+.dash-section { margin-bottom: 30px; }
+
+.dash-title {
+    font-size: 18px; /* 타이틀 크기 증가 */
+    font-weight: 800;
+    color: var(--text-primary);
+    margin-bottom: 15px;
+    padding-left: 5px;
+    letter-spacing: -0.5px;
+}
+
+/* [3] 카드 공통 */
+.dash-card {
+    background: var(--bg-card);
+    border-radius: 12px;
+    box-shadow: var(--shadow-base);
+    padding: 30px; /* 패딩을 늘려서 시원시원하게 */
+    border: 1px solid #ebedf0;
+    transition: all 0.2s ease-in-out;
+}
+
+.dash-card:hover {
+    box-shadow: var(--shadow-hover);
+    transform: translateY(-3px);
+}
+
+/* [4] 웰컴 배너 */
+.welcome-banner {
+    background: #fff;
+    border-left: 6px solid var(--primary-main);
+    padding: 25px 35px; /* 크기 키움 */
+    margin-bottom: 30px;
+}
+
+.banner-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.greeting {
+    font-size: 24px; /* 폰트 키움 */
+    font-weight: 800;
+    margin: 0 0 6px 0;
+    color: #222;
+}
+
+.sub-greeting {
+    font-size: 14px;
+    color: #888;
+}
+
+.ticker-container {
+    background: #f8f9fa;
+    padding: 10px 24px;
+    border-radius: 30px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    border: 1px solid #eee;
+}
+
+.ticker-label {
+    font-size: 12px;
+    font-weight: 700;
+    color: #fff;
+    background: var(--primary-main);
+    padding: 4px 10px;
+    border-radius: 4px;
+    text-transform: uppercase;
+}
+
+#tickerText {
+    margin: 0;
+    font-size: 15px;
+    color: #444;
+}
+
+.highlight-count {
+    color: var(--danger-color);
+    font-weight: 800;
+    margin: 0 3px;
+}
+
+
+/* [5] 핵심 지표 카드 (상단 3개) */
+.card-row { display: flex; gap: 24px; width: 100%; }
+
+.metric-card {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 160px;
+    /* [수정] 모든 카드 왼쪽 라인을 메인 블루 컬러로 통일 */
+    border-left: 5px solid var(--primary-main); 
+}
+
+
+.card-label {
+    font-size: 15px;
+    font-weight: 700;
+    color: #777;
+    margin-bottom: 15px;
+    display: block;
+}
+
+.metric-value-row {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    margin-bottom: 10px;
+}
+
+.card-value {
+    font-size: 42px; /* 숫자 대폭 확대 */
+    font-weight: 900;
+    letter-spacing: -1.5px;
+    line-height: 1;
+}
+
+.card-value,
+.card-value.red,
+.card-value.orange,
+.card-value.blue {
+    color: var(--primary-dark) !important; /* 진한 남색으로 통일 */
+}
+
+.unit { font-size: 16px; color: #aaa; font-weight: 500; }
+
+.card-sub-text {
+    font-size: 14px;
+    color: #666;
+    margin: 0;
+    margin-top: auto; /* 하단 고정 */
+}
+.card-sub-text.urgent { color: var(--danger-color); font-weight: 700; }
+
+.count-badge span {
+    background: #eef6fc;
+    color: var(--primary-main);
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-weight: 700;
+    font-size: 13px;
+}
+
+
+/* [6] 메인 섹션 (차트 + 리스트) */
+.split-section { display: flex; gap: 24px; }
+.chart-wrapper { flex: 1.5; } /* 차트 영역 비율 증가 */
+.action-wrapper { flex: 1; display: flex; flex-direction: column; }
+
+.chart-header, .card-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #f5f5f5;
+}
+
+.chart-header h4, .card-header-row h4 {
+    margin: 0;
+    font-size: 17px;
+    font-weight: 800;
+    color: #333;
+}
+
+.view-all {
+    font-size: 13px;
+    color: #999;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.chart-tab-group {
+    background: #f1f3f5;
+    padding: 4px;
+    border-radius: 8px;
+    display: flex; gap: 4px;
+}
+
+.chart-tab {
+    border: none;
+    background: transparent;
+    padding: 6px 14px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #777;
+    cursor: pointer;
+    border-radius: 6px;
+}
+.chart-tab.active { background: #fff; color: var(--primary-main); box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+
+.chart-container { position: relative; height: 350px; width: 100%; } /* 차트 높이 조금 증가 */
+
+
+/* [7] 긴급 조치 테이블 */
+.action-table { width: 100%; border-collapse: separate; border-spacing: 0 10px; }
+
+.action-table tr { background: #fff; }
+.action-table td { padding: 12px 8px; vertical-align: middle; border-bottom: 1px solid #f5f5f5; }
+.action-table tr:last-child td { border-bottom: none; }
+
+.badge {
+    padding: 5px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #fff;
+    display: inline-block;
+}
+.badge.red-grad { background: var(--danger-color); }
+.badge.orange-grad { background: var(--warning-color); }
+.badge.yellow-grad { background: #f1c40f; color: #fff; }
+
+.action-desc { font-size: 14px; font-weight: 700; color: #333; margin-bottom: 4px; }
+.action-sub { font-size: 13px; color: #999; }
+.text-right { text-align: right; }
+
+.btn-action {
+	min-width: 96px;
+    padding: 6px 12px;
+    font-size: 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 700;
+    border: 1px solid transparent;
+}
+.btn-action.red { background: #fff5f5; color: var(--danger-color); border-color: #ffe3e3; }
+.btn-action.blue { background: #eef6fc; color: var(--primary-main); border-color: #dbeafe; }
+.btn-action.gray { background: #f8f9fa; color: #666; border-color: #eee; }
+
+
+/* [8] 하단 스탯 (크기 복구 및 강조) */
+.status-row { gap: 24px; }
+
+.status-card {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 30px;
+    min-height: 180px;
+    /* [수정] 모든 카드 상단 라인을 메인 블루 컬러로 통일 */
+    border-top: 5px solid var(--primary-main); 
+    position: relative;
+    overflow: hidden;
+}
+
+.status-label {
+    font-size: 16px; /* 라벨 크기 증가 */
+    color: #666;
+    font-weight: 700;
+}
+
+.status-count {
+    font-size: 48px; /* 숫자 크기 대폭 증가 */
+    font-weight: 900;
+    color: #222;
+    align-self: flex-end; /* 숫자를 오른쪽 아래로 배치 */
+    line-height: 1;
+}
+
+.status-count .unit {
+    font-size: 18px;
+    font-weight: 500;
+    margin-left: 2px;
+}
+
+/* 2. 하단 업무 현황 숫자 통일 */
+.status-count,
+.status-count.processing,
+.status-count.waiting,
+.status-count.completed {
+    color: var(--primary-dark) !important; /* 진한 남색으로 통일 */
+}
+
+/* (선택사항) 배경에 은은한 숫자 효과 추가 */
+.status-card::before {
+    content: '';
+    position: absolute;
+    left: -10px;
+    bottom: -20px;
+    font-size: 120px;
+    font-weight: 900;
+    opacity: 0.05;
+    font-family: sans-serif;
+    color: #000;
+    z-index: 0;
+}
+/* [웰컴 배너 레이아웃 수정] */
+.welcome-banner {
+    padding: 20px 40px; /* 내부 여백 넉넉하게 */
+    background: #fff;
+    border-left: 6px solid var(--primary-main);
+    display: flex;
+    align-items: center;
+    border-radius: 12px;
+}
+
+.banner-content {
+    display: flex;
+    align-items: center; /* 수직 중앙 정렬 (핵심) */
+    width: 100%;
+    gap: 0; /* 간격은 자식 요소에서 제어 */
+}
+
+/* 1. 왼쪽 인사말 영역 */
+.user-greeting-box {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    flex-shrink: 0; /* 줄어들지 않음 */
+}
+
+.greeting {
+    font-size: 24px;
+    font-weight: 800;
+    color: #222;
+    margin: 0 0 5px 0;
+    letter-spacing: -0.5px;
+}
+
+.sub-greeting {
+    font-size: 14px;
+    color: #888;
+    margin: 0;
+    font-weight: 500;
+}
+
+/* 2. 중앙 수직 구분선 ( | 대신 그래픽 선 사용) */
+.vertical-line {
+    width: 1px;
+    height: 40px; /* 선 높이 고정 */
+    background-color: #e0e0e0; /* 연한 회색 */
+    margin: 0 40px; /* 좌우 간격 넓게 */
+}
+
+/* 3. 오른쪽 공지사항(Ticker) 영역 */
+.ticker-wrapper {
+    flex: 1; /* 남은 공간 모두 차지 */
+    display: flex;
+    justify-content: flex-start; /* 왼쪽 정렬 */
+}
+
+.ticker-container {
+    background: #fff; /* 연한 회색 배경 */
+    border: none;
+    border-radius: 50px; /* 완전 둥근 캡슐형 */
+    padding: 8px 20px 8px 10px; /* 배지 쪽 패딩은 좁게 */
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    width: 100%; /* 가로 꽉 채우기 (선택사항) */
+    max-width: 600px; /* 너무 길어지지 않게 제한 */
+}
+
+/* [핵심] NOTICE 배지 (찌그러짐 방지) */
+.ticker-badge {
+    background: var(--primary-main);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 800;
+    padding: 5px 12px;
+    border-radius: 20px;
+    letter-spacing: 0.5px;
+    flex-shrink: 0; /* [중요] 공간이 부족해도 절대 줄어들지 않음 */
+    white-space: nowrap; /* [중요] 줄바꿈 방지 */
+    box-shadow: 0 2px 4px rgba(15, 76, 129, 0.2);
+}
+
+.ticker-content {
+    overflow: hidden; /* 텍스트 넘침 방지 */
+}
+
+#tickerText {
+    margin: 0;
+    font-size: 15px;
+    color: #444;
+    font-weight: 500;
+    white-space: nowrap; /* 텍스트 한 줄로 */
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.highlight-count {
+    color: var(--danger-color);
+    font-weight: 800;
+    font-size: 17px;
+    margin: 0 4px;
+    position: relative;
+    top: 1px; /* 숫자 시각적 보정 */
+}

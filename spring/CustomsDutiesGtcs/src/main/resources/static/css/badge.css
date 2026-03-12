@@ -1,0 +1,60 @@
+@charset "UTF-8";
+/* --- 탭 메뉴 스타일 --- */
+.status-tabs {
+	display: flex;
+	gap: 5px;
+	margin-bottom: 0;
+	border-bottom: 2px solid #0f4c81;
+	padding-left: 10px;
+	flex-wrap: wrap; /* 탭이 많아질 경우 줄바꿈 허용 */
+}
+
+.tab-btn {
+	padding: 10px 15px; /* 좌우 패딩을 조금 줄여서 많은 탭 수용 */
+	background: #f8f9fa;
+	border: 1px solid #ddd;
+	border-bottom: none;
+	border-radius: 5px 5px 0 0;
+	cursor: pointer;
+	font-size: 13px;
+	font-weight: bold;
+	color: #666;
+	transition: all 0.2s;
+}
+
+.tab-btn:hover {
+	background: #e9ecef;
+	color: #0f4c81;
+}
+
+.tab-btn.active {
+	background: #0f4c81;
+	color: #fff;
+	border-color: #0f4c81;
+}
+
+/* 공용 CSS를 기반으로 하되, 상세페이지에서 확실히 보이도록 보정 */
+.badge {
+    padding: 2px 10px !important;
+    border-radius: 12px !important;
+    color: #ffffff !important;
+    font-size: 11px !important;
+    display: inline-block !important;
+    min-width: 65px !important;
+    text-align: center !important;
+    font-weight: 500 !important;
+    line-height: 1.6 !important;
+    vertical-align: middle !important;
+}
+
+/* 검사중/보완 상태용 주황색 클래스 */
+.badge.supp {
+    background-color: #fd7e14 !important; /* 공용 CSS의 주황색 */
+}
+
+/* 나머지 상태 색상 (공용 CSS 기반) */
+.badge.wait { background-color: #6c757d !important; }
+.badge.ing  { background-color: #0d6efd !important; }
+.badge.pay  { background-color: #6f42c1 !important; }
+.badge.done { background-color: #198754 !important; }
+.badge.err  { background-color: #dc3545 !important; }

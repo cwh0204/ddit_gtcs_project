@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.gtcs.warehousestock.mapper.WarehouseStockMapper">
+
+<resultMap id="warehouseStockMap" type="kr.or.gtcs.dto.WarehouseStockDTO">
+    <id property="stockId" column="stock_id" />
+	<association property="importMaster" column="{declNo=decl_no}" select="selectImportByNo" />
+    <association property="exportMaster" column="{declNo=decl_no}" select="selectExportByNo" />
+
+    <collection property="fileList" column="{declNo=decl_no, contNo=cont_no}" select="selectFilesByNo" />
+</resultMap>
+
+<insert id="insertWarehouseStock" parameterType="kr.or.gtcs.dto.WarehouseStockDTO">
+    <selectKey keyProperty="stockId,contNo" resultType="kr.or.gtcs.dto.WarehouseStockDTO" order="BEFORE">
+    SELECT  
+          STOCK_ID_SEQ.NEXTVAL AS stockId
+        , 'C-' || TO_CHAR(SYSDATE, 'YYYYMMDD') || '-' || TO_CHAR(STOCK_ID_SEQ.NEXTVAL, 'FM0000000') AS contNo
+    FROM DUAL
+</selectKey>
+
+    INSERT INTO warehouse_stock (
+          stock_id
+        , unique_no
+        , item_name
+        , qty
+        , gross_weight
+        , warehouse_id
+        , position_area
+        , mem_id
+        , rep_name
+        , cont_no
+        , damaged_yn
+        , damaged_comment
+    ) VALUES (
+          #{stockId}
+        , #{uniqueNo}
+        , #{itemName}
+        , #{qty}
+        , #{grossWeight}
+        , #{warehouseId}
+        , #{positionArea}
+        , #{memId}
+        , #{repName}
+        , #{contNo}
+        , #{damagedYn}
+        , #{damagedComment}
+    )
+</insert>
+
+<select id="selectLocateWarehouseStock" resultType="kr.or.gtcs.dto.WarehouseStockDTO">
+	SELECT
+		  stock_id
+		, unique_no
+		, item_name
+		, qty
+		, gross_weight
+		, warehouse_id
+		, del_yn
+		, cont_no
+		, position_area
+		, decl_no
+		, mem_id
+		, out_date
+		, reg_date
+	FROM
+	    warehouse_stock
+	WHERE
+	    cont_no = #{contNo} and position_area = #{positionArea}
+</select>
+
+
+<select id="selectDetailWarehouseStock" resultMap="warehouseStockMap">
+    SELECT * FROM warehouse_stock WHERE stock_id = #{stockId}
+</select>
+
+<select id="selectImportByNo" resultType="kr.or.gtcs.dto.ImportMasterDTO">
+    SELECT * FROM IMPORT_MASTER 
+    WHERE import_number = #{declNo} AND #{declNo} LIKE 'IMP%'
+</select>
+
+<select id="selectExportByNo" resultType="kr.or.gtcs.dto.ExportMasterDTO">
+    SELECT * FROM EXPORT_MASTER 
+    WHERE export_number = #{declNo} AND #{declNo} LIKE 'EXP%'
+</select>
+
+<select id="selectFilesByNo" resultType="kr.or.gtcs.dto.AttachentsDTO">
+    SELECT * FROM ATTACHMENTS 
+    WHERE ref_id = #{declNo} or ref_id = #{contNo}
+</select>
+
+<select id="selectListWarehouseStock" resultMap="warehouseStockMap" parameterType="kr.or.gtcs.dto.MemberDTO">
+	SELECT * FROM warehouse_stock
+	<where>
+            <choose>
+                <when test="memRole != 'SHIPPER'">
+                    1=1
+                </when>
+                <otherwise>
+                    AND REP_NAME = #{repName}
+                </otherwise>
+            </choose>
+     </where>
+</select>
+
+<update id="updateWarehouseStock" parameterType="kr.or.gtcs.dto.WarehouseStockDTO">
+	UPDATE warehouse_stock
+	SET
+	    UNIQUE_NO = #{uniqueNo},
+	    ITEM_NAME = #{itemName},
+	    QTY = #{qty},
+	    GROSS_WEIGHT = #{grossWeight},
+	    REP_NAME = #{repName}
+	WHERE
+	    stock_id = #{stockId}
+</update>
+
+<update id="updateLocateWarehouseStock" parameterType="kr.or.gtcs.dto.WarehouseStockDTO">
+	UPDATE warehouse_stock
+	SET 
+		  warehouse_id = #{warehouseId}
+		, position_area = #{positionArea}
+	WHERE stock_id = #{stockId}
+</update>
+
+<update id="updateOutboundWarehouseStock" parameterType="kr.or.gtcs.dto.WarehouseStockDTO">
+	UPDATE warehouse_stock
+	SET 
+		  del_yn = #{delYn}
+		, out_date = SYSDATE
+	WHERE stock_id = #{stockId}
+</update>
+
+<select id="selectWarehouseStockAreaCount" resultType="kr.or.gtcs.dto.WarehouseStockAreaDTO">
+	<![CDATA[
+	    SELECT 
+	        BASE.AREA_CODE AS "AREA", 
+	        COUNT(W.WAREHOUSE_ID) AS "COUNT"
+	    FROM (
+	        SELECT CHR(64 + LEVEL) AS AREA_CODE
+	        FROM DUAL
+	        CONNECT BY LEVEL <= 9
+	    ) BASE
+	    LEFT OUTER JOIN WAREHOUSE_STOCK W
+	        ON SUBSTR(W.WAREHOUSE_ID, 1, 1) = BASE.AREA_CODE
+	        AND W.POSITION_AREA = #{positionArea}
+	    GROUP BY BASE.AREA_CODE
+	    ORDER BY "AREA"
+    ]]>
+</select>
+</mapper>

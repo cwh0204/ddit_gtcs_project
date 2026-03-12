@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.gtcs.member.mapper.MemberMapper">
+<!-- 로그인 -->
+<select id="memberLogin" resultType="kr.or.gtcs.dto.MemberDTO">
+SELECT MEM_ID, LOGIN_ID, PASSWORD, MEM_NAME, MEM_ROLE, DEL_YN, REP_NAME
+FROM MEMBER
+WHERE LOGIN_ID = #{loginId} AND DEL_YN = 'N'
+</select>
+
+<!-- 아이디 찾기 -->
+<select id="memberIdFind" resultType="kr.or.gtcs.dto.MemberDTO">
+SELECT LOGIN_ID 
+FROM MEMBER
+WHERE EMAIL = #{email}
+</select>
+
+<!-- 비밀번호 찾기 -->
+<update id="memberPassFind">
+UPDATE MEMBER
+SET PASSWORD = #{password}
+WHERE LOGIN_ID = #{loginId}
+AND EMAIL = #{email}
+AND DEL_YN = 'N'
+</update>
+
+<!-- 아이디 중복확인 -->
+<select id="memberIdCheck" resultType="boolean">
+SELECT COUNT(*)
+FROM MEMBER
+WHERE LOGIN_ID = #{loginId}
+</select>
+
+<!-- 회원가입 -->
+<insert id="memberInsert">
+INSERT INTO member (
+PASSWORD,
+MEM_NAME,
+EMAIL,
+HP_NO,
+REP_TEL_NO,
+COMPANY_NAME,
+REP_NAME,
+ZIP_CODE,
+ADDRESS,
+ADDRESS_DETAIL,
+CUSTOMS_ID_NO,
+EMERGENCY_CONTACT,
+LOGIN_ID,
+BIZ_REG_NO 
+) VALUES (
+#{password},
+#{memName},
+#{email},
+#{hpNo},
+#{repTelNo},
+#{companyName},
+#{repName},
+#{zipCode},
+#{address},
+#{addressDetail},
+#{customsIdNo},
+#{emergencyContact},
+#{loginId},
+#{bizRegNo}
+)
+</insert>
+
+<!-- 이메일 중복 확인 -->
+<select id="memberEmailCheck" resultType="boolean">
+    SELECT COUNT(*) FROM MEMBER WHERE EMAIL = #{email} AND DEL_YN = 'N'
+</select>
+
+
+<!-- 회원 상세 정보 조회 -->
+<select id="memberselect" resultType="kr.or.gtcs.dto.MemberDTO">
+SELECT
+	MEM_NAME,
+	COMPANY_NAME,
+	EMAIL,
+	HP_NO,
+	MOD_DATE,
+	LOGIN_ID,
+	ZIP_CODE,
+	ADDRESS,
+	ADDRESS_DETAIL,
+	REG_DATE,
+	DEL_YN,
+	REP_NAME,
+	REP_TEL_NO,
+	CUSTOMS_ID_NO,
+	BIZ_REG_NO,
+	EMERGENCY_CONTACT,
+	MEM_ROLE
+	
+FROM MEMBER
+
+WHERE MEM_ID = #{memId}
+</select>
+
+<!-- 회원 상세 정보 수정 -->
+<update id="memberUpdate" parameterType="kr.or.gtcs.dto.MemberDTO">
+    UPDATE MEMBER
+    <set>
+        <if test="memName != null"> MEM_NAME = #{memName}, </if>
+        <if test="companyName != null"> COMPANY_NAME = #{companyName}, </if>
+        <if test="email != null"> EMAIL = #{email}, </if>
+        <if test="hpNo != null"> HP_NO = #{hpNo}, </if>
+        <if test="zipCode != null"> ZIP_CODE = #{zipCode}, </if>
+        <if test="address != null"> ADDRESS = #{address}, </if>
+        <if test="addressDetail != null"> ADDRESS_DETAIL = #{addressDetail}, </if>
+        <if test="repName != null"> REP_NAME = #{repName}, </if>
+        <if test="repTelNo != null"> REP_TEL_NO = #{repTelNo}, </if>
+        <if test="emergencyContact != null"> EMERGENCY_CONTACT = #{emergencyContact}, </if>
+        <if test="password != null"> PASSWORD = #{password}, </if>
+        MOD_DATE = SYSDATE
+    </set>
+    WHERE MEM_ID = #{memId}
+</update>
+
+<!-- 회원 삭제 -->
+<update id="deleteMember" parameterType="kr.or.gtcs.dto.MemberDTO">
+	UPDATE MEMBER
+	SET
+		DEL_YN = 'Y',
+		MOD_DATE = SYSDATE
+	WHERE MEM_ID = #{memId}
+</update>
+
+<select id="selectListOfficer" resultType="kr.or.gtcs.dto.MemberDTO">
+	SELECT 
+	    A.*, 
+	    NVL(B.WORK_COUNT, 0) AS TASK_LOAD
+	FROM MEMBER A
+	LEFT JOIN (
+	    SELECT  OFFICER_ID, COUNT(*) AS WORK_COUNT
+	    FROM (
+	        SELECT OFFICER_ID, STATUS FROM EXPORT_MASTER
+	        UNION ALL
+	        SELECT OFFICER_ID, STATUS FROM IMPORT_MASTER
+	    )
+	    WHERE STATUS != 'DELIVERED'
+	    GROUP BY OFFICER_ID
+	) B ON A.MEM_ID = B.OFFICER_ID
+	WHERE A.MEM_ROLE = 'OFFICER'
+	ORDER BY TASK_LOAD DESC, A.MEM_NAME ASC
+</select>
+</mapper>

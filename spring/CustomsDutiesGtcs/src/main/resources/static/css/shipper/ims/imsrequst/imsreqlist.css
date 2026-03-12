@@ -1,0 +1,373 @@
+@charset "UTF-8";
+/* 관세사 리스트페이지 전용 css 파일 */
+
+/* =========================================
+   [1] 기존 유지 CSS (레이아웃, 사이드바 등)
+   ========================================= */
+
+body {
+	font-family: "Pretendard", "Malgun Gothic", sans-serif;
+	font-size: 18px;
+	background-color: #f5f7fa;
+	height: 100vh;
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
+}
+
+.main-body {
+	display: flex;
+	flex: 1;
+	overflow: hidden;
+	width: 100%;
+}
+
+/* 동적 메뉴 그룹 */
+.menu-group {
+	display: none !important;
+}
+
+.menu-group.active {
+	display: block !important;
+	animation: groupFadeIn 0.4s ease-out;
+}
+
+@keyframes groupFadeIn {from { opacity:0;
+	transform: translateY(-5px);
+}
+
+to {
+	opacity: 1;
+	transform: translateY(0);
+}
+
+}
+
+
+/* 메인 콘텐츠 */
+main {
+	flex: 1;
+	padding: 20px 30px;
+	overflow-y: auto;
+	background-color: #f5f7fa;
+}
+
+.header-logo {
+	font-size: 18px;
+	font-weight: bold;
+	color: #0f4c81;
+	text-decoration: none;
+}
+
+/* =========================================
+         [2] NEW: 5열 컴팩트 카드 그리드 스타일
+         ========================================= */
+
+/* 1. 상단 필터바 (기존 유지하되 높이 최적화) */
+.filter-bar {
+	height: 65px;
+	min-width: 1440px;
+	background: #fff;
+	border: 1px solid #e1e4e8;
+	border-radius: 6px;
+	padding: 10px 20px;
+	margin-bottom: 20px;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+}
+
+.filter-left {
+	display: flex;
+	gap: 10px;
+	align-items: center;
+}
+
+.search-box input {
+	height: 30px;
+	border: 1px solid #ddd;
+	border-radius: 4px;
+	font-size: 13px;
+	outline: none;
+	background: #f9f9f9;
+	width: 450px;
+}
+
+.search-box {
+	padding-left: 35px;
+	position: relative;
+}
+
+.search-box i {
+	position: absolute;
+	left: 10px;
+	top: 50%;
+	transform: translateY(-50%);
+	color: #999;
+}
+
+.btn-filter {
+	padding: 7px 12px;
+	border: 1px solid #ddd;
+	border-radius: 4px;
+	background: #fff;
+	font-size: 12px;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	gap: 5px;
+	color: #555;
+}
+
+.btn-filter:hover {
+	border-color: #0f4c81;
+	color: #0f4c81;
+}
+
+.btn-filter.active {
+	background: #eef6fc;
+	border-color: #0f4c81;
+	color: #0f4c81;
+	font-weight: 600;
+}
+
+.filter-right {
+	font-size: 12px;
+	color: #666;
+	display: flex;
+	gap: 15px;
+	align-items: center;
+}
+
+.sort-opt {
+	cursor: pointer;
+}
+
+.sort-opt.active {
+	font-weight: bold;
+	color: #0f4c81;
+	text-decoration: underline;
+}
+
+/* 2. 그리드 컨테이너 (5열 배치) */
+.broker-grid-container {
+	display: grid;
+	/* 기본 5열 (최소 너비 220px 확보하며 자동 채움) */
+	grid-template-columns: repeat(5, 1fr);
+	gap: 15px;
+	padding-bottom: 50px;
+}
+
+/* 반응형: 화면이 너무 좁아지면 4열, 3열로 변경 */
+@media ( max-width : 1600px) {
+	.broker-grid-container {
+		grid-template-columns: repeat(4, 1fr);
+	}
+}
+
+@media ( max-width : 1300px) {
+	.broker-grid-container {
+		grid-template-columns: repeat(3, 1fr);
+	}
+}
+
+/* 3. 컴팩트 카드 디자인 */
+.compact-card {
+	min-width: 300px;
+	width: 100%;
+	background: #fff;
+	border: 1px solid #e1e4e8;
+	border-radius: 8px;
+	padding: 15px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	transition: transform 0.2s, box-shadow 0.2s;
+	position: relative;
+	overflow: hidden;
+	height: 240px; /* 높이 고정 (컴팩트) */
+}
+
+.compact-card:hover {
+	transform: translateY(-3px);
+	box-shadow: 0 8px 15px rgba(0, 0, 0, 0.08);
+	border-color: #0f4c81;
+}
+
+/* 상태 바 (카드 상단 라인) */
+.compact-card::before {
+	content: "";
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 3px;
+	background: #ccc;
+}
+
+.compact-card.online::before {
+	background: #2ecc71;
+}
+
+.compact-card.offline::before {
+	background: #95a5a6;
+}
+
+/* [카드 내부] 상단: 로고 및 뱃지 */
+.card-top {
+	display: flex;
+	justify-content: space-between;
+	align-items: flex-start;
+	margin-bottom: 10px;
+}
+
+.card-logo {
+	width: 40px;
+	height: 40px;
+	border-radius: 6px;
+	background: #f8f9fa;
+	border: 1px solid #eee;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 18px;
+	color: #0f4c81;
+}
+
+.status-badge {
+	font-size: 10px;
+	padding: 2px 6px;
+	border-radius: 4px;
+	font-weight: 600;
+}
+
+.badge-aeo {
+	background: #e3f2fd;
+	color: #0f4c81;
+	border: 1px solid #badffb;
+}
+
+.badge-off {
+	background: #f5f5f5;
+	color: #999;
+	border: 1px solid #ddd;
+}
+
+/* [카드 내부] 중단: 정보 */
+.card-body {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+}
+
+.comp-name {
+	font-size: 14px;
+	font-weight: 700;
+	color: #333;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.broker-name {
+	font-size: 12px;
+	color: #666;
+	display: flex;
+	align-items: center;
+	gap: 5px;
+}
+
+.broker-loc {
+	font-size: 11px;
+	color: #999;
+	margin-bottom: 5px;
+}
+
+/* 태그 영역 */
+.card-tags {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 4px;
+	margin-top: auto;
+	padding-top: 8px;
+}
+
+.mini-tag {
+	font-size: 10px;
+	background: #f1f3f5;
+	color: #555;
+	padding: 2px 6px;
+	border-radius: 4px;
+	border: 1px solid #e9ecef;
+}
+
+/* [카드 내부] 하단: 실적 및 버튼 */
+.card-footer {
+	margin-top: 12px;
+	padding-top: 10px;
+	border-top: 1px solid #f1f3f5;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.rating-wrap {
+	display: flex;
+	flex-direction: column;
+}
+
+.rating-val {
+	font-size: 13px;
+	font-weight: 800;
+	color: #333;
+}
+
+.rating-val i {
+	color: #f39c12;
+	font-size: 11px;
+}
+
+.deal-count {
+	font-size: 10px;
+	color: #888;
+}
+
+.btn-card {
+	padding: 5px 10px;
+	font-size: 11px;
+	font-weight: 600;
+	border-radius: 4px;
+	cursor: pointer;
+	transition: 0.2s;
+}
+
+.btn-hire {
+	background: #0f4c81;
+	color: #fff;
+	border: 1px solid #0f4c81;
+}
+
+.btn-hire:hover {
+	background: #0c3b66;
+}
+
+.btn-view {
+	background: #fff;
+	color: #555;
+	border: 1px solid #ddd;
+	margin-right: 3px;
+}
+
+.btn-view:hover {
+	border-color: #0f4c81;
+	color: #0f4c81;
+}
+
+.btn-disable {
+	background: #eee;
+	color: #aaa;
+	border: 1px solid #ddd;
+	cursor: not-allowed;
+}

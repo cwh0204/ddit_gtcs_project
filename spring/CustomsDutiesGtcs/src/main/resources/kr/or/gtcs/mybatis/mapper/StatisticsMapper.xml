@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.gtcs.statistics.mapper.StatisticsMapper">
+
+    <select id="selectZoneInspectionStats" resultType="map">
+        WITH ZONES AS (
+            SELECT 'A' AS ZONE FROM DUAL UNION ALL
+            SELECT 'B' AS ZONE FROM DUAL UNION ALL
+            SELECT 'C' AS ZONE FROM DUAL UNION ALL
+            SELECT 'D' AS ZONE FROM DUAL UNION ALL
+            SELECT 'E' AS ZONE FROM DUAL UNION ALL
+            SELECT 'F' AS ZONE FROM DUAL UNION ALL
+            SELECT 'G' AS ZONE FROM DUAL UNION ALL
+            SELECT 'H' AS ZONE FROM DUAL UNION ALL
+            SELECT 'I' AS ZONE FROM DUAL
+        )
+        SELECT 
+            Z.ZONE AS "zone",
+            NVL(SUM(D.PHYSICAL_CNT), 0) AS "physicalCount",
+            NVL(SUM(D.COMPLETED_CNT), 0) AS "completedCount"
+        FROM ZONES Z
+        LEFT JOIN (
+        
+            <trim prefixOverrides="UNION ALL">
+                
+                <if test="declType == 'ALL' or declType == 'IMPORT'">
+                    UNION ALL
+                    SELECT SUBSTR(WS.WAREHOUSE_ID, 1, 1) AS ZONE, 1 AS PHYSICAL_CNT, 0 AS COMPLETED_CNT
+                    FROM IMPORT_MASTER IM
+                    JOIN WAREHOUSE_STOCK WS ON IM.IMPORT_NUMBER = WS.DECL_NO
+                    WHERE IM.STATUS = 'PHYSICAL'
+                    <if test="startDate != null and startDate != ''">
+                        AND IM.MOD_DATE >= TO_DATE(#{startDate}, 'YYYY-MM-DD')
+                    </if>
+                    <if test="endDate != null and endDate != ''">
+                        AND IM.MOD_DATE &lt; TO_DATE(#{endDate}, 'YYYY-MM-DD') + 1
+                    </if>
+                </if>
+                
+                <if test="declType == 'ALL' or declType == 'EXPORT'">
+                    UNION ALL
+                    SELECT SUBSTR(WS.WAREHOUSE_ID, 1, 1) AS ZONE, 1 AS PHYSICAL_CNT, 0 AS COMPLETED_CNT
+                    FROM EXPORT_MASTER EM
+                    JOIN WAREHOUSE_STOCK WS ON EM.EXPORT_NUMBER = WS.DECL_NO
+                    WHERE EM.STATUS = 'PHYSICAL'
+                    <if test="startDate != null and startDate != ''">
+                        AND EM.MOD_DATE >= TO_DATE(#{startDate}, 'YYYY-MM-DD')
+                    </if>
+                    <if test="endDate != null and endDate != ''">
+                        AND EM.MOD_DATE &lt; TO_DATE(#{endDate}, 'YYYY-MM-DD') + 1
+                    </if>
+                </if>
+                
+                <if test="declType == 'ALL' or declType == 'IMPORT'">
+                    UNION ALL
+                    SELECT SUBSTR(WS.WAREHOUSE_ID, 1, 1) AS ZONE, 0 AS PHYSICAL_CNT, 1 AS COMPLETED_CNT
+                    FROM IMPORT_MASTER_LOG IML
+                    JOIN WAREHOUSE_STOCK WS ON IML.IMPORT_NUMBER = WS.DECL_NO
+                    WHERE IML.ACTION_TYPE = 'INSPECTION_COMPLETED'
+                    <if test="startDate != null and startDate != ''">
+                        AND IML.ACTION_DATE >= TO_DATE(#{startDate}, 'YYYY-MM-DD')
+                    </if>
+                    <if test="endDate != null and endDate != ''">
+                        AND IML.ACTION_DATE &lt; TO_DATE(#{endDate}, 'YYYY-MM-DD') + 1
+                    </if>
+                </if>
+                
+                <if test="declType == 'ALL' or declType == 'EXPORT'">
+                    UNION ALL
+                    SELECT SUBSTR(WS.WAREHOUSE_ID, 1, 1) AS ZONE, 0 AS PHYSICAL_CNT, 1 AS COMPLETED_CNT
+                    FROM EXPORT_MASTER_LOG EML
+                    JOIN WAREHOUSE_STOCK WS ON EML.EXPORT_NUMBER = WS.DECL_NO
+                    WHERE EML.ACTION_TYPE = 'INSPECTION_COMPLETED'
+                    <if test="startDate != null and startDate != ''">
+                        AND EML.ACTION_DATE >= TO_DATE(#{startDate}, 'YYYY-MM-DD')
+                    </if>
+                    <if test="endDate != null and endDate != ''">
+                        AND EML.ACTION_DATE &lt; TO_DATE(#{endDate}, 'YYYY-MM-DD') + 1
+                    </if>
+                </if>
+                
+            </trim>
+
+        ) D ON Z.ZONE = D.ZONE
+        GROUP BY Z.ZONE
+        ORDER BY Z.ZONE
+
+    </select>
+    
+    <select id="selectWarehouseShareStats" resultType="map">
+        SELECT 
+            -- 국내 창고 재고 수
+            NVL(SUM(CASE WHEN POSITION_AREA = 'LOCAL' THEN 1 ELSE 0 END), 0) AS "localCount",
+            -- 보세 창고 재고 수
+            NVL(SUM(CASE WHEN POSITION_AREA = 'BONDED' THEN 1 ELSE 0 END), 0) AS "bondedCount",
+            -- 조건에 맞는 전체 현존 재고 수
+            COUNT(*) AS "totalCount"
+        FROM WAREHOUSE_STOCK
+        WHERE OUT_DATE IS NULL
+        
+        <if test="declType == 'IMPORT'">
+            AND DECL_NO LIKE 'IMP-%'
+        </if>
+        <if test="declType == 'EXPORT'">
+            AND DECL_NO LIKE 'EXP-%'
+        </if>
+        <if test="startDate != null and startDate != ''">
+            AND REG_DATE >= TO_DATE(#{startDate}, 'YYYY-MM-DD')
+        </if>
+        <if test="endDate != null and endDate != ''">
+            AND REG_DATE &lt; TO_DATE(#{endDate}, 'YYYY-MM-DD') + 1
+        </if>
+    </select>
+    
+    <select id="selectLogDashboardStats" resultType="map">
+        SELECT 
+            -- 1번 차트: 단계별 진행 현황
+            NVL(SUM(CASE WHEN ACTION_TYPE = 'WAITING' THEN 1 ELSE 0 END), 0) AS "waitingCount",
+            NVL(SUM(CASE WHEN ACTION_TYPE = 'SUPPLEMENT' THEN 1 ELSE 0 END), 0) AS "supplementCount",
+            NVL(SUM(CASE WHEN ACTION_TYPE = 'ACCEPTED' THEN 1 ELSE 0 END), 0) AS "acceptedCount",
+            NVL(SUM(CASE WHEN ACTION_TYPE = 'PAY_WAITING' THEN 1 ELSE 0 END), 0) AS "payWaitingCount",
+            NVL(SUM(CASE WHEN ACTION_TYPE = 'RELEASE_APPROVED' THEN 1 ELSE 0 END), 0) AS "releaseApprovedCount",
+            NVL(SUM(CASE WHEN ACTION_TYPE = 'INSPECTION_COMPLETED' THEN 1 ELSE 0 END), 0) AS "inspectionCompletedCount",
+            NVL(SUM(CASE WHEN ACTION_TYPE = 'DELIVERED' THEN 1 ELSE 0 END), 0) AS "deliveredCount",
+            
+            -- 2번 차트: 반출 차단 건수 (승인 건수는 위에서 구한 releaseApprovedCount 재활용)
+            NVL(SUM(CASE WHEN ACTION_TYPE = 'RELEASE_REJECTED' THEN 1 ELSE 0 END), 0) AS "releaseRejectedCount"
+        FROM (
+            <trim prefixOverrides="UNION ALL">
+                <if test="declType == 'ALL' or declType == 'IMPORT'">
+                    UNION ALL
+                    SELECT ACTION_TYPE FROM IMPORT_MASTER_LOG
+                    WHERE 1=1
+                    <if test="startDate != null and startDate != ''">
+                        AND ACTION_DATE >= TO_DATE(#{startDate}, 'YYYY-MM-DD')
+                    </if>
+                    <if test="endDate != null and endDate != ''">
+                        AND ACTION_DATE &lt; TO_DATE(#{endDate}, 'YYYY-MM-DD') + 1
+                    </if>
+                </if>
+                <if test="declType == 'ALL' or declType == 'EXPORT'">
+                    UNION ALL
+                    SELECT ACTION_TYPE FROM EXPORT_MASTER_LOG
+                    WHERE 1=1
+                    <if test="startDate != null and startDate != ''">
+                        AND ACTION_DATE >= TO_DATE(#{startDate}, 'YYYY-MM-DD')
+                    </if>
+                    <if test="endDate != null and endDate != ''">
+                        AND ACTION_DATE &lt; TO_DATE(#{endDate}, 'YYYY-MM-DD') + 1
+                    </if>
+                </if>
+            </trim>
+        )
+    </select>
+
+    <select id="selectMasterDashboardStats" resultType="map">
+        SELECT 
+            NVL(SUM(CASE WHEN STATUS = 'WAITING' THEN 1 ELSE 0 END), 0) AS "waiting",
+            NVL(SUM(CASE WHEN STATUS = 'REVIEWING' THEN 1 ELSE 0 END), 0) AS "reviewing",
+            NVL(SUM(CASE WHEN STATUS = 'PHYSICAL' THEN 1 ELSE 0 END), 0) AS "physical",
+            NVL(SUM(CASE WHEN STATUS = 'SUPPLEMENT' THEN 1 ELSE 0 END), 0) AS "supplement",
+            NVL(SUM(CASE WHEN STATUS = 'ESCALATED' THEN 1 ELSE 0 END), 0) AS "escalated",
+            NVL(SUM(CASE WHEN STATUS = 'ACCEPTED' THEN 1 ELSE 0 END), 0) AS "accepted",
+            NVL(SUM(CASE WHEN STATUS = 'REJECTED' THEN 1 ELSE 0 END), 0) AS "rejected",
+            NVL(SUM(CASE WHEN STATUS = 'PAY_WAITING' THEN 1 ELSE 0 END), 0) AS "payWaiting",
+            NVL(SUM(CASE WHEN STATUS = 'PAY_COMPLETED' THEN 1 ELSE 0 END), 0) AS "payCompleted",
+            NVL(SUM(CASE WHEN STATUS = 'WH_IN_APPROVED' THEN 1 ELSE 0 END), 0) AS "whInApproved",
+            NVL(SUM(CASE WHEN STATUS = 'WH_IN_REJECTED' THEN 1 ELSE 0 END), 0) AS "whInRejected",
+            NVL(SUM(CASE WHEN STATUS = 'RELEASE_APPROVED' THEN 1 ELSE 0 END), 0) AS "releaseApproved",
+            NVL(SUM(CASE WHEN STATUS = 'RELEASE_REJECTED' THEN 1 ELSE 0 END), 0) AS "releaseRejected",
+            NVL(SUM(CASE WHEN STATUS = 'APPROVED' THEN 1 ELSE 0 END), 0) AS "approved",
+            NVL(SUM(CASE WHEN STATUS = 'DELIVERED' THEN 1 ELSE 0 END), 0) AS "delivered"
+        FROM (
+            <trim prefixOverrides="UNION ALL">
+                <if test="declType == 'ALL' or declType == 'IMPORT'">
+                    UNION ALL
+                    SELECT STATUS FROM IMPORT_MASTER
+                    WHERE 1=1
+                    <if test="startDate != null and startDate != ''">
+                        AND SUBMIT_DATE >= TO_DATE(#{startDate}, 'YYYY-MM-DD')
+                    </if>
+                    <if test="endDate != null and endDate != ''">
+                        AND SUBMIT_DATE &lt; TO_DATE(#{endDate}, 'YYYY-MM-DD') + 1
+                    </if>
+                </if>
+                <if test="declType == 'ALL' or declType == 'EXPORT'">
+                    UNION ALL
+                    SELECT STATUS FROM EXPORT_MASTER
+                    WHERE 1=1
+                    <if test="startDate != null and startDate != ''">
+                        AND SUBMIT_DATE >= TO_DATE(#{startDate}, 'YYYY-MM-DD')
+                    </if>
+                    <if test="endDate != null and endDate != ''">
+                        AND SUBMIT_DATE &lt; TO_DATE(#{endDate}, 'YYYY-MM-DD') + 1
+                    </if>
+                </if>
+            </trim>
+        )
+    </select>
+
+</mapper>

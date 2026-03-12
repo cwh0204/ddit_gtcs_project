@@ -1,0 +1,582 @@
+@charset "UTF-8";
+
+/* ==========================================================================
+   [1] 필수 레이아웃 유틸리티 (JSP 파일 호환용 - 추가됨)
+   ========================================================================== */
+.flex-row {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	width: 100%;
+}
+
+.flex-grow {
+	flex: 1;
+	width: 100%;
+}
+
+.w-fixed {
+	width: auto;
+	flex-shrink: 0;
+}
+
+/* 기존 JSP의 .form-table을 이 CSS의 .view-table 스타일로 매핑 */
+.form-table {
+	width: 100%;
+	border-top: 2px solid #0f4c81;
+	border-collapse: collapse;
+	font-size: 13px;
+	margin-bottom: 0; /* 섹션 내부 여백 관리를 위해 */
+}
+
+.form-table th {
+	background: #fdfdfd;
+	color: #666;
+	font-weight: 600;
+	padding: 10px;
+	border-bottom: 1px solid #eee;
+	border-right: 1px solid #eee;
+	text-align: left;
+	width: 15%;
+}
+
+.form-table td {
+	padding: 10px;
+	border-bottom: 1px solid #eee;
+	border-right: 1px solid #eee;
+	color: #333;
+}
+
+/* Read-only 입력창 스타일 (텍스트처럼 보이게) */
+.form-table input[type="text"], .form-table input[type="date"],
+	.form-table select, .form-table textarea {
+	width: 100%;
+	padding: 5px;
+	border: 1px solid #e1e4e8; /* 연한 테두리 */
+	background: #f9f9f9;
+	border-radius: 4px;
+	font-size: 13px;
+	color: #555;
+	pointer-events: none; /* 클릭 방지 */
+}
+
+/* 검색 버튼 등 숨김 처리 */
+.btn-search, .btn-small, .btn.micro {
+	display: none !important;
+}
+
+/* ==========================================================================
+   [2] 사용자 제공 스타일 (상세 페이지 전용)
+   ========================================================================== */
+/* 공통 레이아웃 상속 */
+.main-content {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	padding: 20px 30px;
+	background-color: #f5f7fa;
+	height: 100%;
+	overflow: hidden;
+	min-width: 1440px;
+}
+
+.page-breadcrumb {
+	padding: 0 0 15px 0;
+	border-bottom: 1px solid #333;
+	margin-bottom: 20px;
+	font-size: 13px;
+	color: #666;
+	display: flex;
+	align-items: center;
+	gap: 5px;
+}
+
+.scrollable-content {
+	flex: 1;
+	overflow-y: auto;
+	padding-right: 10px;
+}
+
+/* 1. 헤더 영역 */
+.detail-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 30px;
+}
+
+.page-title {
+	font-size: 24px; /* 크기 살짝 키움 */
+	font-weight: bold;
+	color: #0f4c81;
+	border-left: 5px solid #0f4c81;
+	padding-left: 15px;
+	margin: 0;
+}
+
+/* 버튼 스타일 */
+.btn-primary, .btn-secondary, .btn-print, .btn {
+	padding: 8px 16px;
+	border-radius: 4px;
+	font-size: 13px;
+	cursor: pointer;
+	border: none;
+	display: inline-flex;
+	align-items: center;
+	gap: 5px;
+	transition: background 0.2s;
+	text-decoration: none;
+}
+
+.btn-primary {
+	background: #0f4c81;
+	color: white;
+}
+
+.btn-primary:hover {
+	background: #0c3b66;
+}
+
+.btn-secondary {
+	background: #fff;
+	border: 1px solid #ccc;
+	color: #555;
+}
+
+.btn-secondary:hover {
+	background: #f0f0f0;
+}
+
+.btn-print {
+	background: #555;
+	color: white;
+	margin-right: 5px;
+}
+
+.btn-print:hover {
+	background: #333;
+}
+
+/* 2. 상태 트래커 (Step Bar) */
+.status-tracker {
+	display: flex;
+	justify-content: space-between;
+	margin-bottom: 40px;
+	position: relative;
+	padding: 0 40px; /* 여백 조정 */
+}
+
+/* 연결선 */
+.status-tracker::before {
+	content: '';
+	position: absolute;
+	top: 15px; /* 위치 조정 */
+	left: 60px;
+	right: 60px;
+	height: 2px;
+	background: #e0e0e0;
+	z-index: 0;
+}
+
+.step {
+	position: relative;
+	z-index: 1;
+	text-align: center;
+	background: #f5f7fa; /* 배경색과 일치시켜 선 가림 */
+	padding: 0 10px;
+	min-width: 80px;
+}
+
+.step-icon {
+	width: 32px;
+	height: 32px;
+	border-radius: 50%;
+	background: #fff;
+	border: 2px solid #ccc;
+	color: #ccc;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 14px;
+	margin: 0 auto 8px;
+	transition: all 0.3s;
+	font-weight: bold;
+}
+
+.step-label {
+	font-size: 13px;
+	font-weight: 600;
+	color: #999;
+}
+
+.step-date {
+	font-size: 11px;
+	color: #bbb;
+	margin-top: 4px;
+	display: block;
+}
+
+/* 완료된 상태 */
+.step.completed .step-icon {
+	background: #eef6fc;
+	border-color: #0f4c81;
+	color: #0f4c81;
+}
+
+.step.completed .step-label {
+	color: #0f4c81;
+}
+
+/* 현재 진행중 상태 */
+.step.active .step-icon {
+	background: #0f4c81;
+	border-color: #0f4c81;
+	color: #fff;
+	box-shadow: 0 0 0 4px rgba(15, 76, 129, 0.15);
+}
+
+.step.active .step-label {
+	color: #0f4c81;
+	font-weight: 800;
+}
+
+.step.active .step-date {
+	color: #555;
+	font-weight: bold;
+}
+
+/* 3. 섹션 박스 스타일 (View Section) */
+.view-section {
+	background: #fff;
+	border: 1px solid #e1e4e8;
+	border-radius: 6px;
+	margin-bottom: 20px;
+	overflow: hidden;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+}
+
+.group-title {
+	background: #f8f9fa;
+	padding: 12px 20px;
+	margin: 0;
+	font-size: 15px;
+	font-weight: bold;
+	color: #333;
+	border-bottom: 1px solid #e1e4e8;
+	cursor: pointer;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.group-title i {
+	color: #999;
+	transition: transform 0.3s;
+}
+
+.group-title.collapsed i {
+	transform: rotate(-90deg);
+}
+
+.section-content {
+	padding: 20px;
+	display: block; /* 기본 보임 */
+}
+
+/* JSP 내부의 .section-title 숨김 (중복 방지) */
+.section-content .section-title {
+	display: none;
+}
+
+.section-content .group-title {
+	display: none;
+}
+
+/* 4. 데이터 그리드 및 기타 */
+.data-grid {
+	width: 100%;
+	border-top: 1px solid #ccc;
+	border-collapse: collapse;
+	background: #fff;
+	font-size: 13px;
+	margin-bottom: 20px;
+}
+
+.data-grid th {
+	background: #f0f4f8;
+	color: #333;
+	padding: 10px;
+	border-bottom: 1px solid #ccc;
+	font-weight: 600;
+	text-align: center;
+}
+
+.data-grid td {
+	padding: 10px;
+	border-bottom: 1px solid #eee;
+	color: #555;
+	text-align: center;
+}
+
+.data-grid td.text-left {
+	text-align: left;
+}
+
+.data-grid td.text-right {
+	text-align: right;
+}
+
+.footer-mini {
+	margin-top: 30px;
+	text-align: center;
+	font-size: 12px;
+	color: #aaa;
+	padding-bottom: 20px;
+}
+
+/* 파일 리스트 */
+.file-view-list {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+}
+
+.file-view-list li {
+	padding: 8px 0;
+	border-bottom: 1px dashed #eee;
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	font-size: 13px;
+}
+
+/* ----------------------------------------------------
+       탭 네비게이션 스타일 
+       ---------------------------------------------------- */
+.tab-navigation {
+	display: flex;
+	border-bottom: 2px solid #0f4c81;
+	margin-bottom: 0; /* 탭과 컨텐츠 사이 여백 제거 */
+	background: transparent;
+}
+
+.tab-btn {
+	padding: 12px 25px;
+	background: #f8f9fa;
+	border: 1px solid #ddd;
+	border-bottom: none;
+	cursor: pointer;
+	font-weight: bold;
+	color: #666;
+	margin-right: 4px;
+	border-radius: 5px 5px 0 0;
+	transition: all 0.2s;
+	font-size: 13px;
+}
+
+.tab-btn:hover {
+	background: #e9ecef;
+	color: #0f4c81;
+}
+
+.tab-btn.active {
+	background: #0f4c81;
+	color: #fff;
+	border-color: #0f4c81;
+}
+
+/* ----------------------------------------------------
+       탭 컨텐츠 영역 (수정됨)
+       ---------------------------------------------------- */
+.tab-pane {
+	display: none;
+	background: #fff;
+	/* [수정] 좌우 여백 추가 (기존 20px 0 -> 30px) */
+	padding: 30px;
+	border: 1px solid #ddd; /* [추가] 전체 테두리 추가 */
+	border-top: none; /* 탭과 연결되도록 상단 테두리 제거 */
+	border-radius: 0 0 4px 4px;
+	animation: fadeIn 0.3s ease-in-out;
+	min-height: 200px; /* 컨텐츠가 적어도 최소 높이 유지 */
+}
+
+.tab-pane.active {
+	display: block;
+}
+
+@keyframes fadeIn {from { opacity:0;
+	transform: translateY(5px);
+}
+
+to {
+	opacity: 1;
+	transform: translateY(0);
+}
+
+}
+
+/* ----------------------------------------------------
+       [수정] 첨부파일 리스트 디자인 강화 (박스 형태)
+       ---------------------------------------------------- */
+.file-view-list {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+	border: 1px solid #e1e4e8;
+	border-radius: 4px;
+}
+
+.file-view-list li {
+	padding: 15px 20px; /* 내부 여백 넉넉하게 */
+	border-bottom: 1px solid #eee;
+	display: flex;
+	align-items: center;
+	gap: 15px;
+	font-size: 13px;
+	background: #fff;
+	transition: background 0.2s;
+}
+
+.file-view-list li:last-child {
+	border-bottom: none;
+}
+
+.file-view-list li:hover {
+	background-color: #f8f9fa;
+}
+
+.file-view-list i {
+	font-size: 18px;
+	width: 24px;
+	text-align: center;
+}
+
+.file-info {
+	display: flex;
+	flex-direction: column;
+	flex: 1;
+}
+
+.file-name {
+	font-weight: bold;
+	color: #333;
+	margin-bottom: 2px;
+}
+
+.file-meta {
+	font-size: 11px;
+	color: #888;
+}
+/* ... 기존 CSS 내용 ... */
+
+/* [추가/수정] 로그 테이블 스타일 */
+.log-table {
+	width: 100%;
+	border-top: 2px solid #666;
+	border-collapse: collapse;
+	margin-top: 10px;
+}
+
+.log-table th {
+	background: #f8f9fa;
+	padding: 12px;
+	border-bottom: 1px solid #ccc;
+	font-size: 13px;
+	color: #333;
+	font-weight: 600;
+	text-align: center;
+}
+
+.log-table td {
+	padding: 12px;
+	border-bottom: 1px solid #eee;
+	font-size: 13px;
+	color: #555;
+	text-align: center;
+}
+
+.log-table td.text-left {
+	text-align: left;
+}
+
+/* ----------------------------------------------------
+       [수정] 상태별 뱃지 디자인 세분화
+       ---------------------------------------------------- */
+.badge {
+	display: inline-block;
+	padding: 4px 10px;
+	border-radius: 4px; /* 사각형 느낌 살짝 */
+	font-size: 11px;
+	font-weight: bold;
+	color: #fff;
+	min-width: 60px;
+	text-align: center;
+}
+
+/* 1. 대기 상태 (회색/파란계열) */
+.badge.waiting {
+	background-color: #6c757d;
+} /* 심사대기, 검사대기, 보완심사대기, 대기중 */
+
+/* 2. 진행/검토 상태 (노랑/주황 - 글자색 어둡게) */
+.badge.process {
+	background-color: #ffc107;
+	color: #333;
+} /* 심사중, 검사중, 세액검토, 유관기관심사 */
+
+/* 3. 이슈/보완요구 (빨강) */
+.badge.issue {
+	background-color: #dc3545;
+} /* 보완요구 */
+
+/* 4. 액션/제출/발송 (하늘색) */
+.badge.action {
+	background-color: #17a2b8;
+} /* 보완제출, 고지서 발송 */
+
+/* 5. 대기 (납부대기 등 - 보라색) */
+.badge.payment {
+	background-color: #6f42c1;
+} /* 납부대기 */
+
+/* 6. 완료/승인 (초록색) */
+.badge.complete {
+	background-color: #28a745;
+} /* 수리완료, 납부완료, 검사완료, 반출승인, 통관승인 */
+
+
+/* ----------------------------------------------------
+       첨부파일 리스트 디자인 (조회용)
+       ---------------------------------------------------- */
+    .file-view-group {
+        margin-bottom: 30px;
+    }
+    .file-group-title {
+        font-size: 14px;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 10px;
+        border-left: 3px solid #0f4c81;
+        padding-left: 10px;
+    }
+    .file-view-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        border: 1px solid #e1e4e8;
+        border-radius: 4px;
+    }
+    .file-view-list li {
+        padding: 15px 20px;
+        border-bottom: 1px solid #eee;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        font-size: 13px;
+        background: #fff;
+    }
+    .file-view-list li:last-child { border-bottom: none; }
+    .file-info { display: flex; flex-direction: column; flex: 1; }
+    .file-name { font-weight: bold; color: #333; margin-bottom: 2px; }
+    .file-meta { font-size: 11px; color: #888; }
+    .req-badge { color: red; font-size: 11px; margin-left: 5px; vertical-align: top; }

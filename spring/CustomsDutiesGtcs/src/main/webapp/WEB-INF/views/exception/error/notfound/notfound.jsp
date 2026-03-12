@@ -1,0 +1,32 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<%@ taglib uri="jakarta.tags.core" prefix="c" %>
+
+<link rel="stylesheet" href="/css/excep/error/error/error.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+
+    <div class="error-card">
+        <div class="icon-area">
+            <div class="icon-circle">
+                <i class="fa-solid fa-file-circle-question main-icon"></i>
+            </div>
+        </div>
+
+        <h2 class="error-title">요청하신 페이지를 찾을 수 없습니다.</h2>
+        
+        <p class="error-desc">
+            입력하신 주소가 정확한지 다시 한번 확인해 주세요.<br>
+            관련된 업무 메뉴가 이동되었거나 삭제되었을 수 있습니다.
+        </p>
+
+        <div class="btn-group">
+            <a href="javascript:history.back()" class="btn btn-outline">이전 화면</a>
+            <a href="/shipper/member/dashboard/dashboard" class="btn btn-primary">대시보드로 이동</a>
+        </div>
+        
+        <div class="contact-info">
+            <i class="fa-regular fa-circle-question"></i> 도움이 필요하시면 전산지원팀(1544-0000)으로 문의해주세요.
+        </div>
+    </div>
+

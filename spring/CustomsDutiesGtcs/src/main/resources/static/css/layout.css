@@ -1,0 +1,802 @@
+@charset "utf-8";
+
+/* =========================================
+   [1] 기본 스타일 초기화 & 공통 레이아웃
+   ========================================= */
+* {
+  /* [Box Model] 테두리와 패딩을 너비 계산에 포함시켜 레이아웃 깨짐 방지 */
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  /* [가독성] 고딕 계열 폰트 우선 적용 (맑은 고딕, 돋움) */
+  font-family: "Malgun Gothic", "Dotum", sans-serif;
+  font-size: 12px; /* 공공기관 표준 폰트 사이즈 */
+  background-color: #f5f7fa; /* 눈이 편안한 연한 회색 배경 */
+
+  /* [레이아웃] 화면 전체 높이를 사용하며 Flex 구조로 상단/중단/하단 배치 */
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto; /* 내용이 넘치면 스크롤 생성 */
+}
+
+/* =========================================
+   [2] 상단 헤더 (Global Header)
+   ========================================= */
+.global-header {
+  height: 60px; /* 고정 높이 */
+  background-color: #0f4c81; /* 메인 테마 색상 (딥블루) */
+  color: #fff; /* 글자색 흰색 */
+
+  /* [배치] Flexbox를 사용하여 좌우 양끝 정렬 */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  padding: 0 20px; /* 좌우 여백 */
+
+  /* [고정 헤더] 스크롤 내려도 상단에 붙어있게 설정 */
+  position: sticky;
+  top: 0;
+  z-index: 1000; /* 다른 요소보다 위에 오도록 높은 값 설정 */
+
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.15); /* 하단 그림자 효과 */
+  min-width: 1440px; /* 최소 너비 보장 (내용 잘림 방지) */
+}
+
+.global-header a {
+  color: #fff;
+  text-decoration: none; /* 링크 밑줄 제거 */
+}
+
+/* 로고 영역 */
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 8px; /* 아이콘과 텍스트 사이 간격 */
+
+  font-size: 22px;
+  font-weight: 800; /* 굵은 폰트 강조 */
+  color: #fff;
+  text-decoration: none;
+  letter-spacing: 1px; /* 자간 조정 */
+}
+
+/* 사용자 정보 및 로그아웃 */
+.user-info {
+  font-size: 13px;
+}
+
+.logout-link {
+  color: #ddd; /* 약간 어두운 흰색 */
+  text-decoration: none;
+  margin-left: 10px;
+}
+/* 비로그인 시 메뉴 그룹 */
+.guest-menu {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-right: 10px;
+}
+
+/* 로그인/회원가입 링크 스타일 */
+.btn-header-login,
+.btn-header-signup {
+    color: #fff;             /* 헤더 배경에 맞는 흰색 텍스트 */
+    text-decoration: none;   /* 밑줄 제거 */
+    font-size: 14px;
+    font-weight: 500;
+    transition: color 0.2s, opacity 0.2s;
+    opacity: 0.8;            /* 약간 투명하게 해서 부드러운 느낌 */
+}
+
+/* 마우스 올렸을 때 */
+.btn-header-login:hover,
+.btn-header-signup:hover {
+    color: #fff;
+    opacity: 1;              /* 선명하게 */
+    text-shadow: 0 0 5px rgba(255,255,255,0.3); /* 살짝 빛나는 효과 */
+}
+
+/* 로그인/회원가입 사이의 작은 구분선 */
+.v-divider-small {
+    width: 1px;
+    height: 12px;
+    background-color: rgba(255, 255, 255, 0.3);
+}
+
+
+/* =========================================
+   [3] 메인 바디 (Main Body)
+   ========================================= */
+.main-body {
+  display: flex; /* 사이드바와 콘텐츠 영역을 가로로 배치 */
+  flex: 1; /* 남은 높이 공간을 모두 차지 */
+  overflow: hidden; /* 내부 스크롤을 각각 제어하기 위해 전체 스크롤 숨김 */
+}
+
+/* =========================================
+   [4] 사이드바 (Sidebar)
+   ========================================= */ 
+* {
+  /* 테두리(border)와 안쪽 여백(padding)을 너비 계산에 포함시킵니다. 
+     레이아웃이 의도치 않게 커지는 것을 방지하는 필수 설정입니다. */
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: "Pretendard", "Malgun Gothic", sans-serif;
+  font-size: 13px;
+  background-color: #f5f7fa; /* 전체 페이지 배경색 (연한 회색) */
+
+  /* 화면 전체 높이를 사용하며, 내용이 넘치면 스크롤은 body가 아닌 내부 요소에서 처리합니다. */
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; /* 이중 스크롤 방지 */
+}
+
+.main-body {
+  /* 헤더를 제외한 나머지 영역을 꽉 채웁니다. */
+  display: flex;
+  flex: 1;
+  overflow: hidden; /* 사이드바와 메인 컨텐츠 각각 스크롤하기 위해 여기서 숨김 */
+  width: 100%;
+}
+
+/* 대시보드 전용: 삼각형 없애기 */
+.menu-category.no-arrow::after {
+    display: none !important; /* 화살표 숨김 */
+    content: none !important; /* 혹시 몰라 내용도 비움 */
+}
+/* =========================================
+   [2] 사이드바 컨테이너 디자인
+   ========================================= */
+.sidebar {
+  position: relative;
+  width: 230px; 
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+  background-color: #0a2742;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0; 
+  z-index: 1000;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+  height: 100%;
+  padding: 0;
+  overflow-y: overlay;
+  overflow-x: hidden;
+}
+
+/* [토글 버튼 - 슬림 핸들 디자인] */
+.sidebar-btn {
+  position: absolute;
+  top: 50%;            /* 화면 세로 중앙 */
+  transform: translateY(-50%);
+  right: 0px;          /* 평소엔 경계선에 붙어있음 */
+  width: 14px;
+  height: 60px;        /* 길쭉한 바 형태 */
+  background-color: rgba(12, 59, 102, 0.8); 
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 4px 0 0 4px; /* 왼쪽만 둥글게 */
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1001;
+  transition: all 0.2s ease;
+  opacity: 0.6;        /* 평소엔 은은하게 */
+}
+
+.sidebar-btn:hover {
+  opacity: 1;
+  width: 20px;         /* 호버 시 살짝 넓어짐 */
+  background-color: #3498db;
+}
+
+.sidebar-btn i {
+  font-size: 10px;
+  transition: transform 0.3s;
+}
+
+/* [핵심: 사이드바가 접혔을 때] */
+body.collapsed .sidebar {
+  width: 0 !important;
+  min-width: 0 !important;
+  opacity: 1; 
+  box-shadow: none;
+  overflow: visible !important; /* 버튼 노출을 위해 필수 */
+}
+
+body.collapsed .sidebar-btn {
+  right: -14px !important;    /* 너비가 0일 때 우측으로 밀어냄 */
+  border-radius: 0 4px 4px 0; /* 접혔을 땐 오른쪽을 둥글게 */
+  opacity: 1;
+  background-color: #0f4c81;
+}
+
+/* 접혔을 때 아이콘 회전 */
+body.collapsed .sidebar-btn i {
+  transform: rotate(180deg);
+}
+
+/* 내부 콘텐츠 숨김 (버튼 제외) */
+body.collapsed .sidebar > *:not(.sidebar-btn) {
+  display: none !important;
+}
+
+
+
+/* =========================================
+   [3] 메뉴 아이템 스타일 (리스트)
+   ========================================= */
+.sidebar-menu {
+  list-style: none; /* 리스트 앞의 점(Bullet) 제거 */
+  padding: 0;
+  margin: 0;
+  width: 100%;
+}
+
+/* 리스트 아이템(li) 자체를 버튼처럼 디자인 */
+.sidebar-menu li {
+  display: block;
+  width: 100%;
+
+  /* [중요] 이곳에 패딩을 주어야 배경색이 hover 시 꽉 차게 보입니다. */
+  padding: 12px 25px;
+
+  color: #cfd8dc; /* 기본 텍스트 색상 (연한 회색) */
+  font-size: 13px;
+  cursor: pointer; /* 마우스 올리면 손가락 모양 */
+
+  /* 마우스 올렸을 때 왼쪽에 생길 강조선 (평소에는 투명) */
+  border-left: 4px solid transparent;
+  transition: all 0.2s ease; /* 부드러운 색상 전환 */
+
+  /* 텍스트가 길어질 경우 줄바꿈 하지 않고 ... 으로 표시 */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 마우스 올렸을 때 (Hover) 효과 */
+.sidebar-menu li:hover {
+  background-color: #0c3b66; /* 배경색 변경 */
+  color: #fff; /* 글자색 흰색 */
+  border-left-color: #3498db; /* 왼쪽 강조선 파란색으로 표시 */
+  padding-left: 10px; /* 텍스트가 살짝 오른쪽으로 이동하는 애니메이션 효과 */
+}
+
+/* a 태그가 있을 경우 부모(li)의 크기와 색상을 상속받도록 설정 */
+.sidebar-menu li {
+  padding: 0; /* 부모인 li의 패딩은 제거하거나 최소화 */
+}
+
+.sidebar-menu li a {
+  color: inherit;
+  text-decoration: none;
+  display: block;
+  width: 100%;
+  /* height: 100% 대신 padding을 사용하여 상하 범위를 늘립니다 */
+  padding: 15px 20px; 
+  box-sizing: border-box; /* 패딩이 추가되어도 전체 너비가 깨지지 않게 방지 */
+}
+
+/* =========================================
+   [4] 동적 메뉴 그룹 (탭 전환 기능)
+   ========================================= */
+.menu-group {
+  display: block;
+  height: auto;
+  flex-shrink: 0; /* 찌그러짐 방지 */
+  padding-bottom: 50px;
+}
+
+.menu-group.active {
+  /* 선택된 역할의 메뉴만 보이게 합니다. */
+  animation: groupFadeIn 0.3s ease-out; /* 메뉴가 바뀔 때 살짝 떠오르는 애니메이션 */
+}
+
+/* [핵심] 마지막 메뉴 그룹 하단 여백 */
+/* 하위 메뉴가 열릴 때 스크롤 공간이 부족하여 잘리는 현상을 방지합니다. */
+.menu-group:last-child {
+  padding-bottom: 50px;
+}
+
+/* 메뉴 등장 애니메이션 키프레임 */
+@keyframes groupFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px); /* 약간 위에서 */
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0); /* 제자리로 */
+  }
+}
+
+/* =========================================
+   [5] 아코디언(카테고리) 스타일
+   ========================================= */
+.menu-category {
+  padding: 20px 25px 8px; /* 카테고리 제목 여백 */
+  font-size: 14px;
+  color: #81d4fa; /* 하늘색 포인트 컬러 */
+  font-weight: bold;
+  text-transform: uppercase; /* 영문일 경우 대문자 변환 */
+  letter-spacing: 0.5px;
+  cursor: pointer;
+
+  position: relative;
+  display: flex;
+  justify-content: space-between; /* 텍스트는 왼쪽, 화살표는 오른쪽에 배치 */
+  align-items: center;
+  transition: color 0.2s;
+}
+
+.menu-category:hover {
+  color: #fff; /* 마우스 올리면 흰색으로 강조 */
+}
+
+/* 화살표 아이콘 (가상 요소 사용) */
+.menu-category::after {
+  content: "▶"; /* 기본 화살표 모양 */
+  font-size: 10px;
+  color: #81d4fa;
+  transition: transform 0.3s ease; /* 회전 애니메이션 */
+}
+
+/* 카테고리가 열렸을 때(.active) 스타일 */
+.menu-category.active {
+  color: #fff;
+}
+.menu-category.active::after {
+  transform: rotate(90deg); /* 화살표를 아래로 회전 */
+  color: #fff;
+}
+
+/* =========================================
+   [수정됨] 하위 메뉴 애니메이션 (커튼 효과 핵심)
+   ========================================= */
+
+/* 하위 메뉴 컨테이너 설정 */
+.menu-group .sidebar-menu {
+  /* 1. DOM에 항상 존재하도록 설정 */
+  /* display: none을 쓰면 애니메이션이 작동하지 않으므로 block 유지 */
+  display: block;
+  
+  position: relative; /* [추가] 메뉴가 열릴 때 확실하게 자리를 차지하도록 설정 */
+  
+  /* 2. 애니메이션 시작 상태 (닫힘) */
+  max-height: 0; /* 높이를 0으로 하여 내용을 숨김 */
+
+  /* 3. 넘치는 내용 숨김 (Masking) */
+  /* max-height가 0일 때 글자가 삐져나오지 않게 잘라냅니다. */
+  overflow: hidden;
+
+  /* 4. 투명도 설정 (중요: 항상 보이게 설정) */
+  /* opacity: 0을 주면 글자가 서서히 나타나므로 '나중에 뜨는' 느낌이 듭니다. */
+  /* 아예 opacity 속성을 제거하거나 1로 두어, 글자는 이미 그 자리에 있게 합니다. 
+     (커튼 뒤에 배우가 서 있는 것과 같은 원리) */
+  opacity: 1;
+
+  /* 5. 여백 초기화 (애니메이션 튀는 현상 방지) */
+  /* 높이가 0이어도 패딩이 있으면 공간을 차지하므로 0으로 설정 */
+  padding: 0;
+  margin: 0;
+
+  /* 6. 애니메이션 정의 */
+  /* max-height 속성만 0.35초 동안 부드럽게(ease-out) 변화시킵니다. */
+  /* 상자가 열리면서 이미 존재하던 텍스트가 자연스럽게 드러납니다. */
+  transition: max-height 0.35s ease-out;
+
+  /* 7. 스타일링 */
+  background-color: rgba(0, 0, 0, 0.2); /* 하위 메뉴 배경색 (약간 어둡게) */
+  border-radius: 0; /* 각진 모서리 */
+}
+
+/* 하위 메뉴 리스트 아이템 (li) */
+.menu-group .sidebar-menu li {
+  /* 내용물이 줄바꿈되지 않고 한 줄로 유지되도록 함 (애니메이션 중 줄바꿈 방지) */
+  white-space: nowrap;
+
+  /* 부모의 투명도 설정 등에 영향받지 않고 항상 보이게 함 */
+  opacity: 1;
+  visibility: visible;
+}
+
+/* [상태 변화] JS에서 .open 클래스를 추가했을 때 */
+.menu-group .sidebar-menu.open {
+  /* JS를 사용하지 않는 순수 CSS 방식일 경우를 대비해 충분히 큰 값을 줍니다.
+     JS를 사용한다면 이 속성은 무시되고 JS가 계산한 정확한 픽셀값이 들어갑니다. */
+  max-height: 1000px;
+}
+
+/* =========================================
+   [6] 메인 콘텐츠 및 기타 스타일
+   ========================================= */
+main {
+  flex: 1; /* 남은 공간 모두 차지 */
+  padding: 50px;
+  overflow-y: auto; /* 본문 내용이 길어지면 스크롤 생성 */
+  background-color: #fff;
+}
+main h1 {
+  font-size: 24px;
+  color: #2c3e50;
+  margin-bottom: 10px;
+}
+main > p {
+  color: #666;
+  margin-bottom: 40px;
+}
+
+/* 역할 선택 카드 컨테이너 */
+.role-selection-container {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 40px;
+}
+
+/* 각각의 역할 카드 디자인 */
+.role-card {
+  flex: 1; /* 동일한 너비로 분배 */
+  max-width: 250px;
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  padding: 30px 20px;
+  text-align: center;
+  cursor: pointer;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02); /* 은은한 그림자 */
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); /* 통통 튀는 애니메이션 */
+}
+
+.role-card:hover {
+  transform: translateY(-5px); /* 위로 살짝 떠오름 */
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+  border-color: #b0bec5;
+}
+
+/* 선택된 역할 카드 (.active) */
+.role-card.active {
+  border: 2px solid #0f4c81; /* 테두리 강조 */
+  background-color: #f4f8fb; /* 배경색 변경 */
+  box-shadow: 0 8px 15px rgba(15, 76, 129, 0.15);
+}
+
+.role-card h3 {
+  margin: 0 0 10px 0;
+  font-size: 18px;
+  color: #333;
+}
+.role-card.active h3 {
+  color: #0f4c81; /* 활성화 시 텍스트 색 변경 */
+  font-weight: bold;
+}
+.role-card p {
+  margin: 0;
+  font-size: 13px;
+  color: #888;
+  line-height: 1.5;
+}
+
+/* 상태 박스 (현재 모드 표시창) */
+.status-box {
+  padding: 25px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  border-left: 5px solid #0f4c81; /* 왼쪽 강조선 */
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.status-box h3 {
+  margin: 0;
+  font-size: 16px;
+  color: #333;
+}
+.status-box p {
+  margin: 0;
+  color: #666;
+  font-size: 13px;
+}
+.menu-group:last-of-type {
+  padding-bottom: 80px;
+  margin-bottom: 20px;
+}
+
+/* =========================================
+   [5] 콘텐츠 영역 (Content Area)
+   ========================================= */
+.content-area {
+  flex: 1; /* 남은 너비 모두 차지 */
+  padding: 5px;
+  overflow-y: auto; /* 내용이 길면 스크롤 생성 */
+  background-color: #fff;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 콘텐츠 내부 컨테이너 */
+.container {
+  flex: 1;
+  width: 1645px;
+  background: #fff;
+  border: 1px solid #ccc; /* 콘텐츠 영역 테두리 */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin: auto;
+}
+
+/* 페이지별 로컬 헤더 (제목 영역) */
+.local-header {
+  padding: 5px;
+  padding-left: 10px;
+  border-bottom: 1px solid #ddd;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #fff;
+}
+
+.local-header h2 {
+  font-size: 18px;
+  color: #2c3e50;
+  font-weight: bold;
+}
+
+/* 경로 표시 (Breadcrumb) */
+.breadcrumb {
+  color: #666;
+  font-size: 11px;
+}
+
+/* =========================================
+   [6] 푸터 (Footer)
+   ========================================= */
+.global-footer {
+  height: 30px;
+  background-color: #eaeaea;
+  border-top: 1px solid #ccc;
+  text-align: center;
+  line-height: 30px; /* 수직 중앙 정렬 */
+  font-size: 11px;
+  color: #777;
+  flex-shrink: 0; /* 높이 고정 */
+}
+
+/* =========================================
+   [헤더 수정 스타일] - 아이콘 및 사용자 정보 개선
+   ========================================= */
+.global-header {
+  height: 60px;
+  background-color: #123150;
+  color: #fff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 25px;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.logo {
+  font-size: 20px;
+  font-weight: bold;
+  color: #fff;
+  text-decoration: none;
+  letter-spacing: 1px;
+}
+
+/* 헤더 우측 영역 컨테이너 */
+.header-right-area {
+  display: flex;
+  align-items: center;
+  gap: 15px; /* 아이콘 간 간격 */
+}
+
+/* 아이콘 링크 스타일 */
+.icon-link {
+  color: #b0c4de; /* 기본 연한 하늘색 */
+  font-size: 18px;
+  margin-right: 10px;
+  text-decoration: none;
+  position: relative;
+  transition: color 0.2s;
+}
+
+.icon-link:hover {
+  color: #fff;
+  transform: scale(1.1); /* 호버 시 약간 확대 */
+}
+
+/* 알림 뱃지 (빨간 점) */
+.badge-dot {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 6px;
+  height: 6px;
+  background-color: #ff6b6b;
+  border-radius: 50%;
+}
+
+/* 세로 구분선 */
+.v-divider {
+  width: 1px;
+  height: 16px;
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
+/* 사용자 정보 텍스트 */
+.user-info-text {
+  font-size: 13px;
+  color: #fff;
+  font-weight: 500;
+}
+
+.user-name {
+  margin-right: 5px;
+}
+
+/* 로그아웃 아이콘 버튼 */
+.logout-icon-btn {
+  color: #ffb8b8; /* 붉은 톤 */
+  font-size: 18px;
+  margin-left: 10px;
+  text-decoration: none;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+}
+
+.logout-icon-btn:hover {
+  color: #ff6b6b; /* 진한 빨강 */
+  transform: translateX(3px); /* 나가는 방향으로 이동 효과 */
+}
+
+.header-logo-icon {
+  width: 24px;
+  height: 24px;
+  color: #81d4fa;
+  display: block;
+}
+
+.header-center-group {
+  position: static;
+  transform: none;
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+/* 드롭다운 컨테이너 */
+.user-menu-container {
+    position: relative;
+    display: inline-block;
+}
+
+/* 햄버거 아이콘 스타일 */
+.menu-trigger {
+    font-size: 22px;
+    color: #333;
+    padding: 10px;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.menu-trigger:hover {
+    color: #007bff;
+}
+
+/* 드롭다운 박스 본체 */
+.dropdown-content {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 45px;
+    background-color: #ffffff !important;
+    min-width: 190px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    z-index: 9999;
+    overflow: hidden; /* 배경색이 삐져나가지 않게 처리 */
+}
+
+/* [중요] 상단 사용자 정보 영역 - 인덱스와 동일하게 회색 배경 설정 */
+.dropdown-info {
+    padding: 15px 20px;
+    background-color: #f8f9fa; /* 인덱스의 연한 회색 배경 */
+    border-bottom: 1px solid #eee;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+}
+
+/* 드롭다운 내부 항목 */
+.dropdown-header {
+    padding: 12px 16px;
+    font-size: 14px;
+    background-color: #f8f9fa;
+}
+
+.info-name {
+    color: #333 !important;
+    font-weight: bold;
+    font-size: 15px;
+    line-height: 1.2;
+}
+
+.info-status {
+    color: #888;
+    font-size: 12px;
+    margin-top: 4px;
+}
+
+/* 메뉴 항목 정렬 */
+.dropdown-item {
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    color: #444 !important;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+/* 오른쪽 영역 정렬 */
+.user-menu-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    height: 100%;
+}
+
+.dropdown-item i {
+    width: 20px;
+    margin-right: 12px;
+    font-size: 16px;
+    color: #666;
+    text-align: center;
+}
+
+.dropdown-divider {
+    height: 1px;
+    background-color: #eee;
+    margin: 0;
+}
+
+.dropdown-item:hover {
+    background-color: #f1f1f1;
+    color: #007bff;
+}
+
+.dropdown-item.logout-item {
+    color: #dc3545; /* 로그아웃은 붉은색 강조 */
+}
+
+.dropdown-item.logout-item:hover {
+    background-color: #fff5f5;
+}
+
+hr {
+    margin: 0;
+    border: 0;
+    border-top: 1px solid #eee;
+}
+
+/* 활성화 클래스 */
+.show {
+    display: block;
+}

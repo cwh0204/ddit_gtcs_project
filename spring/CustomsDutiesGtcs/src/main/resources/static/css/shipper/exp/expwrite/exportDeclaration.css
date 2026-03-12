@@ -1,0 +1,722 @@
+@charset "UTF-8";
+
+/* ========================================================================
+   G-TCS 통합 폼 스타일 (수출/수입 신고서 통일)
+   - 전송/삭제 버튼: 수입신고서 스타일 (심플 사각)
+   - 내부 입력/버튼: 수출신고서 스타일 (세련된 정제)
+   ======================================================================== */
+
+/* ========================================================================
+   [1] 기본 변수 및 타이포그래피
+   ======================================================================== */
+:root {
+    --primary-color: #0f4c81;       /* 관세청/무역 대표 네이비 블루 */
+    --primary-hover: #0a3d6a;
+    --primary-deep: #082d4e;
+    --bg-header: #f9fbff;           /* 테이블 헤더 배경 */
+    --border-color: #ced4da;        /* 테두리 색상 */
+    --border-soft: #e0e4e8;
+    --text-color: #333333;
+    --text-dark: #2c3e50;
+    --required-color: #e53e3e;      /* 필수항목 빨간색 */
+    --input-height: 28px;           /* 입력 필드 높이 통일 */
+    --input-focus: #007bff;
+    --accent-color: #f8f9fa;
+    --danger-color: #dc3545;
+}
+
+body {
+    font-family: 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+    color: var(--text-color);
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+/* ========================================================================
+   [2] 컨테이너 및 탭 네비게이션
+   ======================================================================== */
+.container {
+    width: 98% !important;
+    max-width: 1800px !important;
+    margin: 0 auto;
+    padding: 10px 0;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* 탭 헤더 */
+.tab-header {
+    display: flex;
+    border-bottom: 2px solid var(--primary-color);
+    background-color: #fff;
+    padding-top: 10px;
+    padding-left: 10px;
+    margin-bottom: 5px;
+}
+
+.tab-btn {
+    background-color: #f1f1f1;
+    border: 1px solid var(--border-soft);
+    border-bottom: none;
+    outline: none;
+    cursor: pointer;
+    padding: 8px 20px;
+    transition: 0.3s;
+    font-size: 13px;
+    font-weight: bold;
+    color: #777;
+    border-radius: 4px 4px 0 0;
+    margin-right: 2px;
+}
+
+.tab-btn:hover {
+    background-color: #ddd;
+    color: var(--primary-color);
+}
+
+.tab-btn.active {
+    background-color: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+}
+
+.tab-content {
+    display: none;
+    animation: fadeEffect 0.4s;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+@keyframes fadeEffect {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* ========================================================================
+   [3] 섹션 타이틀 스타일링 (수출신고서 스타일)
+   ======================================================================== */
+.group-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--primary-color);
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--primary-color);
+    margin: 20px 0 15px 0;
+}
+
+.section-title {
+    display: block;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin: 20px 0 8px 0;
+    padding-left: 10px;
+    border-left: 4px solid var(--primary-color);
+    line-height: 1.2;
+}
+
+.section-subtitle {
+    display: block;
+    font-size: 14px;
+    font-weight: bold;
+    color: #333;
+    margin: 20px 0 10px 0;
+    border-left: 3px solid var(--primary-color);
+    padding-left: 10px;
+}
+
+/* ========================================================================
+   [4] 폼 섹션 및 폼 테이블 (수출신고서 스타일 기준)
+   ======================================================================== */
+.form-section {
+    font-size: 13px;
+    font-family: 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+    color: var(--text-color);
+    padding: 15px;
+    background: #fff;
+    border: 1px solid var(--border-soft);
+    border-radius: 0 0 8px 8px;
+    flex: 1;
+    overflow-y: hidden;
+}
+
+form {
+    flex: 1;
+    padding: 9px;
+}
+
+/* 폼 테이블 (공문서 스타일) */
+.form-table {
+    width: 100%;
+    border-collapse: collapse;
+    border-top: 2px solid var(--primary-color);
+    table-layout: fixed;
+    background-color: #fff;
+    margin-bottom: 10px;
+}
+
+.form-table th,
+.form-table td {
+    border: 1px solid var(--border-color);
+    padding: 4px 8px;
+    vertical-align: middle;
+    height: 32px;
+}
+
+/* 테이블 헤더 (라벨) */
+.form-table th {
+    background-color: var(--bg-header);
+    color: var(--text-dark);
+    font-weight: 400;
+    font-size: 14px;
+    text-align: left;
+    word-break: keep-all;
+    padding: 6px 10px;
+}
+
+/* 필수 입력 표시 (th.required) */
+.form-table th.required::before {
+    content: '*';
+    color: var(--required-color);
+    margin-right: 4px;
+    font-weight: bold;
+}
+
+/* 필수서류 테이블 (첨부파일 섹션용) */
+.essential-table {
+    width: 100%;
+    border-collapse: collapse;
+    border-top: 2px solid #333;
+    margin-bottom: 30px;
+}
+
+.essential-table th {
+    background-color: var(--accent-color);
+    text-align: left;
+    padding: 12px 15px;
+    border-bottom: 1px solid #ddd;
+    width: 200px;
+}
+
+.essential-table td {
+    padding: 10px 15px;
+    border-bottom: 1px solid #ddd;
+}
+
+/* 데이터 그리드 테이블 (스크롤 및 헤더 고정) */
+.data-grid-table thead th {
+    position: sticky;
+    top: 0;
+    background-color: #e9ecef;
+    z-index: 10;
+    border: 1px solid #ccc;
+    font-size: 13px;
+    box-shadow: 0 1px 0 #ccc;
+}
+
+.data-grid-table input,
+.data-grid-table select {
+    position: relative;
+    z-index: 1;
+}
+
+/* ========================================================================
+   [5] 입력 필드 (Input, Select) - 수출신고서 스타일 기준
+   ======================================================================== */
+input[type="text"],
+input[type="date"],
+input[type="number"],
+input[type="password"],
+select {
+    height: var(--input-height);
+    width: 100%;
+    padding: 0 8px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background-color: #fff;
+    font-size: 12px;
+    color: var(--text-color);
+    box-sizing: border-box;
+    transition: all 0.2s;
+}
+
+/* 포커스 시 효과 */
+input:focus,
+select:focus {
+    outline: none;
+    border-color: var(--input-focus);
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.1);
+}
+
+/* 읽기 전용 (readonly) / 비활성화 */
+input[readonly],
+input:disabled,
+select:disabled {
+    background-color: #f0f0f0 !important;
+    color: #666;
+    border-color: #ddd;
+    cursor: default;
+}
+
+/* 자동 계산 필드 강조 (총세액합계 등) */
+input[readonly].highlight {
+    font-weight: bold;
+    color: var(--primary-color);
+}
+
+/* 라디오 버튼 / 체크박스 */
+input[type="radio"],
+input[type="checkbox"] {
+    vertical-align: middle;
+    margin: 0 4px 0 0;
+    height: auto;
+    cursor: pointer;
+}
+
+label {
+    cursor: pointer;
+    font-size: 13px;
+    margin-right: 15px;
+    display: inline-flex;
+    align-items: center;
+}
+
+/* 텍스트 정렬 유틸리티 */
+.text-right,
+input[style*="text-align: right"] {
+    text-align: right;
+    padding-right: 5px;
+}
+
+/* ========================================================================
+   [6] 레이아웃 유틸리티 (Flex)
+   ======================================================================== */
+.flex-row {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    gap: 4px;
+}
+
+.flex-grow {
+    flex: 1;
+    width: 100%;
+}
+
+.w-full {
+    width: 100% !important;
+}
+
+.w-fixed {
+    width: auto;
+    min-width: 80px;
+}
+
+/* 통화 단위/단위 텍스트 (Input 옆의 span) */
+.flex-row span {
+    font-size: 12px;
+    color: #666;
+    white-space: nowrap;
+}
+
+/* 폼 테이블 내부 flex 정렬 보정 */
+.form-table .flex-row {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+/* ========================================================================
+   [7] 버튼 스타일 - 내부 버튼 (수출신고서 스타일)
+   ======================================================================== */
+
+/* 기본 버튼 */
+.btn,
+.btn-search {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: var(--input-height);
+    background-color: #fff;
+    border: 1px solid #aaa;
+    color: #333;
+    cursor: pointer;
+    font-size: 12px;
+    padding: 0 10px;
+    white-space: nowrap;
+    border-radius: 2px;
+    transition: all 0.2s;
+}
+
+.btn:hover,
+.btn-search:hover {
+    background-color: #f1f1f1;
+    border-color: #888;
+}
+
+/* 돋보기(검색) 버튼 */
+.btn-search {
+    min-width: 30px;
+    padding: 0;
+    font-weight: bold;
+    color: var(--primary-color);
+}
+
+/* 파란색 주요 버튼 (HS코드조회 등) */
+.btn-primary {
+    background-color: var(--primary-color);
+    color: #fff;
+    border: 1px solid var(--primary-color);
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-hover);
+}
+
+/* 작은 버튼 (.micro) - 환율조회 등 */
+.btn.micro {
+    padding: 4px 10px;
+    font-size: 12px;
+    border-radius: 3px;
+    cursor: pointer;
+    border: 1px solid var(--primary-color);
+    background-color: var(--primary-color);
+    color: #ffffff !important;
+    font-weight: 600;
+    transition: all 0.2s;
+    height: 28px;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn.micro:hover {
+    background-color: #09345a;
+    border-color: #09345a;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* 조회/환율조회 버튼 (슬림 네이비) */
+.btn-lookup {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    height: 26px !important;
+    padding: 0 10px !important;
+    background: #4a5568 !important;
+    color: #fff !important;
+    border: none !important;
+    border-radius: 4px !important;
+    font-size: 11px !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+    transition: background-color 0.2s, transform 0.1s !important;
+    line-height: 1 !important;
+    white-space: nowrap !important;
+}
+
+.btn-lookup:hover {
+    background-color: #2d3748 !important;
+    transform: translateY(-1px);
+}
+
+.btn-lookup:active {
+    transform: translateY(0);
+}
+
+/* ========================================================================
+   [8] 첨부파일 섹션 스타일 (수출신고서 스타일 적용)
+   ======================================================================== */
+
+/* 드롭존 디자인 (수출신고서 스타일) */
+.drop-zone {
+    width: 100% !important;
+    min-height: 150px !important;
+    border: 2px dashed var(--primary-color) !important;
+    border-radius: 8px !important;
+    background-color: #f8fbff !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+    margin-bottom: 15px !important;
+    text-align: center !important;
+}
+
+.drop-zone i {
+    font-size: 48px !important;
+    color: var(--primary-color) !important;
+    margin-bottom: 15px !important;
+    display: block !important;
+}
+
+.drop-zone p {
+    margin: 10px 0 0 0 !important;
+    font-size: 14px !important;
+    color: #666 !important;
+    font-weight: 500 !important;
+}
+
+/* 드래그 시 효과 */
+.drop-zone.drag-over {
+    background-color: #e3f2fd !important;
+    border-color: #1a73e8 !important;
+}
+
+.drop-zone:hover {
+    background: #e8f4ff !important;
+    border-color: #09345a !important;
+}
+
+/* 파일 선택 버튼 */
+.btn-file-select {
+    padding: 5px 15px;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    cursor: pointer;
+    font-size: 12px;
+    transition: background-color 0.2s;
+}
+
+.btn-file-select:hover {
+    background-color: #e9ecef;
+}
+
+.file-name-display {
+    margin-left: 10px;
+    color: #888;
+    font-size: 12px;
+}
+
+/* 파일 추가/삭제 버튼 (수출신고서 스타일) */
+.btn.file-action,
+.file-action-btn {
+    height: 30px !important;
+    padding: 0 12px !important;
+    border-radius: 4px !important;
+    font-size: 12px !important;
+    cursor: pointer !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 5px !important;
+    font-weight: 600 !important;
+}
+
+/* 파일 추가 버튼 (연한 파랑/회색 톤) */
+.btn.file-add,
+.btn-add {
+    background-color: #ffffff !important;
+    border: 1px solid var(--primary-color) !important;
+    color: var(--primary-color) !important;
+}
+
+.btn.file-add:hover,
+.btn-add:hover {
+    background-color: #f0f7ff !important;
+}
+
+/* 파일 삭제 버튼 (경고 의미로 붉은 계열) */
+.btn.file-delete,
+.btn-del {
+    background-color: #ffffff !important;
+    border: 1px solid var(--danger-color) !important;
+    color: var(--danger-color) !important;
+}
+
+.btn.file-delete:hover,
+.btn-del:hover {
+    background-color: #fff5f5 !important;
+}
+
+/* ========================================================================
+   [9] 하단 푸터 버튼 그룹 (수입신고서 스타일 - 심플 사각)
+   ======================================================================== */
+.footer-btn-group {
+    padding: 20px 0;
+    border-top: 1px solid #ddd;
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    background-color: #fdfdfd;
+    margin-top: 5px !important;
+}
+
+/* [전송] 버튼: 수입신고서 스타일 (심플 사각형) */
+.btn-submit-main {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-width: 80px !important;
+    height: 36px !important;
+    background-color: var(--primary-color) !important;
+    color: #ffffff !important;
+    border: 1px solid var(--primary-color) !important;
+    border-radius: 0 !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+    box-shadow: none !important;
+    transition: background-color 0.2s !important;
+    letter-spacing: 0.5px !important;
+    padding: 0 20px !important;
+}
+
+.btn-submit-main:hover {
+    background-color: var(--primary-hover) !important;
+    border-color: var(--primary-hover) !important;
+}
+
+.btn-submit-main:active {
+    background-color: var(--primary-deep) !important;
+}
+
+.btn-submit-main i {
+    margin-right: 6px;
+    font-size: 14px;
+}
+
+/* [삭제/초기화] 버튼: 수입신고서 스타일 (심플 사각형) */
+.btn-reset-main {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-width: 70px !important;
+    height: 36px !important;
+    background-color: #ffffff !important;
+    color: #444 !important;
+    border: 1px solid #adb5bd !important;
+    border-radius: 0 !important;
+    font-size: 13px !important;
+    font-weight: 500 !important;
+    cursor: pointer !important;
+    box-shadow: none !important;
+    transition: all 0.2s !important;
+    padding: 0 16px !important;
+}
+
+.btn-reset-main:hover {
+    background-color: var(--accent-color) !important;
+    border-color: #868e96 !important;
+    color: #333 !important;
+}
+
+/* ========================================================================
+   [10] 모달창 스타일
+   ======================================================================== */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-window {
+    background: #fff;
+    width: 90%;
+    max-width: 1000px;
+    max-height: 90vh;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+}
+
+#modalDetailContent {
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+/* ========================================================================
+   [11] 첨부파일 탭 상단 "4. 첨부파일" 제목 제거
+   ======================================================================== */
+/* 첨부파일 탭 최상단 섹션 타이틀 숨김 처리 */
+#tab4 > .section-title:first-child,
+#tab-attachment > .section-title:first-child,
+.tab-content[data-tab="attachment"] > .section-title:first-child {
+    display: none !important;
+}
+
+/* ========================================================================
+   [12] 반응형 처리 (모바일/태블릿 대응)
+   ======================================================================== */
+@media screen and (max-width: 768px) {
+    .form-table,
+    .form-table tbody,
+    .form-table tr,
+    .form-table th,
+    .form-table td {
+        display: block;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .form-table tr {
+        margin-bottom: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        overflow: hidden;
+    }
+
+    .form-table th {
+        width: auto;
+        border-bottom: none;
+        background-color: #e9ecef;
+        padding: 8px 10px;
+    }
+
+    .form-table td {
+        border-top: none;
+        padding: 8px;
+    }
+
+    /* colspan 강제 해제 */
+    .form-table td[colspan] {
+        display: block;
+    }
+}
+/* ========================================================================
+   [추가] 내 정보 불러오기 전용 버튼 스타일
+   ======================================================================== */
+.btn-autofill {
+    margin-left: auto;
+    margin-right: 10px;           /* 우측 여백 살짝 띄우기 */
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #0f4c81;               /* 메인 브랜드 컬러 텍스트 */
+    background-color: #f0f4fc;    /* 아주 연한 파란색 배경 */
+    border: 1px solid #c4d4e5;    /* 은은한 테두리 */
+    border-radius: 6px;           /* 부드러운 모서리 */
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+}
+
+/* 마우스 올렸을 때 (Hover) 애니메이션 */
+.btn-autofill:hover {
+    background-color: #0f4c81;    /* 배경색을 메인 컬러로 */
+    color: #ffffff;               /* 글씨는 흰색으로 */
+    border-color: #0f4c81;
+    box-shadow: 0 3px 6px rgba(15, 76, 129, 0.2);
+    transform: translateY(-1px);  /* 살짝 위로 뜨는 느낌 */
+}
+
+/* 아이콘 위치 미세조정 */
+.btn-autofill i {
+    font-size: 14px;
+}

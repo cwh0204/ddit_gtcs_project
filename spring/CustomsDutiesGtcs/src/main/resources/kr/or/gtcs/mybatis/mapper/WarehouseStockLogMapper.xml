@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.or.gtcs.log.warehousestocklog.mapper.WarehouseStockLogMapper">
+
+    <insert id="insertStockLog" parameterType="kr.or.gtcs.dto.WarehouseStockLogDTO">
+        INSERT INTO WAREHOUSE_STOCK_LOG (
+              LOG_ID
+            , ACTION_TYPE
+            , ACTION_DATE
+            , WORKER_ID
+            , STOCK_ID
+            , UNIQUE_NO
+            , ITEM_NAME
+            , QTY
+            , GROSS_WEIGHT
+            , WAREHOUSE_ID
+            , DEL_YN
+            , POSITION_AREA
+            , DECL_NO
+            , MEM_ID
+            , OUT_DATE
+            , REP_NAME
+            , CONT_NO
+        ) VALUES (
+              STOCK_LOG_SEQ.NEXTVAL
+            , #{actionType}
+            , SYSDATE
+            , #{workerId}
+            , #{stockId}
+            , #{uniqueNo}
+            , #{itemName}
+            , #{qty}
+            , #{grossWeight}
+            , #{warehouseId}
+            , 'N'
+            , #{positionArea}
+            , #{declNo}
+            , #{memId}
+            , #{outDate}
+            , #{repName}
+            , #{contNo}
+        )
+    </insert>
+
+	<select id="selectWarehouseLogListByDeclNo" resultType="kr.or.gtcs.dto.WarehouseHistoryDTO">
+        SELECT 
+            L.ACTION_DATE AS "actionDate",
+            L.ACTION_TYPE AS "status",
+            M.MEM_NAME    AS "workerName"
+        FROM WAREHOUSE_STOCK_LOG L
+        LEFT OUTER JOIN MEMBER M ON L.WORKER_ID = M.MEM_ID
+        WHERE L.DECL_NO = #{declNo}
+        ORDER BY L.ACTION_DATE DESC, L.LOG_ID DESC
+    </select>
+
+</mapper>

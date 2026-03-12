@@ -1,0 +1,126 @@
+@charset "UTF-8";
+
+/* [1] 변수 설정 - 유지 */
+:root {
+    --primary-main: #0f4c81;
+    --text-primary: #222;
+    --text-secondary: #666;
+    --bg-light: #f5f7fa;
+    --white: #ffffff;
+}
+
+/* [2] 컨테이너 설정 (body 대신 사용) */
+/* 사이트메쉬 본문 영역 내에서 중앙 정렬을 담당합니다 */
+.error-section {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* 헤더 높이를 제외한 나머지 영역에서 중앙 정렬 */
+    min-height: calc(100vh - 160px); 
+    padding: 40px 20px;
+    box-sizing: border-box;
+}
+
+/* [3] 에러 카드 레이아웃 */
+.error-card {
+    background: var(--white);
+    width: 1700px;
+    padding: 60px 0px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    /* 레이아웃 안에서 붕 뜨지 않도록 마진 제거 */
+    margin: 0 auto;
+}
+
+/* 상단 포인트 바 - 유지 */
+.error-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 6px;
+}
+
+/* [4] 아이콘 영역 - 유지 */
+.icon-area {
+    margin-bottom: 25px;
+    position: relative;
+    display: inline-block;
+}
+
+.main-icon {
+    font-size: 80px;
+    color: var(--primary-main);
+    margin-bottom: 10px;
+}
+
+.icon-circle {
+    width: 120px;
+    height: 120px;
+    background: #f0f4f8;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+}
+
+/* [5] 타이포그래피 - 유지 */
+.error-title {
+    font-size: 26px;
+    font-weight: 800;
+    color: var(--text-primary);
+    margin: 0 0 70px ;
+    word-break: keep-all;
+}
+
+.error-desc {
+    font-size: 15px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin-bottom: 340px;
+    word-break: keep-all;
+}
+
+/* [6] 버튼 그룹 - 유지 */
+.btn-group {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+}
+
+.btn {
+    padding: 12px 24px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.2s;
+}
+
+.btn-primary {
+    background-color: var(--primary-main);
+    color: var(--white);
+    border: 1px solid var(--primary-main);
+}
+
+.btn-primary:hover {
+    background-color: #0a2e5a;
+    box-shadow: 0 4px 10px rgba(15, 76, 129, 0.2);
+}
+
+.btn-outline {
+    background-color: var(--white);
+    color: #555;
+    border: 1px solid #ddd;
+}
+
+/* [7] 하단 문의 안내 - 유지 */
+.contact-info {
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #f0f0f0;
+    font-size: 13px;
+    color: #888;
+}
