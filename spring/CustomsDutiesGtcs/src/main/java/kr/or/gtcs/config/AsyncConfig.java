@@ -7,7 +7,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import java.util.concurrent.Executor;
 
-@EnableAsync // 스프링의 비동기 처리를 활성화합니다.
+@EnableAsync // 스프링의 비동기 처리를 활성화
 @Configuration
 public class AsyncConfig {
 

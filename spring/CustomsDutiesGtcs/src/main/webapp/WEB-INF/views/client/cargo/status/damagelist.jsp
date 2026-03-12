@@ -75,7 +75,7 @@
 .search-bar .form-select { min-width: 100px; cursor: pointer; }
 .search-bar .form-input { width: 180px; }
 
-/* 💡 날짜 입력창 크기를 일시(datetime-local)에 맞게 넓힘 */
+/* 날짜 입력창 크기를 일시(datetime-local)에 맞게 넓힘 */
 .search-bar input[type="datetime-local"].form-input { width: 175px; font-family: inherit; }
 
 .search-divider { width: 1px; height: 20px; background: #d1d5db; margin: 0 4px; }
@@ -87,7 +87,7 @@
 .stats-bar { display: flex; align-items: center; gap: 12px; font-size: 13px; color: #4b5563; margin-bottom: 10px; padding: 8px 14px; background: #fff1f2; border-radius: 6px; border-left: 3px solid #dc3545; }
 .stats-value { font-weight: 700; color: #dc3545; }
 
-/* 뱃지 및 기타 스타일 생략 (기존과 동일하게 유지) */
+/* 뱃지 및 기타 스타일 생략 */
 .badge { padding: 4px 10px; border-radius: 6px; color: #fff; font-size: 11px; font-weight: 600; display: inline-block; min-width: 80px; text-align: center; line-height: 1.2; box-shadow: 0 1px 2px rgba(0,0,0,0.1); letter-spacing: -0.3px; }
 .badge.bonded-in { background-color: #3b82f6; } 
 .badge.bonded { background-color: #2563eb; } 
@@ -193,14 +193,14 @@
 
 <script>
 // =========================================================
-// [1] 전역 변수 (그리드 ID 변경)
+// [1] 전역 변수
 // =========================================================
 const GRID_ID          = 'damageTrackingGrid';
 let currentCargoType   = 'all';
 let originalData       = [];
 
 // =========================================================
-// [2] 상태코드 맵 (기존과 동일)
+// [2] 상태코드 맵
 // =========================================================
 const STATUS_MAP = {
     'BONDED_IN'            : { label: '보세입고완료',   cls: 'bonded-in' },
@@ -277,7 +277,7 @@ const resetSearch = () => {
 };
 
 //=========================================================
-//[5] 필터 적용 및 그리드 업데이트 (시간 비교 완벽 수정판)
+//[5] 필터 적용 및 그리드 업데이트
 //=========================================================
 const applyFiltersAndRender = (isBackground) => {
  const api = getGridApi();
@@ -286,7 +286,6 @@ const applyFiltersAndRender = (isBackground) => {
  const rawDateFrom = document.getElementById('s-dateFrom').value;
  const rawDateTo   = document.getElementById('s-dateTo').value;
 
- // 💡 1. 검색할 시간을 문자열이 아닌 Date 객체(밀리초 숫자)로 변환
  const fromTime = rawDateFrom ? new Date(rawDateFrom).getTime() : null;
  const toTime   = rawDateTo   ? new Date(rawDateTo).getTime() : null;
 
@@ -300,15 +299,12 @@ const applyFiltersAndRender = (isBackground) => {
 
      if (currentCargoType !== 'all' && getCargoType(item) !== currentCargoType) return false;
 
-     // 💡 2. 일시(Datetime) 숫자 비교 로직
      if (fromTime || toTime) {
          if (!item.regDate) return false;
          
-         // DB 데이터에 띄어쓰기가 있다면 'T'로 바꿔서 Date 객체가 안전하게 인식하도록 처리
          const safeRegDate = item.regDate.replace(' ', 'T');
          const itemTime = new Date(safeRegDate).getTime();
          
-         // 숫자로 변환된 시간끼리 정확하게 비교!
          if (fromTime && itemTime < fromTime) return false;
          if (toTime   && itemTime > toTime)   return false;
      }
@@ -325,6 +321,11 @@ const applyFiltersAndRender = (isBackground) => {
          if (!target.includes(keyword)) return false;
      }
      return true;
+ });
+
+ // 1. 데이터에 번호 명찰 달아주기 추가 
+ filtered.forEach((item, index) => {
+     item.listNo = index + 1;
  });
 
  if (typeof api.setGridOption === 'function') {
@@ -378,6 +379,16 @@ function fetchSilentData() {
 document.addEventListener('DOMContentLoaded', () => {
 
     const colDefs = [
+        // 2. No. 컬럼 추가 (listNo 필드 사용) 
+        { 
+            headerName: 'No.', 
+            field: 'listNo', 
+            width: 70, 
+            pinned: 'left', 
+            sortable: false, 
+            filter: false,
+            cellStyle: { textAlign: 'center' } 
+        },
         { headerName: '컨테이너 번호', field: 'contNo', width: 180, pinned: 'left', cellClass: 'cell-left' },
         { headerName: '신고 상태', width: 145, cellRenderer: cargoStatusRenderer, valueGetter: p => getStatus(p.data) },
         

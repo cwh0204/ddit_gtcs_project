@@ -428,7 +428,7 @@ function parseJwt(token) {
     line-height: 1.4;
 
     display: -webkit-box;
-    -webkit-line-clamp: 2;      /* ✅ 최대 2줄 */
+    -webkit-line-clamp: 2;      /* 최대 2줄 */
     -webkit-box-orient: vertical;
 
     overflow: hidden;
@@ -491,7 +491,7 @@ function parseJwt(token) {
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
 
-  white-space: normal;     /* ✅ nowrap 제거 */
+  white-space: normal;     /* nowrap 제거 */
   overflow: hidden;
   text-overflow: ellipsis;
   word-break: break-word;
@@ -938,7 +938,7 @@ function parseJwt(token) {
 	display: flex;
 	flex-direction: column;
 	gap: 4px;
-	justify-content: center; /* ★ 추가: 카드가 위아래로 늘어날 때 내부 요소 세로 중앙 정렬 */
+	justify-content: center; /* 추가: 카드가 위아래로 늘어날 때 내부 요소 세로 중앙 정렬 */
 	transition: all var(--transition);
 	position: relative;
 	overflow: hidden;
@@ -1284,7 +1284,7 @@ function loadDashboardData() {
             updateTabCounts(dashData);
         })
         .catch(function(err) {
-            console.error("❌ 대시보드 조회 실패:", err);
+            console.error("대시보드 조회 실패:", err);
             ['impSuppList','expSuppList','rejectList'].forEach(function(id) {
                 const el = document.getElementById(id);
                 if (el) el.innerHTML = '<div class="empty-list">데이터를 불러올 수 없습니다.</div>';
@@ -1596,7 +1596,7 @@ function goToList(category, status, dateFilter) {
     }
 
     const url = base + (p.length ? '?' + p.join('&') : '');
-    console.log("🔗 페이지 이동:", url);
+    console.log("페이지 이동:", url);
     location.href = url;
 }
 

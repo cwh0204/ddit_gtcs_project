@@ -8,7 +8,7 @@ import kr.or.gtcs.dto.DashboardDTO.*;
 @Mapper
 public interface DashboardMapper {
 
-    // ===== 긴급 (기존 그대로) =====
+    // ===== 긴급 =====
     List<UrgentItem> selectImportSupplements(@Param("memId") Long memId, @Param("limit") int limit);
     int countImportSupplements(@Param("memId") Long memId);
     List<UrgentItem> selectExportSupplements(@Param("memId") Long memId, @Param("limit") int limit);
@@ -18,7 +18,7 @@ public interface DashboardMapper {
     List<UrgentItem> selectExportRejects(@Param("memId") Long memId, @Param("limit") int limit);
     int countExportRejects(@Param("memId") Long memId);
 
-    // ===== KPI (기존 그대로) =====
+    // ===== KPI =====
     int countImportRejectToday(@Param("memId") Long memId);
     int countImportByStatus(@Param("memId") Long memId, @Param("status") String status);
     int countImportCompletedToday(@Param("memId") Long memId);
@@ -30,15 +30,16 @@ public interface DashboardMapper {
     int countTaxPaymentDueToday(@Param("memId") Long memId);
     int countNewImportToday(@Param("memId") Long memId);
     int countNewExportToday(@Param("memId") Long memId);
+    int countImportPayCompletedToday(Integer memId);
 
-    // ===== 차트 (기존 그대로) =====
+    // ===== 차트 =====
     int countTotalApprovedImport(@Param("memId") Long memId);
     int countTotalApprovedExport(@Param("memId") Long memId);
     List<MonthlyTax> selectMonthlyTax(@Param("memId") Long memId);
     List<MonthlyIssue> selectMonthlyIssues(@Param("memId") Long memId);
     List<MonthlyVolume> selectMonthlyVolume(@Param("memId") Long memId);
 
-    // ===== ★ 신규 메서드 (금일 기준) =====
+    // ===== 신규 메서드 =====
     /** 금일 수입 특정 상태 건수 (TRUNC(STATUS_DATE) = TRUNC(SYSDATE)) */
     int countImportTodayByStatus(@Param("memId") Long memId, @Param("status") String status);
     /** 금일 수입 출고완료 */

@@ -197,7 +197,7 @@
     gap: 6px;
 }
 
-/* 커스텀 컨트롤 바 스타일 (수입과 동일) */
+/* 커스텀 컨트롤 바 스타일 */
 .custom-control-bar {
     display: flex;
     justify-content: space-between;
@@ -384,11 +384,21 @@ const normalizeStatus = (status) => {
     if (!status) return '-';
     const s = status.toString().toUpperCase().trim();
     const map = {
-        'BONDED_IN': '보세입고완료', 'WAITING': '심사대기', 'PHYSICAL': '현품검사중',
-        'INSPECTION_COMPLETED': '현품검사완료', 'SUPPLEMENT': '보완/정정', 'REVIEWING': '심사중',
-        'ACCEPTED': '수리', 'REJECTED': '반려', 'PAY_WAITING': '납부 대기',
-        'PAY_COMPLETED': '납부 완료', 'WH_IN_APPROVED': '반입승인', 'WH_IN_REJECTED': '반입차단',
-        'RELEASE_APPROVED': '반출승인', 'RELEASE_REJECTED': '반출차단', 'APPROVED': '통관승인',
+        'BONDED_IN': '보세입고완료',
+        'WAITING': '심사대기',
+        'PHYSICAL': '현품검사중',
+        'INSPECTION_COMPLETED': '현품검사완료',
+        'SUPPLEMENT': '보완/정정',
+        'REVIEWING': '심사중',
+        'ACCEPTED': '수리',
+        'REJECTED': '반려',
+        'PAY_WAITING': '납부 대기',
+        'PAY_COMPLETED': '납부 완료',
+        'WH_IN_APPROVED': '반입승인',
+        'WH_IN_REJECTED': '반입차단',
+        'RELEASE_APPROVED': '반출승인',
+        'RELEASE_REJECTED': '반출차단',
+        'APPROVED': '통관승인',
         'DELIVERED': '출고 완료'
     };
     return map[s] || status;
@@ -399,11 +409,23 @@ const statusBadgeRenderer = (p) => {
     const normalizedStatus = normalizeStatus(originalStatus);
     const s = originalStatus.toString().toUpperCase().trim();
     
+    // 기본값: 회색 (BONDED_IN, WAITING 등)
     let cls = 'wait'; 
-    if (['REVIEWING', 'PHYSICAL', 'SUPPLEMENT'].includes(s)) cls = 'ing';
-    else if (['ACCEPTED', 'PAY_WAITING', 'WH_IN_APPROVED', 'RELEASE_APPROVED'].includes(s)) cls = 'pay';
-    else if (['PAY_COMPLETED', 'APPROVED', 'DELIVERED', 'INSPECTION_COMPLETED'].includes(s)) cls = 'done';
-    else if (['REJECTED', 'WH_IN_REJECTED', 'RELEASE_REJECTED'].includes(s)) cls = 'err';
+    
+    // 상태별 CSS 클래스 세분화 매핑
+    if (['REVIEWING'].includes(s)) {
+        cls = 'ing';          // 파란색 (심사중)
+    } else if (['PHYSICAL'].includes(s)) {
+        cls = 'inspect';      // 청록색 (현품검사중)
+    } else if (['SUPPLEMENT', 'CORRECTION'].includes(s)) {
+        cls = 'supp';         // 주황색 (보완/정정)
+    } else if (['ACCEPTED', 'PAY_WAITING', 'WH_IN_APPROVED', 'RELEASE_APPROVED'].includes(s)) {
+        cls = 'pay';          // 보라색 (수리, 납부대기, 반입/반출승인)
+    } else if (['PAY_COMPLETED', 'APPROVED', 'DELIVERED', 'INSPECTION_COMPLETED'].includes(s)) {
+        cls = 'done';         // 초록색 (납부완료, 승인, 출고, 검사완료)
+    } else if (['REJECTED', 'WH_IN_REJECTED', 'RELEASE_REJECTED'].includes(s)) {
+        cls = 'err';          // 빨간색 (반려, 반입/반출차단)
+    }
     
     return '<span class="badge ' + cls + '">' + normalizedStatus + '</span>';
 };

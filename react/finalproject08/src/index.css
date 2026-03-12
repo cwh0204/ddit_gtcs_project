@@ -1,0 +1,147 @@
+@import "tailwindcss";
+
+@theme {
+  /* 폰트 설정 */
+  --font-sans: "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+
+  /* [Color System] */
+  /* Primary: Classic Blue (헤더, 강조 버튼) */
+  --color-primary: #0f4c81;
+  --color-primary-light: #34689a;
+  --color-primary-dark: #0a365c;
+
+  /* Secondary: Deep Navy (사이드바 배경) - 요청하신 색상 적용 */
+  --color-secondary: #0a2742;
+  --color-secondary-surface: #123150; /* 사이드바 메뉴 선택 시 배경 */
+
+  /* Base Colors */
+  --color-bg-base: #f4f6f8; /* 앱 내부(Main) 배경 */
+  --color-bg-outside: #e5e7eb; /* 브라우저 바깥 배경 (회색) */
+
+  --color-text-main: #111827;
+  --color-text-sub: #6b7280;
+  --color-text-mute: #9ca3af;
+
+  /* [Layout System] - 고정 해상도 */
+  --width-app: 100%;
+  --height-app: 100%; /* 최소 높이 */
+
+  /* [Animation] */
+  --animate-fade-in: fade-in 0.3s ease-out;
+  --animate-scale-up: scale-up 0.3s ease-out;
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  @keyframes scale-up {
+    from {
+      transform: scale(0.95);
+      opacity: 0;
+    }
+    to {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+}
+
+@layer base {
+  body {
+    font-family: var(--font-sans);
+    color: var(--color-text-main);
+    background-color: var(--color-bg-outside);
+
+    /* 브라우저가 작아져도 Body 내용은 줄어들지 않음 */
+    min-width: var(--width-app);
+    min-height: 100vh;
+
+    /* 화면 정중앙 배치 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    margin: 0;
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.5;
+  }
+
+  #root {
+    width: var(--width-app);
+    min-height: var(--height-app); /* 최소 높이 보장 */
+
+    /* 핵심: 앱 자체가 찌그러지지 않도록 고정 */
+    flex-shrink: 0;
+
+    /* 배경색 및 그림자 */
+    background-color: var(--color-bg-base);
+
+    /* Tailwind 유틸리티 적용 (@apply는 @layer 안에서만 동작) */
+    @apply shadow-2xl overflow-hidden relative flex flex-col;
+  }
+
+  /* 입력 필드 공통 스타일 */
+  input:focus,
+  select:focus,
+  textarea:focus {
+    @apply outline-none ring-2 ring-primary border-transparent;
+  }
+
+  /* 스크롤바 커스텀 */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #94a3bb;
+  }
+
+  @layer components {
+    .ag-theme-alpine {
+      /* AG-Grid CSS 변수 오버라이드 */
+      --ag-header-height: 48px;
+      --ag-header-background-color: #f9fafb;
+      --ag-header-foreground-color: #4b5563;
+      --ag-row-height: 48px;
+      --ag-row-border-color: #f3f4f6;
+      --ag-cell-horizontal-padding: 12px;
+      --ag-font-family: var(--font-sans);
+      --ag-font-size: 14px;
+      --ag-foreground-color: #374151;
+
+      /* Hover 제거 */
+      --ag-row-hover-color: #8080801e;
+      --ag-selected-row-background-color: transparent;
+    }
+
+    /* 헤더 정렬 */
+    .ag-theme-alpine .ag-header-cell.ag-center-header .ag-header-cell-label {
+      justify-content: center;
+    }
+
+    .ag-theme-alpine .ag-header-cell.ag-right-header .ag-header-cell-label {
+      justify-content: flex-end;
+    }
+
+    .ag-theme-alpine .ag-header-cell.ag-left-header .ag-header-cell-label {
+      justify-content: flex-start;
+    }
+
+    /* Cell Flex 레이아웃 */
+    .ag-theme-alpine .ag-cell {
+      display: flex;
+      align-items: center;
+    }
+  }
+}

@@ -1,5 +1,6 @@
 package kr.or.gtcs.statistics.service;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -86,5 +87,56 @@ public class StatisticsServiceImpl implements StatisticsService {
             throw new SystemFailureException("마스터 기반 대시보드 통계 조회 중 오류가 발생했습니다. 관리자에게 문의하세요");
         }
     }
+    
+    /**
+     * SLA 대시보드 종합 통계 조회 (BFF 패턴 적용)
+     */
+    @Override
+    public Map<String, Object> findSlaDashboardStats(String startDate, String endDate, String declType) {
+        try {
+            // 결과값을 담을 통합 Map 생성
+            Map<String, Object> finalStats = new HashMap<>();
+
+            // AI 위험도 점수 및 결과(RED/GREEN) 조회
+            Map<String, Object> aiStats = statisticsMapper.selectAiRiskStats(startDate, endDate, declType);
+            finalStats.putAll(aiStats); // Map 병합
+
+            // 총 납부 세액 조회 (수출일 경우 세금이 없으므로 0 처리)
+            if ("EXPORT".equals(declType)) {
+                finalStats.put("totalTaxAmount", 0L);
+            } else {
+                long totalTax = statisticsMapper.selectTotalTaxPayment();
+                finalStats.put("totalTaxAmount", totalTax);
+            }
+
+            // 지연(DELAY_YN) 통계 조회
+            Map<String, Object> delayStats = statisticsMapper.selectDelayStats(startDate, endDate, declType);
+            long delayY = ((Number) delayStats.getOrDefault("delayY", 0)).longValue();
+            long delayN = ((Number) delayStats.getOrDefault("delayN", 0)).longValue();
+            long totalProcessing = delayY + delayN;
+
+            // 지연율 / 정상처리율 퍼센트 계산 (소수점 1자리)
+            double delayYRate = 0.0;
+            double delayNRate = 0.0;
+
+            if (totalProcessing > 0) {
+                delayYRate = Math.round(((double) delayY / totalProcessing * 100.0) * 10) / 10.0;
+                delayNRate = Math.round((100.0 - delayYRate) * 10) / 10.0;
+            }
+
+            // 계산된 지연 통계 데이터 병합
+            finalStats.put("delayY", delayY);
+            finalStats.put("delayN", delayN);
+            finalStats.put("delayYRate", delayYRate);
+            finalStats.put("delayNRate", delayNRate);
+
+            return finalStats;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new SystemFailureException("SLA 통계 조회 중 오류가 발생했습니다 관리자에게 문의하세요");
+        }
+    }
+    
     
 }

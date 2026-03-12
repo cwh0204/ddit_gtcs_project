@@ -37,21 +37,23 @@
 				page="/WEB-INF/views/client/exp/expwrite/exportAttachment.jsp" />
 		</form>
 
-		<div class="footer-btn-group"
-			style="text-align: center; margin-top: 20px">
-
-			<button type="button" class="btn-submit-main"
-				onclick="submitDeclaration('SUBMIT')">전송</button>
-
-			<button type="button" class="btn-reset-main" onclick="resetDeclaration()">삭제</button>
+		<div class="footer-btn-group" 
+		     style="position: relative; display: flex; justify-content: center; align-items: center; margin-top: 20px; gap: 10px;">
+		
+		    <button type="button" class="btn-submit-main" onclick="submitDeclaration('SUBMIT')">전송</button>
+		    <button type="button" class="btn-reset-main" onclick="resetDeclaration()">삭제</button>
+		
+		    <button type="button" id="quick-export-autofill" onclick="autoFillExport()" 
+		            style="position: absolute; right: 0; padding: 8px 16px; background-color: #f3f4f6; color: #4b5563; border: 1px solid #d1d5db; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: bold; transition: background-color 0.2s;" 
+		            title="수출 데이터 자동입력"
+		            onmouseover="this.style.backgroundColor='#e5e7eb'" 
+		            onmouseout="this.style.backgroundColor='#f3f4f6'">
+		            수출 데이터 자동입력
+		    </button>
+		
 		</div>
 	</div>
-	<div id="quick-export-autofill" 
-     onclick="autoFillExport()" 
-     style="position: fixed; top: 0; left: 0; width: 40px; height: 40px; 
-            background: rgba(0,0,0,0.02); z-index: 9999; cursor: pointer;" 
-     title="수출 데이터 자동입력">
-	</div>
+
 </main>
 <script src="/js/shipper/exp/expwrite/exportDeclaration.js"></script>
 <script src="/js/shipper/common/cago/preview.js"></script>

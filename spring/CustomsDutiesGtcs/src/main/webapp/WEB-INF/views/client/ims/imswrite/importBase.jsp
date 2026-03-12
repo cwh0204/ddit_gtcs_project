@@ -45,20 +45,17 @@
 		</form>
 
 		<div class="footer-btn-group"
-            style="text-align: center; margin-top: 20px;">
-            
-            <button type="button" class="btn primary"
-                onclick="submitDeclaration()">전송</button>
-
-            <button type="button" class="btn" onclick="resetForm()">초기화</button>
-        </div>
-	</div>
-	<div id="quick-autofill-trigger" 
-     onclick="autoFill()" 
-     style="position: fixed; top: 0; left: 0; width: 30px; height: 30px; 
-            background: rgba(0,0,0,0.01); z-index: 9999; cursor: pointer;" 
-     title="더미데이터 입력">
-	</div>
+		    style="position: relative; display: flex; justify-content: center; gap: 10px; margin-top: 20px;">
+		    
+		    <button type="button" class="btn primary" onclick="submitDeclaration()">전송</button>
+		    <button type="button" class="btn" onclick="resetForm()">초기화</button>
+		
+		    <div style="position: absolute; right: 0; display: flex; gap: 8px;">
+		        <button type="button" class="btn btn-case-normal" onclick="autoFillPendingCase()">심사중 케이스</button>
+		        <button type="button" class="btn btn-case-reject" onclick="autoFillRejectCase()">반려 케이스</button>
+		    </div>
+		</div>
+	
 </main>
 <script src="/js/shipper/ims/imswrite/importDeclaration.js"></script>
 <script src="/js/shipper/common/cago/preview.js"></script>

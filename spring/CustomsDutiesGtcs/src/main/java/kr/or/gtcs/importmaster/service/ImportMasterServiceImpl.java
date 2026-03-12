@@ -137,12 +137,6 @@ public class ImportMasterServiceImpl implements ImportMasterService {
             if ("ACCEPTED".equals(status)) {
                 if (importId != null) {
                     taxService.generateTaxBill(importId, officerId);
-                    
-                    // SYSTEM 으로 변경 (로그용 마스터 키)
-                    ImportMasterDTO payWaitingMaster = impMapper.selectImportMaster(importId, "SYSTEM");
-                    if (payWaitingMaster != null) {
-                        logService.registerLog(payWaitingMaster, payWaitingMaster.getStatus());
-                    }
                 }
             }
         } catch (Exception e) {

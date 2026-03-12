@@ -456,6 +456,26 @@
 		display: none !important;
 	}
 }
+/* 나타날 때: 위에서 아래로 스르륵 */
+  @keyframes slideDown {
+    from { transform: translateY(-100%); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+  
+  /* 사라질 때: 아래에서 위로 스르륵 */
+  @keyframes slideUp {
+    from { transform: translateY(0); opacity: 1; }
+    to { transform: translateY(-100%); opacity: 0; }
+  }
+
+  /* SweetAlert2에 적용할 클래스 */
+  .my-slide-down {
+    animation: slideDown 0.3s ease-out !important;
+  }
+  .my-slide-up {
+    animation: slideUp 0.3s ease-in !important;
+  }
+  
 </style>
 
 <!-- ===== 고지서 본문 ===== -->
@@ -473,7 +493,7 @@
 
 			<div class="header">
 				<h1>수입 납부 고지서</h1>
-				<div class="issue-info">관세청 (Korea Customs Service)</div>
+				<div class="issue-info">G-TCS (Global Trade Compliance & Logistics System)</div>
 				<span id="currentStatusBadge" class="status-badge status-wait">로딩중</span>
 			</div>
 
@@ -609,7 +629,7 @@
 					onclick="issueVirtualAccount()">가상계좌 발급신청</button>
 				<button id="btnSimulate" class="btn btn-outline"
 					style="display: none; border-color: #f39c12; color: #f39c12;"
-					onclick="openBankSimulator()">[TEST] 은행 납부 시뮬레이터</button>
+					onclick="openBankSimulator()">은행 납부</button>
 				<button id="btnPrint" class="btn btn-outline" style="display: none;"
 					onclick="window.print()">납부영수증 인쇄</button>
 				<button class="btn btn-outline" onclick="history.back()">목록으로</button>
@@ -710,7 +730,14 @@
       currentImportId = importId;
       fetchImportData(importId);
     } else {
-      alert("납부 정보가 존재하지 않습니다.");
+    	Swal.fire({
+    		  icon: 'warning',
+    		  title: '알림',
+    		  text: '납부 정보가 존재하지 않습니다.',
+    		  confirmButtonText: '확인',
+    		  scrollbarPadding: false,
+    		  heightAuto: false
+    		});
       history.back();
     }
   });
@@ -774,14 +801,14 @@
                 currentPayStatus = 'PAY_WAITING';
             }
 
-            console.log("✅ DB 연동 완료 - 상태:", currentPayStatus, "/ 계좌:", currentVacct);
+            console.log("DB 연동 완료 - 상태:", currentPayStatus, "/ 계좌:", currentVacct);
             
             bindDataToNotice(importData);
             applyStatus();
             showContent();
           })
           .catch(function(err) {
-            console.error("❌ 데이터 조회 실패:", err);
+            console.error("데이터 조회 실패:", err);
             showError();
           });
     }
@@ -844,7 +871,7 @@
         els.vacctNumber.style.textDecoration = 'line-through';
         els.vacctNumber.style.color = '#999';
         if (currentBankName) setText('bankNameDisplay', currentBankName);
-        els.vacctAmountMsg.innerHTML = '<strong>✅ 납부가 정상적으로 완료되었습니다.</strong>';
+        els.vacctAmountMsg.innerHTML = '<strong>납부가 정상적으로 완료되었습니다.</strong>';
         els.vacctAmountMsg.style.color = '#2e7d32';
         els.vacctAmountMsg.style.fontSize = '15px';
       }
@@ -876,7 +903,7 @@
 
   function showError() {
     els.pageLoading.innerHTML =
-      '<div style="color:#dc3545;font-size:15px;">⚠ 고지서 정보를 불러올 수 없습니다.<br/>' +
+      '<div style="color:#dc3545;font-size:15px;">고지서 정보를 불러올 수 없습니다.<br/>' +
       '<button class="btn btn-outline" style="margin-top:16px;" onclick="history.back()">돌아가기</button></div>';
   }
 
@@ -885,7 +912,14 @@
    * ================================================================ */
   function issueVirtualAccount() {
     if (!currentImportId) {
-      alert("수입신고 정보가 없습니다.");
+    	Swal.fire({
+            icon: 'warning',
+            title: '알림',
+            text: '수입신고 정보가 없습니다.',
+            confirmButtonText: '확인',
+            scrollbarPadding: false,  // 사이드바 보호 1
+            heightAuto: false         // 사이드바 보호 2
+        });
       return;
     }
 
@@ -905,22 +939,36 @@
           virtualAcct: newVacct
         })
         .then(function(res) {
-          // ★ 여기를 수정했습니다! 데이터가 아니라 HTTP 상태 코드로 성공 여부 판단
+          // 데이터가 아니라 HTTP 상태 코드로 성공 여부 판단
           if (res.status === 200) { 
             currentVacct = newVacct;
             currentBankName = randomBank;
             currentPayStatus = 'PAY_WAITING';
             // 로컬스토리지 저장 로직 완전 삭제 (DB가 우선)
             applyStatus();
-            alert("가상계좌가 발급되었습니다.\n은행: " + randomBank + "\n계좌: " + newVacct);
+            Swal.fire({
+            	  icon: 'success',
+            	  title: '가상계좌가 발급되었습니다.',
+            	  html: '은행: ' + randomBank + '<br>계좌: ' + newVacct,
+            	  confirmButtonText: '확인',
+            	  scrollbarPadding: false,
+            	  heightAuto: false
+            	});
           } else {
-            alert("가상계좌 발급에 실패했습니다.");
+        	  Swal.fire({
+        		  icon: 'error',
+        		  title: '발급 실패',
+        		  text: '가상계좌 발급에 실패했습니다.',
+        		  confirmButtonText: '확인',
+        		  scrollbarPadding: false,
+        		  heightAuto: false
+        		});
             els.btnIssue.innerText = '가상계좌 발급신청';
             els.btnIssue.disabled = false;
           }
       })
       .catch(function(err) {
-        console.error("❌ API 오류:", err);
+        console.error("API 오류:", err);
         alert("서버 오류가 발생했습니다.");
         els.btnIssue.innerText = '가상계좌 발급신청';
         els.btnIssue.disabled = false;
@@ -1006,7 +1054,14 @@
 
   function handlePaymentError(msg) {
     els.loadingOverlay.classList.remove('active');
-    alert("납부 처리 실패: " + msg);
+    Swal.fire({
+        icon: 'error',
+        title: '납부 처리 실패',
+        text: msg,
+        confirmButtonText: '확인',
+        scrollbarPadding: false,
+        heightAuto: false // 사이드바 보호용 옵션
+    });
   }
 
   function closeLoadingOverlay() { els.loadingOverlay.classList.remove('active'); }
@@ -1047,7 +1102,21 @@
   function copyToClipboard() {
     const text = els.vacctNumber.innerText;
     navigator.clipboard.writeText(text).then(function() {
-      alert('계좌번호가 복사되었습니다.');
+    	Swal.fire({
+    		  toast: true,
+    		  position: 'top',
+    		  icon: 'success',
+    		  title: '계좌번호가 복사되었습니다.',
+    		  showConfirmButton: false,
+    		  timer: 1500,
+    		  // 슬라이드 애니메이션 적용
+    		  showClass: {
+			    popup: 'my-slide-down'
+			  },
+			  hideClass: {
+			    popup: 'my-slide-up'
+			  }
+    		});
     });
   }
 </script>

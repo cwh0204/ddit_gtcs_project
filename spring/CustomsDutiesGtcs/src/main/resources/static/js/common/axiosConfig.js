@@ -39,7 +39,8 @@ axios.interceptors.response.use(
                 text: '인증이 만료되었거나 권한이 없습니다. 다시 로그인해주세요.',
                 confirmButtonColor: '#3478f6',
                 confirmButtonText: '확인',
-                allowOutsideClick: false // 바깥 배경을 눌러서 꺼지는 것을 방지
+                allowOutsideClick: false, // 바깥 배경을 눌러서 꺼지는 것을 방지
+                heightAuto: false // 수정 : 이현규 / 이유 : 사이드바 짤림 현상 방지
             }).then((result) => {
                 // 사용자가 '확인' 버튼을 클릭하면 로그인 페이지로 이동
                 if (result.isConfirmed) {

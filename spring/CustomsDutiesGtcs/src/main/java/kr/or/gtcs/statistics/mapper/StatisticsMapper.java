@@ -48,5 +48,26 @@ public interface StatisticsMapper {
             @Param("declType") String declType
     );
 	
-	
+    /**
+     * AI 위험도 점수 구간별 건수 및 RED/GREEN 결과 통계
+     */
+    public Map<String, Object> selectAiRiskStats(
+            @Param("startDate") String startDate,
+            @Param("endDate") String endDate,
+            @Param("declType") String declType
+    );
+
+    /**
+     * IMPORT_TAX_PAYMENT 테이블의 총 납부 세액 합계
+     */
+    public Long selectTotalTaxPayment();
+
+    /**
+     * 수입/수출 신고서 업무 지연(DELAY_YN) 통계
+     */
+    public Map<String, Object> selectDelayStats(
+            @Param("startDate") String startDate,
+            @Param("endDate") String endDate,
+            @Param("declType") String declType
+    );
 }

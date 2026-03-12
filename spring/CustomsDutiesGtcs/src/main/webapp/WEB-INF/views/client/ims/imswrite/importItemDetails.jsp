@@ -17,7 +17,7 @@
 			<td>
 				<div class="flex-row">
 					<input type="text" id="txtHsCode" name="hsCode" class="flex-grow" maxlength="12" placeholder="12자리" />
-					<%-- ✅ id 추가 + 초기 숨김 (보완/정정 상태일 때만 표시됨) --%>
+					<%-- id 추가 + 초기 숨김 (보완/정정 상태일 때만 표시됨) --%>
 					<button type="button" class="btn-lookup edit-only-btn"
 					        onclick="openHsCodePopup('txtHsCode')">HS코드조회</button>
 				</div>
@@ -42,8 +42,6 @@
 			<td>
 				<div class="flex-row">
 					<input type="text" id="txtItemName" name="itemNameDeclared" class="flex-grow" maxlength="50" />
-					<%-- ✅ id 추가 + 초기 숨김 (보완/정정 상태일 때만 표시됨) --%>
-					<button type="button" class="btn-lookup edit-only-btn">거래품명조회</button>
 				</div>
 			</td>
 		</tr>
@@ -67,6 +65,7 @@
 						<option value="M">M</option>
 						<option value="SET">SET</option>
 						<option value="BOX">BOX</option>
+						<option value="PCS">PSC</option>
 					</select>
 				</div>
 			</td>
@@ -118,7 +117,6 @@
 			<td>
 				<div class="flex-row">
 					<input type="text" id="txtOriginCode" name="originCode" class="flex-grow" maxlength="2" placeholder="예: KR, CN, US" style="text-transform: uppercase;" />
-					<button type="button" class="btn-search"><i class="fa-solid fa-magnifying-glass"></i></button>
 				</div>
 			</td>
 			<th class="required">원산지표시유무</th>
@@ -135,7 +133,7 @@
 
 <script>
 // ===================================================================
-// [물품정보 자동 계산 및 유효성 검사]
+// [물품정보 자동 계산 및 이벤트 바인딩]
 // ===================================================================
 
 function calculateAmount() {
@@ -159,64 +157,10 @@ function calculateUSD() {
     if (!krwInput || !usdInput) return;
     
     var krw = parseFloat(krwInput.value) || 0;
-    var exchangeRate = 1300;
+    var exchangeRate = 1300; // 고정 환율
     var usd = krw / exchangeRate;
     
     usdInput.value = usd > 0 ? usd.toFixed(2) : '';
-}
-
-function validateSection3() {
-    var errors = [];
-    
-    var hsCode = document.getElementById('txtHsCode').value.trim();
-    var taxType = document.getElementById('selTaxKind').value;
-    var taxBaseType = document.querySelector('input[name="taxBaseType"]:checked') ? 
-                      document.querySelector('input[name="taxBaseType"]:checked').value : '';
-    var itemNameDeclared = document.getElementById('txtItemName').value.trim();
-    var itemNameTrade = document.getElementById('txtTradeName').value.trim();
-    var qty = document.getElementById('txtQty').value.trim();
-    var qtyUnit = document.getElementById('selQtyUnit').value;
-    var unitPrice = document.getElementById('txtUnitPrice').value.trim();
-    var totalAmount = document.getElementById('txtAmount').value.trim();
-    var netWeight = document.getElementById('txtNetWeight').value.trim();
-    var taxBaseAmtItem = document.getElementById('txtTaxableValueKRW').value.trim();
-    var originCode = document.getElementById('txtOriginCode').value.trim();
-    var originMarkYn = document.getElementById('selOriginMarkYN').value;
-    
-    if (!hsCode) errors.push('HS부호는 필수입니다.');
-    if (!taxType) errors.push('관세구분은 필수입니다.');
-    if (!taxBaseType) errors.push('관세액기준은 필수입니다.');
-    if (!itemNameDeclared) errors.push('신고품명은 필수입니다.');
-    if (!itemNameTrade) errors.push('거래품명은 필수입니다.');
-    if (!qty) errors.push('수량은 필수입니다.');
-    if (!qtyUnit) errors.push('수량 단위는 필수입니다.');
-    if (!unitPrice) errors.push('단가는 필수입니다.');
-    if (!totalAmount) errors.push('금액이 계산되지 않았습니다.');
-    if (!netWeight) errors.push('순중량은 필수입니다.');
-    if (!taxBaseAmtItem) errors.push('과세가격(란별)은 필수입니다.');
-    if (!originCode) errors.push('원산지코드는 필수입니다.');
-    if (!originMarkYn) errors.push('원산지표시유무는 필수입니다.');
-    
-    if (hsCode && hsCode.length !== 12) errors.push('HS부호는 12자리여야 합니다.');
-    if (originCode && originCode.length !== 2) errors.push('원산지코드는 2자리 국가코드여야 합니다 (예: KR, CN, US).');
-    
-    if (qty && isNaN(parseFloat(qty))) errors.push('수량은 숫자여야 합니다.');
-    else if (qty && parseFloat(qty) <= 0) errors.push('수량은 0보다 커야 합니다.');
-    
-    if (unitPrice && isNaN(parseFloat(unitPrice))) errors.push('단가는 숫자여야 합니다.');
-    else if (unitPrice && parseFloat(unitPrice) <= 0) errors.push('단가는 0보다 커야 합니다.');
-    
-    if (netWeight && isNaN(parseFloat(netWeight))) errors.push('순중량은 숫자여야 합니다.');
-    else if (netWeight && parseFloat(netWeight) <= 0) errors.push('순중량은 0보다 커야 합니다.');
-    
-    if (taxBaseAmtItem && isNaN(parseFloat(taxBaseAmtItem))) errors.push('과세가격은 숫자여야 합니다.');
-    
-    if (errors.length > 0) {
-        alert('다음 항목을 확인해주세요:\n\n' + errors.join('\n'));
-        return false;
-    }
-    
-    return true;
 }
 
 // ===================================================================
@@ -233,6 +177,7 @@ function validateSection3() {
         var qtyInput = document.getElementById('txtQty');
         var unitPriceInput = document.getElementById('txtUnitPrice');
         
+        // 수량 입력 이벤트
         if (qtyInput) {
             qtyInput.addEventListener('input', function(e) {
                 this.value = this.value.replace(/[^0-9.]/g, '');
@@ -241,6 +186,7 @@ function validateSection3() {
             qtyInput.addEventListener('blur', calculateAmount);
         }
         
+        // 단가 입력 이벤트
         if (unitPriceInput) {
             unitPriceInput.addEventListener('input', function(e) {
                 this.value = this.value.replace(/[^0-9.]/g, '');
@@ -249,6 +195,7 @@ function validateSection3() {
             unitPriceInput.addEventListener('blur', calculateAmount);
         }
         
+        // 과세가격(KRW) 입력 이벤트
         var taxableKRW = document.getElementById('txtTaxableValueKRW');
         if (taxableKRW) {
             taxableKRW.addEventListener('input', function(e) {
@@ -258,6 +205,7 @@ function validateSection3() {
             taxableKRW.addEventListener('blur', calculateUSD);
         }
         
+        // 숫자만 입력받는 항목들 포맷팅
         var numberInputs = ['txtNetWeight'];
         numberInputs.forEach(function(id) {
             var input = document.getElementById(id);
@@ -274,6 +222,7 @@ function validateSection3() {
             }
         });
         
+        // HS코드 입력 제한 (숫자와 점만 허용)
         var hsCodeInput = document.getElementById('txtHsCode');
         if (hsCodeInput) {
             hsCodeInput.addEventListener('input', function(e) {
@@ -281,6 +230,7 @@ function validateSection3() {
             });
         }
         
+        // 원산지코드 대문자 및 영문만 허용
         var originCodeInput = document.getElementById('txtOriginCode');
         if (originCodeInput) {
             originCodeInput.addEventListener('input', function(e) {
@@ -288,7 +238,7 @@ function validateSection3() {
             });
         }
         
-        console.log('✅ Section3 초기화 완료');
+        console.log('Section3(물품정보) 자동계산 및 이벤트 초기화 완료');
     }
 })();
 </script>

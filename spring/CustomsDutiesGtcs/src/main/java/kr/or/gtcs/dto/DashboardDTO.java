@@ -38,7 +38,7 @@ public class DashboardDTO {
     private int exportCorrectionAfter;
     private int exportCompletedToday;
 
-    // ---- ★ 신규 필드 (금일 기준 카드용) ----
+    // ---- 신규 필드 (금일 기준 카드용) ----
     private int importPhysicalToday;        // 금일 수입 현품검사중
     private int importWaitingToday;         // 금일 수입 심사대기
     private int importReviewingToday;       // 금일 수입 심사중

@@ -19,4 +19,9 @@ public interface StatisticsService {
      */
     public Map<String, Object> findMasterDashboardStats(String startDate, String endDate, String declType);
     
+    
+    /**
+     * SLA 대시보드 종합 통계 조회 (AI 분석, 세액, 지연율)
+     */
+    public Map<String, Object> findSlaDashboardStats(String startDate, String endDate, String declType);
 }

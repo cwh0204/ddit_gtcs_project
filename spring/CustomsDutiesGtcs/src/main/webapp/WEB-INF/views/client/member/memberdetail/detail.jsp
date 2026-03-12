@@ -472,9 +472,206 @@ to {
 .btn-modal-danger:hover {
 	background-color: #c82333;
 }
-</style>
 
-<div class="dashboard-grid">
+/* 페이지 진입 시 비밀번호 확인 모달 */
+.verify-password-overlay {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(0, 0, 0, 0.7);
+	z-index: 9999;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	animation: fadeIn 0.3s;
+}
+
+.verify-password-modal {
+	background-color: #ffffff;
+	border-radius: 16px;
+	width: 90%;
+	max-width: 450px;
+	box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+	animation: slideDown 0.3s;
+	overflow: hidden;
+}
+
+.verify-modal-header {
+	padding: 30px 30px 20px;
+	text-align: center;
+	background: linear-gradient(135deg, #0a1929 0%, #1a5490 100%);
+	color: #ffffff;
+}
+
+.verify-modal-header i {
+	font-size: 48px;
+	margin-bottom: 15px;
+	opacity: 0.9;
+}
+
+.verify-modal-header h2 {
+	margin: 0;
+	font-size: 24px;
+	font-weight: 700;
+	margin-bottom: 8px;
+}
+
+.verify-modal-header p {
+	margin: 0;
+	font-size: 14px;
+	opacity: 0.85;
+	font-weight: 400;
+}
+
+.verify-modal-body {
+	padding: 35px 30px;
+}
+
+.verify-form-group {
+	margin-bottom: 25px;
+}
+
+.verify-form-group label {
+	display: block;
+	margin-bottom: 10px;
+	font-weight: 600;
+	color: #495057;
+	font-size: 14px;
+}
+
+.verify-input-wrapper {
+	position: relative;
+}
+
+.verify-input {
+	width: 100%;
+	padding: 14px 45px 14px 15px;
+	border: 2px solid #dee2e6;
+	border-radius: 10px;
+	font-size: 15px;
+	transition: all 0.2s;
+	box-sizing: border-box;
+}
+
+.verify-input:focus {
+	outline: none;
+	border-color: #1a5490;
+	box-shadow: 0 0 0 3px rgba(26, 84, 144, 0.1);
+}
+
+.verify-toggle-icon {
+	position: absolute;
+	right: 15px;
+	top: 50%;
+	transform: translateY(-50%);
+	cursor: pointer;
+	color: #adb5bd;
+	font-size: 16px;
+	transition: color 0.2s;
+}
+
+.verify-toggle-icon:hover {
+	color: #495057;
+}
+
+.verify-modal-footer {
+	padding: 0 30px 30px;
+	display: flex;
+	gap: 10px;
+}
+
+.verify-btn {
+	flex: 1;
+	padding: 14px;
+	border: none;
+	border-radius: 10px;
+	font-weight: 600;
+	font-size: 15px;
+	cursor: pointer;
+	transition: all 0.2s;
+}
+
+.verify-btn-cancel {
+	background-color: #6c757d;
+	color: #ffffff;
+}
+
+.verify-btn-cancel:hover {
+	background-color: #5a6268;
+	transform: translateY(-1px);
+}
+
+.verify-btn-confirm {
+	background-color: #1a5490;
+	color: #ffffff;
+}
+
+.verify-btn-confirm:hover {
+	background-color: #154173;
+	transform: translateY(-1px);
+}
+
+/* 페이지 콘텐츠 숨김 */
+.page-hidden {
+	filter: blur(5px);
+	pointer-events: none;
+	user-select: none;
+}
+
+/* 비밀번호 에러 메시지 */
+.verify-error-message {
+	color: #dc3545;
+	font-size: 13px;
+	margin-top: 8px;
+	display: none;
+	align-items: center;
+	gap: 6px;
+}
+
+.verify-error-message.show {
+	display: flex;
+}
+
+.verify-error-message i {
+	font-size: 14px;
+}
+</style>
+<!-- 비밀번호 확인 모달 (페이지 진입 시) -->
+<div id="verifyPasswordOverlay" class="verify-password-overlay">
+	<div class="verify-password-modal">
+		<div class="verify-modal-header">
+			<i class="fa-solid fa-shield-halved"></i>
+			<h2>본인 확인</h2>
+			<p>회원 정보 보호를 위해 비밀번호를 입력해주세요</p>
+		</div>
+		<div class="verify-modal-body">
+			<div class="verify-form-group">
+				<label for="verifyPasswordInput">
+					<i class="fa-solid fa-key"></i> 비밀번호
+				</label>
+				<div class="verify-input-wrapper">
+					<input type="password" id="verifyPasswordInput" class="verify-input"
+						placeholder="비밀번호를 입력하세요" autocomplete="off">
+					<i class="fa-regular fa-eye verify-toggle-icon" id="verifyToggleIcon"
+						onclick="toggleVerifyPassword()"></i>
+				</div>
+				<!-- 비밀번호 에러 메시지 -->
+				<div class="verify-error-message" id="verifyErrorMessage">
+				<i class="fa-solid fa-circle-exclamation"></i>
+				<span>비밀번호가 틀렸습니다.</span>
+			</div>
+			</div>
+		</div>
+		<div class="verify-modal-footer">
+			<button class="verify-btn verify-btn-cancel" onclick="cancelVerify()">취소</button>
+			<button class="verify-btn verify-btn-confirm" onclick="confirmVerify()">확인</button>
+		</div>
+	</div>
+</div>
+
+<div class="dashboard-grid page-hidden" id="mainContent">
 	<div class="card-box profile-card">
 		<div class="profile-avatar" id="profileImgArea">
 			<i class="fa-solid fa-user"></i>
@@ -699,9 +896,153 @@ const swalConfig = {
 	};
 	
 let originUserData = {}; 
+let isPasswordVerified = false; // 변수 추가
+
+//JWT 토큰 파싱 함수
+function parseJwt(token) {
+	try {
+		const base64Url = token.split('.')[1];
+		const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+		const jsonPayload = decodeURIComponent(
+			atob(base64).split('').map(function(c) {
+				return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+			}).join('')
+		);
+		return JSON.parse(jsonPayload);
+	} catch (error) {
+		console.error('토큰 파싱 오류:', error);
+		return null;
+	}
+}
+
+//비밀번호 가시성 토글 (진입 모달)
+function toggleVerifyPassword() {
+	const input = document.querySelector('#verifyPasswordInput');
+	const icon = document.querySelector('#verifyToggleIcon');
+	
+	if (input.type === 'password') {
+		input.type = 'text';
+		icon.classList.remove('fa-eye');
+		icon.classList.add('fa-eye-slash');
+	} else {
+		input.type = 'password';
+		icon.classList.remove('fa-eye-slash');
+		icon.classList.add('fa-eye');
+	}
+}
+
+//비밀번호 확인 취소
+function cancelVerify() {
+		location.href = '/';
+}
+
+//비밀번호 확인
+async function confirmVerify() {
+	const password = document.querySelector('#verifyPasswordInput').value.trim();
+	const errorMessage = document.querySelector('#verifyErrorMessage');
+	
+	errorMessage.classList.remove('show');
+	
+	if (!password) {
+		Swal.fire({
+			...swalConfig,
+			icon: 'warning',
+			title: '입력 필요',
+			text: '비밀번호를 입력해주세요.'
+		});
+		return;
+	}
+	
+	const token = localStorage.getItem('accessToken');
+	if (!token) {
+		Swal.fire({
+			...swalConfig,
+			icon: 'warning',
+			title: '로그인 필요',
+			text: '로그인이 필요합니다.'
+		}).then(() => {
+			location.href = '/member/auth/session/login';
+		});
+		return;
+	}
+	
+	// JWT에서 memId 추출
+	const payload = parseJwt(token);
+	const memId = payload.realUser.memId;
+	
+	try {
+		const response = await axios.post('/member/verifyPassword', {
+			memId: memId,
+			password: password
+		}, {
+			headers: {
+				'Authorization': 'Bearer ' + token,
+				'Content-Type': 'application/json'
+			}
+		});
+		
+		if (response.data === 'Y') {
+			// 비밀번호 확인 성공
+			isPasswordVerified = true;
+			document.querySelector('#verifyPasswordOverlay').style.display = 'none';
+			document.querySelector('#mainContent').classList.remove('page-hidden');
+			
+			Swal.fire({
+				...swalConfig,
+				icon: 'success',
+				title: '인증 완료',
+				text: '본인 확인이 완료되었습니다.',
+				timer: 1500,
+				showConfirmButton: false
+			});
+			
+			// 회원 정보 로드
+			loadMemberData();
+		} else {
+			errorMessage.classList.add('show');
+			document.querySelector('#verifyPasswordInput').value = '';
+			document.querySelector('#verifyPasswordInput').focus();
+		}
+	} catch (error) {
+		console.error('비밀번호 확인 에러:', error);
+		if (error.response?.status === 401) {
+			Swal.fire({
+				...swalConfig,
+				icon: 'warning',
+				title: '인증 만료',
+				text: '로그인이 만료되었습니다.'
+			}).then(() => {
+				localStorage.removeItem('accessToken');
+				location.href = '/member/auth/session/login';
+			});
+		} else {
+			errorMessage.classList.add('show');
+			document.querySelector('#verifyPasswordInput').value = '';
+			document.querySelector('#verifyPasswordInput').focus();
+		}
+	}
+}
 
 // 페이지 로드 시 실행
 document.addEventListener('DOMContentLoaded', function() {
+	// Enter 키 이벤트 (비밀번호 확인 모달)
+	const verifyInput = document.querySelector('#verifyPasswordInput');
+	const errorMessage = document.querySelector('#verifyErrorMessage');
+	
+	if (verifyInput) {
+		verifyInput.addEventListener('input', function() {
+			errorMessage.classList.remove('show');
+		});
+		
+		verifyInput.addEventListener('keypress', function(e) {
+			if (e.key === 'Enter') {
+				confirmVerify();
+			}
+		});
+		// 자동 포커스
+		verifyInput.focus();
+	}
+	
     // ===== JWT 토큰 확인 및 axios 헤더 설정 =====
     const token = localStorage.getItem('accessToken');
     if (token) {

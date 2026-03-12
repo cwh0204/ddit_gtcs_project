@@ -13,7 +13,7 @@ public interface MemberMapper {
 	// 아이디 찾기
 	public MemberDTO memberIdFind(MemberDTO member);
 	// 비밀번호 찾기
-	public MemberDTO memberPassFind(MemberDTO member);
+	public int memberPassFind(MemberDTO member);
 	// 아이디 중복
 	public boolean memberIdCheck(MemberDTO member);
 	// 회원가입
@@ -28,4 +28,8 @@ public interface MemberMapper {
 	public int deleteMember(MemberDTO member);
 	// 세관원목록 불러오기
 	public List<MemberDTO> selectListOfficer();
+	// 회원 상세 정보 비밀번호 조회
+	public String memberPwSelect(Integer memId);
+	
+	
 }

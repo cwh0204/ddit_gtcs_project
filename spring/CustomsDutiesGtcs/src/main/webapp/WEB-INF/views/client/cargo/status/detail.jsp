@@ -101,7 +101,7 @@
                                     <td class="px-5 text-gray-900 font-medium" id="d-itemName">-</td>
                                 </tr>
                                 <tr>
-                                    <th class="bg-gray-50/30 px-5 font-semibold text-gray-600 text-left">수량 / 중량</th>
+                                    <th class="bg-gray-50/30 px-5 font-semibold text-gray-600 text-left">수량 / 총중량</th>
                                     <td class="px-5 text-gray-900 font-medium" id="d-qtyWeight">-</td>
                                 </tr>
                                 <tr>
@@ -313,7 +313,7 @@ const renderDetail = (data) => {
  setText('d-repName',   data.repName);
  setText('d-uniqueNo',  data.uniqueNo);
  setText('d-itemName',  data.itemName);
- document.getElementById('d-qtyWeight').textContent = (data.qty || 0) + '개 / ' + (data.grossWeight || 0) + ' kg';
+ document.getElementById('d-qtyWeight').textContent = (data.qty || 0) + 'EA / ' + (data.grossWeight || 0) + ' kg';
  setText('d-delYn', data.delYn === 'Y' ? '출고완료' : '재고중');
 
  document.getElementById('d-location').innerHTML = '<span class="text-blue-600 font-bold">' + (data.warehouseId || '-') + '</span>';
@@ -374,7 +374,7 @@ const renderDetail = (data) => {
  masterBody.innerHTML = masterHtml;
 };
 
-//💡 1. 다운로드 실패 시 Swal 적용 (사이드바 방지 추가)
+//1. 다운로드 실패 시 Swal 적용
 const downloadFile = (fileId) => {
  if(!fileId) {
      Swal.fire({
@@ -410,7 +410,7 @@ const renderHistory = (logs) => {
 
 let currentDetailData = null;
 	
-//💡 2. 데이터 조회 실패 시 Swal 적용 (사이드바 방지 추가)
+//2. 데이터 조회 실패 시 Swal 적용
 const loadDetail = () => {
  const stockNo = getStockNo();
  if (!stockNo || isNaN(Number(stockNo))) {
@@ -483,7 +483,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
  if (typeof initGlobalSSE === 'function') {
      initGlobalSSE(["WAREHOUSE_REFRESH", "IMPORT_REFRESH", "EXPORT_REFRESH"], () => {
-         console.log("🔄 [화물 상세화면] 수입/수출/창고 상태가 변경되어 데이터를 갱신합니다.");
+         console.log("[화물 상세화면] 수입/수출/창고 상태가 변경되어 데이터를 갱신합니다.");
          loadDetail();
      });
  }

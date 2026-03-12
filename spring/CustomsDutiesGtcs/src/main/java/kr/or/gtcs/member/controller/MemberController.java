@@ -158,16 +158,14 @@ public class MemberController {
 	                   + "</div>";
 	    
 	    try {
-	        Object result = memberService.memberPassFind(member);
+	        int result = memberService.memberPassFind(member);
 
-	        if (result != null) {
+	        if (result > 0) {
 	            emailCheck.emailCheck(email, title, content);
 	            return "Y";
 	        }
 	    } catch (Exception e) {
-	        System.out.println("타입 불일치 예외 무시 및 강제 성공 처리: " + e.getMessage());
-	        emailCheck.emailCheck(email, title, content);
-	        return "Y";
+	        System.out.println("비밀번호 찾기 실패: " + e.getMessage());
 	    }
 	    return "N";
 	}
@@ -268,4 +266,22 @@ public class MemberController {
 		return memberService.findListOfficer();
 	}
 	
-}
+	// 회원 상세 정보 비밀번호 조회 
+	@PostMapping("/member/verifyPassword")
+	@ResponseBody
+	public String memberPwSelect(@RequestBody Map<String, Object> params) {
+		        Integer memId = Integer.parseInt(params.get("memId").toString());
+		        String inputPassword = params.get("password").toString();
+		        
+		        String dbPassword = memberService.memberPwSelect(memId);
+		        
+		        if (dbPassword == null) {
+		            return "N";
+		        }
+		        
+		        boolean isCorrect = passwordEncoder.matches(inputPassword, dbPassword);
+		        
+		        return isCorrect ? "Y" : "N";
+		}
+	}
+	

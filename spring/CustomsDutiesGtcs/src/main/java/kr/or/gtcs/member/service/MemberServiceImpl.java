@@ -48,7 +48,7 @@ public class MemberServiceImpl implements MemberService{
 
 	// 비밀번호 찾기
 	@Override
-	public MemberDTO memberPassFind(MemberDTO member) {
+	public int memberPassFind(MemberDTO member) {
 		return memberMapper.memberPassFind(member);
 	}
 
@@ -93,5 +93,11 @@ public class MemberServiceImpl implements MemberService{
 	@Override
 	public List<MemberDTO> findListOfficer() {
 		return memberMapper.selectListOfficer();
+	}
+
+	// 회원 상세 정보 비밀번호 조회 
+	@Override
+	public String memberPwSelect(Integer memId) {
+		return memberMapper.memberPwSelect(memId);
 	}
 }

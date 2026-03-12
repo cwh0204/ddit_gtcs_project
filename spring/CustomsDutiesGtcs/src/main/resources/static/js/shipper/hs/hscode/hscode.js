@@ -37,7 +37,7 @@ function createHsCodeModal() {
                     <input type="text" id="hsSearchUsage" class="hscode-input" placeholder="용도 (예: 남성용)" style="width:100%; height:38px; padding:0 10px; border:1px solid #ccc; border-radius:4px; box-sizing:border-box; font-size:13px; color:#333;" onkeyup="if(window.event.keyCode==13){fetchHsCodeData()}">
                 </div>
 
-                <button type="button" class="btn-blue" onclick="fetchHsCodeData()" style="width:120px; background:#0056b3; color:#fff; border:none; border-radius:4px; cursor:pointer; font-weight:bold; font-size:14px; box-sizing:border-box;">DB 검색</button>
+                <button type="button" class="btn-blue" onclick="fetchHsCodeData()" style="width:120px; background:#0056b3; color:#fff; border:none; border-radius:4px; cursor:pointer; font-weight:bold; font-size:14px; box-sizing:border-box;">AI 검색</button>
             </div>
 
             <div class="hscode-list-container" style="max-height:300px; overflow-y:auto; padding:0 20px 20px 20px;">
@@ -198,7 +198,7 @@ function renderHsCodeList(data) {
 
 // 6. 항목 선택 시 동작
 function selectHsCode(code) {
-    console.log("👉 클릭됨! 선택된 코드:", code, " / 타겟ID:", targetInputId);
+    console.log("클릭됨! 선택된 코드:", code, " / 타겟ID:", targetInputId);
 
     if (targetInputId) {
         const targetInput = document.getElementById(targetInputId);
@@ -209,7 +209,7 @@ function selectHsCode(code) {
             
             targetInput.value = cleanCode; // 값 입력
             
-            console.log("👉 입력 완료! 현재 Input 값:", targetInput.value);
+            console.log("입력 완료! 현재 Input 값:", targetInput.value);
 
             // 이벤트 강제 발생 (화면 갱신용)
             targetInput.dispatchEvent(new Event('input', { bubbles: true }));

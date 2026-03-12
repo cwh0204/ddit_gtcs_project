@@ -1,7 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 
 <style>
-/* ─── importPayment 전용: flex-row / w-fixed 보정 ─── */
+/* importPayment 전용: flex-row / w-fixed 보정 */
 #section3 .flex-row {
     display: flex !important;
     align-items: center !important;
@@ -163,59 +163,7 @@
 
 <script>
 // ===================================================================
-// [Section2 유효성 검사]
-// ===================================================================
-function validateSection2() {
-    var errors = [];
-    
-    var writeDate = document.getElementById('dateWrite').value;
-    var currencyCode = document.getElementById('txtCurrency').value.trim();
-    var payAmount = document.getElementById('txtPayAmt').value.trim();
-    var invoiceNo = document.getElementById('txtInvNo').value.trim();
-    var invoiceDate = document.getElementById('dateInv').value;
-    var contractNo = document.getElementById('txtContractNo').value.trim();
-    var contractDate = document.getElementById('dateCont').value;
-    var poNo = document.getElementById('txtPoNo').value.trim();
-    var poDate = document.getElementById('datePo').value;
-    var incoterms = document.getElementById('selIncoterms').value;
-    var totalWeight = document.getElementById('txtTotalWeight').value.trim();
-    var containerNo = document.getElementById('txtContainerNo').value.trim();
-    
-    if (!writeDate) errors.push('작성일자는 필수입니다.');
-    if (!currencyCode) errors.push('통화 코드는 필수입니다.');
-    if (!payAmount) errors.push('결제금액은 필수입니다.');
-    if (!invoiceNo) errors.push('인보이스 번호는 필수입니다.');
-    if (!invoiceDate) errors.push('인보이스 발행일은 필수입니다.');
-    if (!contractNo) errors.push('계약번호는 필수입니다.');
-    if (!contractDate) errors.push('계약일자는 필수입니다.');
-    if (!poNo) errors.push('구매주문서번호는 필수입니다.');
-    if (!poDate) errors.push('구매주문일은 필수입니다.');
-    if (!incoterms) errors.push('인도조건은 필수입니다.');
-    
-    if (!totalWeight || parseFloat(totalWeight) <= 0) {
-        errors.push('총중량은 필수이며 0보다 커야 합니다.');
-    }
-    
-    if (!containerNo) {
-        errors.push('컨테이너 번호는 필수입니다.');
-    } else if (containerNo.length > 20) {
-        errors.push('컨테이너 번호는 12자리를 넘을 수 없습니다.');
-    }
-    
-    if (payAmount && isNaN(parseFloat(payAmount.replace(/,/g, '')))) {
-        errors.push('결제금액은 숫자여야 합니다.');
-    }
-    
-    if (errors.length > 0) {
-        alert('다음 항목을 확인해주세요:\n\n' + errors.join('\n'));
-        return false;
-    }
-    
-    return true;
-}
-
-// ===================================================================
-// [페이지 로드 시 초기화]
+// [페이지 로드 시 초기화 - 입력 제한 및 포맷팅]
 // ===================================================================
 (function() {
     if (document.readyState === 'loading') {
@@ -225,8 +173,9 @@ function validateSection2() {
     }
     
     function initSection2() {
-        console.log('📄 Section2 페이지 초기화 (심플 버전)');
+        console.log('Section2 페이지 초기화 (심플 버전)');
         
+        // 1. 숫자만 입력 가능하도록 제한할 항목들
         var numberInputs = [
             'txtPayAmt', 'txtTotalWeight', 'txtFreightAmt', 
             'txtInsurAmt', 'txtAddAmt'
@@ -236,22 +185,23 @@ function validateSection2() {
             var input = document.getElementById(id);
             if (input) {
                 input.addEventListener('input', function(e) {
-                    this.value = this.value.replace(/[^0-9.]/g, '');
+                    this.value = this.value.replace(/[^0-9.]/g, ''); // 숫자와 소수점만 허용
                 });
             }
         });
         
+        // 2. 대문자 영문/숫자만 입력 가능하도록 제한할 항목들 (통화코드, 컨테이너번호)
         var upperInputs = ['txtCurrency', 'txtContainerNo'];
         upperInputs.forEach(function(id) {
             var input = document.getElementById(id);
             if(input) {
                 input.addEventListener('input', function(e) {
-                    this.value = this.value.toUpperCase().replace(/[^A-Z0-9-]/g, '');
+                    this.value = this.value.toUpperCase().replace(/[^A-Z0-9-]/g, ''); // 영대문자, 숫자, 하이픈만 허용
                 });
             }
         });
         
-        console.log('✅ Section2 초기화 완료');
+        console.log('Section2(결제 및 세액) 이벤트 초기화 완료');
     }
 })();
 </script>

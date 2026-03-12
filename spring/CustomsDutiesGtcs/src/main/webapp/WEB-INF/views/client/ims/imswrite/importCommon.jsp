@@ -14,7 +14,6 @@
 			<td>
 				<div class="flex-row">
 					<input type="text" id="txtImporterTradeName" name="importerName" class="flex-grow" />
-					<button type="button" class="btn-search"><i class="fa-solid fa-magnifying-glass"></i></button>
 				</div>
 			</td>
 			<th class="required">성명</th>
@@ -65,7 +64,6 @@
 			<td>
 				<div class="flex-row">
 					<input type="text" id="txtTaxpayerCode" name="customsId" class="flex-grow" />
-					<button type="button" class="btn-search"><i class="fa-solid fa-magnifying-glass"></i></button>
 				</div>
 			</td>
 		</tr>
@@ -74,7 +72,6 @@
 			<td colspan="3">
 				<div class="flex-row">
 					<input type="text" id="txtAddress" name="address" class="flex-grow" />
-					<button type="button" class="btn-search"><i class="fa-solid fa-magnifying-glass"></i></button>
 				</div>
 			</td>
 		</tr>
@@ -83,14 +80,12 @@
 			<td>
 				<div class="flex-row">
 					<input type="text" id="txtOverseasBiz" name="overseasBizName" class="flex-grow" />
-					<button type="button" class="btn-search"><i class="fa-solid fa-magnifying-glass"></i></button>
 				</div>
 			</td>
 			<th class="required">해외거래처국적</th>
 			<td>
 				<div class="flex-row">
 					<input type="text" id="txtOverseasNation" name="overseasCountry" class="flex-grow" />
-					<button type="button" class="btn-search"><i class="fa-solid fa-magnifying-glass"></i></button>
 				</div>
 			</td>
 		</tr>
@@ -152,11 +147,10 @@
 		<tr>
 			<th class="required">보세구역 반입일자</th>
 			<td><input type="date" id="dateCarryIn" name="bondedInDate" class="flex-grow" /></td>
-			<th class="required">수입국</th>
+			<th class="required">원산지</th>
 			<td>
 				<div class="flex-row">
 					<input type="text" id="txtImportNation" name="originCountry" class="flex-grow" />
-					<button type="button" class="btn-search"><i class="fa-solid fa-magnifying-glass"></i></button>
 				</div>
 			</td>
 		</tr>
@@ -165,7 +159,6 @@
 			<td>
 				<div class="flex-row">
 					<input type="text" id="txtArrivalPort" name="arrivalPort" class="flex-grow" />
-					<button type="button" class="btn-search"><i class="fa-solid fa-magnifying-glass"></i></button>
 				</div>
 			</td>
 			<th>B/L 또는 AWB</th>
@@ -232,75 +225,4 @@ document.addEventListener('DOMContentLoaded', function() {
         emailDomainInput.addEventListener('blur', updateEmailField);
     }
 });
-
-// ===================================================================
-// [폼 제출 전 유효성 검사 - 공통사항]
-// ===================================================================
-function validateSection1() {
-    const errors = [];
-    
-    // 필수 필드 검증
-    const importerName = document.getElementById('txtImporterTradeName').value.trim();
-    const repName = document.getElementById('txtTaxpayerName').value.trim();
-    const telNo = document.getElementById('txtRepTel').value.trim();
-    const bizRegNo = document.getElementById('txtBizRegNo').value.trim();
-    const customsId = document.getElementById('txtTaxpayerCode').value.trim();
-    const address = document.getElementById('txtAddress').value.trim();
-    const overseasBizName = document.getElementById('txtOverseasBiz').value.trim();
-    const overseasCountry = document.getElementById('txtOverseasNation').value.trim();
-    const importType = document.getElementById('selImportType').value;
-    const cargoMgmtNo = document.getElementById('txtCargoManageNo').value.trim();
-    const vesselName = document.getElementById('txtVesselName').value.trim();
-    const arrivalEstDate = document.getElementById('dateArrival').value;
-    const bondedInDate = document.getElementById('dateCarryIn').value;
-    const originCountry = document.getElementById('txtImportNation').value.trim();
-    
-    // 이메일 통합 확인
-    updateEmailField();
-    const email = document.getElementById('hiddenEmail').value;
-    
-    // 필수 입력 체크
-    if (!importerName) errors.push('기업명은 필수입니다.');
-    if (!repName) errors.push('성명은 필수입니다.');
-    if (!telNo) errors.push('전화번호는 필수입니다.');
-    if (!email) errors.push('이메일은 필수입니다.');
-    if (!bizRegNo) errors.push('사업자등록번호는 필수입니다.');
-    if (!customsId) errors.push('통관고유부호는 필수입니다.');
-    if (!address) errors.push('주소는 필수입니다.');
-    if (!overseasBizName) errors.push('해외거래처명은 필수입니다.');
-    if (!overseasCountry) errors.push('해외거래처국적은 필수입니다.');
-    if (!importType) errors.push('수입종류는 필수입니다.');
-    if (!cargoMgmtNo) errors.push('화물관리번호는 필수입니다.');
-    if (!vesselName) errors.push('선기명은 필수입니다.');
-    if (!arrivalEstDate) errors.push('입항예정일은 필수입니다.');
-    if (!bondedInDate) errors.push('보세구역 반입일자는 필수입니다.');
-    if (!originCountry) errors.push('수입국은 필수입니다.');
-    
-    // 사업자등록번호 형식 검증 (10자리 숫자)
-    if (bizRegNo && !/^\d{10}$/.test(bizRegNo)) {
-        errors.push('사업자등록번호는 10자리 숫자여야 합니다.');
-    }
-    
-    // 통관고유부호 형식 검증 (13자리)
-    if (customsId && customsId.length !== 13) {
-        errors.push('통관고유부호는 13자리여야 합니다.');
-    }
-    
-    // 화물관리번호 형식 검증 (14자리)
-    if (cargoMgmtNo && cargoMgmtNo.length !== 14) {
-        errors.push('화물관리번호는 14자리여야 합니다.');
-    }
-    
-    // 이메일 형식 검증
-    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-        errors.push('이메일 형식이 올바르지 않습니다.');
-    }
-    
-    if (errors.length > 0) {
-        alert('다음 항목을 확인해주세요:\n\n' + errors.join('\n'));
-        return false;
-    }
-    
-    return true;
-}
 </script>

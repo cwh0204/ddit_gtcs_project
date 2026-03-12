@@ -11,29 +11,26 @@
         </colgroup>
         <tbody>
             <tr>
-                <th>적용환율</th>
-                <td colspan="3">
+                <th class="required">적용환율</th>
+                <td>
                     <div class="flex-row" style="gap: 5px;">
-                        <input type="text" id="txtExchangeRate" name="exchangeRate" class="flex-grow text-right" placeholder="0.00" />
-                        <select id="selExchangeCurr" style="width: 120px;">
-                            <option value="USD">USD (미국)</option>
-                            <option value="CNY">CNY (중국)</option>
-                            <option value="TWD">TWD (대만)</option>
+                    	<select id="selExchangeCurr" style="width: 100px;">
+                            <option value="USD">USD</option>
+                            <option value="CNY">CNY</option>
+                            <option value="TWD">TWD</option>
                         </select>
+                        <input type="text" id="txtExchangeRate" name="exchangeRate" class="flex-grow text-right" placeholder="0.00" />
+                        
                     </div>
                 </td>
-            </tr>
-
-            <tr>
                 <th class="required">통화코드 / 결제금액</th>
-                <td colspan="3">
+                <td>
                     <div class="flex-row" style="gap: 5px;">
-                        <select id="selCurrencyCode" name="currencyCode" style="width: 90px;">
+                        <select id="selCurrencyCode" name="currencyCode" style="width: 80px;">
                             <option value="USD" selected>USD</option>
                             <option value="CNY">CNY</option>
                             <option value="TWD">TWD</option>
                         </select>
-                        <button type="button" class="btn-lookup edit-only-btn" onclick="alert('준비중...')">환율조회</button>
                         <input type="text" id="txtPaymentAmount" name="payAmount" class="flex-grow text-right" value="0" placeholder="0.00" />
                     </div>
                 </td>
@@ -43,7 +40,6 @@
                 <th>운임료</th>
                 <td>
                     <div class="flex-row" style="gap: 5px;">
-                        <button type="button" class="btn-lookup edit-only-btn" onclick="alert('준비중...')">조회</button>
                         <input type="text" id="txtFreightUSD" class="flex-grow text-right" placeholder="USD" />
                         <span>/</span>
                         <input type="text" id="txtFreightKRW" name="freightAmt" class="flex-grow text-right" placeholder="KRW" />
@@ -52,7 +48,6 @@
                 <th>운송보험료</th>
                 <td>
                     <div class="flex-row" style="gap: 5px;">
-                        <button type="button" class="btn-lookup edit-only-btn" onclick="alert('준비중...')">조회</button>
                         <input type="text" id="txtInsuranceUSD" class="flex-grow text-right" placeholder="USD" />
                         <span>/</span>
                         <input type="text" id="txtInsuranceKRW" name="insuranceAmt" class="flex-grow text-right" placeholder="KRW" />
@@ -77,14 +72,12 @@
                 <td>
                     <div class="flex-row" style="gap: 2px;">
                         <input type="text" id="txtBondedReporter" name="bondedRepName" class="flex-grow" />
-                        <button type="button" class="btn-search"><i class="fa-solid fa-magnifying-glass"></i></button>
                     </div>
                 </td>
                 <th>선박회사(항공사)</th>
                 <td>
                     <div class="flex-row" style="gap: 2px;">
                         <input type="text" id="txtCarrierCode" name="carrierName" class="flex-grow" />
-                        <button type="button" class="btn-search"><i class="fa-solid fa-magnifying-glass"></i></button>
                     </div>
                 </td>
             </tr>

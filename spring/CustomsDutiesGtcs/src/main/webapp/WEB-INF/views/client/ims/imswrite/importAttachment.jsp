@@ -120,7 +120,7 @@
 var FileManager = (function() {
     'use strict';
     
-    console.log('📁 FileManager 초기화');
+    console.log('FileManager 초기화');
     
     var otherFilesList = [];
     var MAX_FILE_SIZE = 32 * 1024 * 1024;
@@ -227,7 +227,7 @@ var FileManager = (function() {
         });
         
         if (isDuplicate) {
-            console.log('⚠️ 중복 파일 무시: ' + file.name);
+            console.log('중복 파일 무시: ' + file.name);
             return false;
         }
         
@@ -252,7 +252,7 @@ var FileManager = (function() {
                 
                 displaySpan.textContent = file.name + ' (' + formatFileSize(file.size) + ')';
                 displaySpan.classList.add('selected');
-                console.log('✓ 필수 파일 선택: ' + file.name);
+                console.log('필수 파일 선택: ' + file.name);
             } else {
                 displaySpan.textContent = '선택된 파일 없음';
                 displaySpan.classList.remove('selected');
@@ -381,7 +381,7 @@ var FileManager = (function() {
                 FileManager.updateRowSelection(checkbox);
             });
             
-            console.log('☑️ 전체 선택: ' + masterCheckbox.checked);
+            console.log('전체 선택: ' + masterCheckbox.checked);
         },
         
         updateRowSelection: function(checkbox) {
@@ -435,13 +435,13 @@ var FileManager = (function() {
         },
         
         init: function() {
-            console.log('🚀 FileManager 초기화 시작');
+            console.log('FileManager 초기화 시작');
             
             var dropZone = document.getElementById('dropZone');
             var fileInput = document.getElementById('fileInput');
             
             if (!dropZone || !fileInput) {
-                console.error('❌ 필수 요소를 찾을 수 없습니다');
+                console.error('필수 요소를 찾을 수 없습니다');
                 return;
             }
             
@@ -481,7 +481,7 @@ var FileManager = (function() {
             
             updateFileCount();
             
-            console.log('✅ FileManager 초기화 완료');
+            console.log('FileManager 초기화 완료');
         }
     };
 })();
@@ -499,12 +499,12 @@ function validateSection4() {
     
     function initSection4() {
         console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-        console.log('📎 Section4 (첨부파일) 페이지 초기화');
+        console.log('Section4 (첨부파일) 페이지 초기화');
         console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
         
         FileManager.init();
         
-        console.log('✅ Section4 초기화 완료');
+        console.log('Section4 초기화 완료');
         console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
     }
 })();

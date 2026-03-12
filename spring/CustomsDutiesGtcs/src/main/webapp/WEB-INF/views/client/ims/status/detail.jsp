@@ -343,6 +343,38 @@ to {
 	line-height: 1;
 	white-space: nowrap
 }
+/* 미리보기 버튼 디자인 */
+.btn-preview {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 8px;
+    background: #fff;
+    color: #0f4c81;
+    border: 1px solid #0f4c81;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 11px;
+    font-weight: 600;
+    transition: all 0.2s;
+    margin-left: 5px;
+    vertical-align: middle;
+}
+
+.btn-preview:hover {
+    background: #eef4f9;
+}
+
+.btn-preview i {
+    font-size: 12px;
+}
+
+/* 모달 내부 이미지가 너무 커지지 않게 제한 */
+#preview-body img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
 </style>
 
 <div class="main-content">
@@ -355,21 +387,23 @@ to {
 				style="vertical-align: middle; margin-left: 10px;"></span>
 		</h2>
 		<div class="action-buttons">
-			<button id="btnPrintCert" class="btn-print" style="display: none;" onclick="printCertificate()">
-			    <i class="fas fa-file-invoice"></i> 필증 출력
-			</button>
-			<button class="btn-secondary"
-				onclick="location.href='/client/ims/status/list'">목록</button>
-			<button id="btnSubmitAction" class="btn-primary"
-				style="display: none;" onclick="handleFinalSubmit()">
-				<i class="fas fa-check-circle"></i> <span id="btnSubmitText">내역
-					제출</span>
-			</button>
-			<button id="btnPayTax" class="btn-primary"
-				style="display: none; background-color: #6f42c1;"
-				onclick="goToPaymentPage()">
-				<i class="fas fa-credit-card"></i> 관세 납부하기
-			</button>
+		    <button id="btnPrintCert" class="btn-print" style="display: none;" onclick="printCertificate()">
+		        <i class="fas fa-file-invoice"></i> 필증 출력
+		    </button>
+		    
+		    <button id="btnSubmitAction" class="btn-primary"
+		        style="display: none;" onclick="handleFinalSubmit()">
+		        <i class="fas fa-check-circle"></i> <span id="btnSubmitText">보완/정정 내역 제출</span>
+		    </button>
+		    
+		    <button id="btnPayTax" class="btn-primary"
+		        style="display: none; background-color: #6f42c1;"
+		        onclick="goToPaymentPage()">
+		        <i class="fas fa-credit-card"></i> 관세 납부하기
+		    </button>
+		    
+		    <button class="btn-secondary"
+		        onclick="location.href='/client/ims/status/list'">목록</button>
 		</div>
 	</div>
 	<div class="decl-info-box">
@@ -475,6 +509,8 @@ to {
 	</div>
 </div>
 
+<script src="/js/shipper/common/cago/preview.js"></script>
+
 <script>
     // [1] 전역 변수 설정
     let g_importData = null;
@@ -482,28 +518,64 @@ to {
     const API_URL = '/rest/import';
     const FILE_API_URL = '/rest/file';
     const FIELD_MAPPING = {
-        'importerName':'txtImporterTradeName', 'repName':'txtTaxpayerName', 'telNo':'txtRepTel',
-        'bizRegNo':'txtBizRegNo', 'customsId':'txtTaxpayerCode', 'address':'txtAddress',
-        'overseasBizName':'txtOverseasBiz', 'overseasCountry':'txtOverseasNation', 'importType':'selImportType',
-        'cargoMgmtNo':'txtCargoManageNo', 'contNo':'txtContainerNo', 'vesselName':'txtVesselName',
-        'vesselNation':'selVesselNation', 'arrivalEstDate':'dateArrival', 'bondedInDate':'dateCarryIn',
-        'originCountry':'txtImportNation', 'arrivalPort':'txtArrivalPort', 'blNo':'txtBLNo',
-        'submitDate':'dateWrite', 'currencyCode':'txtCurrency', 'payAmount':'txtPayAmt',
-        'invoiceNo':'txtInvNo', 'invoiceDate':'dateInv', 'contractNo':'txtContractNo',
-        'contractDate':'dateCont', 'poNo':'txtPoNo', 'poDate':'datePo', 'incoterms':'selIncoterms',
-        'totalWeight':'txtTotalWeight', 'originCertYn':'selOriginCertYn', 'freightCurrency':'selFreightCurr',
-        'freightAmt':'txtFreightAmt', 'insuranceCurrency':'selInsurCurr', 'insuranceAmt':'txtInsurAmt',
-        'addAmtCurrency':'selAddCurr', 'addAmt':'txtAddAmt', 'totalTaxBase':'txtTotalTaxable',
-        'totalDuty':'txtTotalDuty', 'totalVat':'txtTotalVat', 'totalTaxSum':'txtTotalTaxSum',
-        'hsCode':'txtHsCode', 'taxType':'selTaxKind', 'itemNameDeclared':'txtItemName',
-        'itemNameTrade':'txtTradeName', 'modelName':'txtModelSpec', 'qty':'txtQty',
-        'qtyUnit':'txtQtyUnit', 'unitPrice':'txtUnitPrice', 'totalAmount':'txtAmount',
-        'originCode':'txtOriginCode', 'originMarkYn':'selOriginMarkYN', 'netWeight':'txtNetWeight',
+        'importerName':'txtImporterTradeName',
+        'repName':'txtTaxpayerName',
+        'telNo':'txtRepTel',
+        'bizRegNo':'txtBizRegNo',
+        'customsId':'txtTaxpayerCode',
+        'address':'txtAddress',
+        'overseasBizName':'txtOverseasBiz',
+        'overseasCountry':'txtOverseasNation',
+        'importType':'selImportType',
+        'cargoMgmtNo':'txtCargoManageNo',
+        'contNo':'txtContainerNo',
+        'vesselName':'txtVesselName',
+        'vesselNation':'selVesselNation',
+        'arrivalEstDate':'dateArrival',
+        'bondedInDate':'dateCarryIn',
+        'originCountry':'txtImportNation',
+        'arrivalPort':'txtArrivalPort',
+        'blNo':'txtBLNo',
+        'submitDate':'dateWrite',
+        'currencyCode':'txtCurrency',
+        'payAmount':'txtPayAmt',
+        'invoiceNo':'txtInvNo',
+        'invoiceDate':'dateInv',
+        'contractNo':'txtContractNo',
+        'contractDate':'dateCont', 
+        'poNo':'txtPoNo',
+        'poDate':'datePo',
+        'incoterms':'selIncoterms',
+        'totalWeight':'txtTotalWeight',
+        'originCertYn':'selOriginCertYn',
+        'freightCurrency':'selFreightCurr',
+        'freightAmt':'txtFreightAmt',
+        'insuranceCurrency':'selInsurCurr',
+        'insuranceAmt':'txtInsurAmt',
+        'addAmtCurrency':'selAddCurr',
+        'addAmt':'txtAddAmt',
+        'totalTaxBase':'txtTotalTaxable',
+        'totalDuty':'txtTotalDuty',
+        'totalVat':'txtTotalVat',
+        'totalTaxSum':'txtTotalTaxSum',
+        'hsCode':'txtHsCode',
+        'taxType':'selTaxKind',
+        'itemNameDeclared':'txtItemName',
+        'itemNameTrade':'txtTradeName',
+        'modelName':'txtModelSpec',
+        'qty':'txtQty',
+        'qtyUnit':'txtQtyUnit',
+        'unitPrice':'txtUnitPrice',
+        'totalAmount':'txtAmount',
+        'originCode':'txtOriginCode',
+        'originMarkYn':'selOriginMarkYN',
+        'netWeight':'txtNetWeight',
         'taxBaseAmtItem':'txtTaxableValueKRW'
     };
 
     document.addEventListener("DOMContentLoaded", function() {
         initPageLayout();
+        initLoadingSpinner(); // 스피너 호출
         const p = new URLSearchParams(window.location.search);
         const id = p.get('id');
         
@@ -517,7 +589,7 @@ to {
                 });
             }
         } else {
-            // 💡 ID 없을 때 Swal 적용
+            // ID 없을 때 Swal 적용
             Swal.fire({
                 icon: 'warning',
                 title: '잘못된 접근',
@@ -542,7 +614,7 @@ to {
     /* 필증 출력 - iframe 백그라운드 인쇄 방식 */
     function printCertificate() {
         if (!g_importData) { 
-            // 💡 데이터 로드 전 필증 출력 클릭 시 Swal 적용
+            // 데이터 로드 전 필증 출력 클릭 시 Swal 적용
             Swal.fire({
                 icon: 'info',
                 title: '데이터 확인 중',
@@ -565,7 +637,10 @@ to {
         const IM = { '11': '11 (신속)', '21': '21 (일반)' };
 
         let b = '';
-        b += '<div class="hdr"><div class="logo">G-TCS</div><div class="hm"><h1>수 입 신 고 필 증</h1></div><div class="hr"><div class="bdg">감 &nbsp; 지</div></div></div>';
+        b += '<div class="hdr" style="position: relative; display: flex; justify-content: center; align-items: center;">' + 
+        '<div class="hm"><h1>수 입 신 고 필 증</h1></div>' + 
+        '<div class="hr" style="position: absolute; right: 0;"><div class="bdg">감 &nbsp; 지</div></div>' + 
+      	'</div>';
         
         b += '<table><colgroup><col style="width:10%"><col style="width:17%"><col style="width:7%"><col style="width:14%"><col style="width:7%"><col style="width:11%"><col style="width:7%"><col style="width:14%"><col style="width:13%"></colgroup>';
         b += '<tr><th><span class="cn">①</span>신고번호</th><td class="v">' + V(d.importNumber) + '</td><th><span class="cn">②</span>신고일</th><td class="v">' + V(d.submitDate) + '</td><th><span class="cn">③</span>세관·과</th><td class="v">' + V(d.customsOffice) + '</td><th><span class="cn">④</span>입항일</th><td class="v">' + V(d.arrivalEstDate) + '</td><td class="c sm">작성일:' + V(d.submitDate) + '</td></tr></table>';
@@ -705,7 +780,7 @@ to {
             }
         })
         .catch(function() {
-            // 💡 조회 실패 Swal 적용
+            // 조회 실패 Swal 적용
             Swal.fire({
                 icon: 'error',
                 title: '조회 실패',
@@ -786,8 +861,19 @@ to {
                 if (key !== 'OTHER' && p[key]) return;
                 p[key] = true;
                 
-                const icon = getFileIcon(file.fileName);
-                const html = '<div style="display:flex;align-items:center;gap:10px;padding:5px 0;"><i class="fas ' + icon.class + '" style="color:' + icon.color + ';font-size:18px;"></i><a href="/download/' + file.fileId + '" class="file-link">' + file.fileName + '</a></div>';
+                const fileName = file.fileName || '';
+                const icon = getFileIcon(fileName);
+                
+                // 미리보기 버튼 추가 및 openById 호출
+                const html = 
+                    '<div style="display:flex;align-items:center;gap:10px;padding:5px 0;">' +
+                        '<i class="fas ' + icon.class + '" style="color:' + icon.color + ';font-size:18px;"></i>' +
+                        '<a href="javascript:void(0);" onclick="downloadFileSwal(\'' + file.fileId + '\', \'' + fileName + '\')" class="file-link">' + fileName + '</a>' +
+                        '<button type="button" class="btn-preview" onclick="FilePreviewer.openById(\'' + file.fileId + '\', \'' + fileName + '\')">' +
+                            '<i class="fas fa-eye"></i> 미리보기' +
+                        '</button>' +
+                    '</div>';
+                
                 const vd = document.getElementById('view-' + key);
                 if (vd) vd.innerHTML = html;
             });
@@ -796,33 +882,43 @@ to {
         Object.keys(uiMap).forEach(function(t) {
             const u = uiMap[t];
             const a = document.getElementById(u.actionId);
-            if (a) a.innerHTML = '<input type="file" id="input-' + t + '" style="display:none" onchange="stageFileForUpload(\'' + t + '\',this)"><button type="button" class="btn-file-change edit-only-btn" onclick="document.getElementById(\'input-' + t + '\').click()"><i class="fas fa-folder-open"></i> ' + (t === 'OTHER' ? '파일 추가' : '파일 변경') + '</button>';
+            if (a) {
+                a.innerHTML = '<input type="file" id="input-' + t + '" style="display:none" onchange="stageFileForUpload(\'' + t + '\',this)">' +
+                              '<button type="button" class="btn-file-change edit-only-btn" style="display:none;" ' + 
+                              'onclick="document.getElementById(\'input-' + t + '\').click()">' +
+                              '<i class="fas fa-folder-open"></i> ' + (t === 'OTHER' ? '파일 추가' : '파일 변경') + 
+                              '</button>';
+            }
         });
     }
 
     function stageFileForUpload(type, input) {
         if (!input.files || !input.files.length) return;
         const file = input.files[0];
-        if (file.size > 10 * 1024 * 1024) {
-            // 💡 파일 용량 초과 시 Swal 적용
+        if (file.size > 32 * 1024 * 1024) {
             Swal.fire({
-                icon: 'warning',
-                title: '용량 초과',
-                text: '10MB 이하만 가능합니다.',
-                confirmButtonColor: '#f59e0b',
-                confirmButtonText: '확인',
-                scrollbarPadding: false,
-                heightAuto: false
+                icon: 'warning', title: '용량 초과', text: '32MB 이하만 가능합니다.',
+                confirmButtonColor: '#f59e0b', scrollbarPadding: false, heightAuto: false
             });
-            input.value = "";
-            return;
+            input.value = ""; return;
         }
         g_pendingFiles[type] = file;
         const vd = document.getElementById('view-' + type);
-        if (vd) vd.innerHTML = '<div style="display:flex;align-items:center;gap:10px;padding:5px 0;"><span class="new-file-badge">NEW</span><span class="pending-file-text">' + file.name + '</span></div>';
+        if (vd) {
+            // NEW 파일용 미리보기 버튼 추가
+            vd.innerHTML = 
+                '<div style="display:flex;align-items:center;gap:10px;padding:5px 0;">' +
+                    '<span class="new-file-badge">NEW</span>' +
+                    '<span class="pending-file-text">' + file.name + '</span>' +
+                    '<button type="button" class="btn-preview" onclick="FilePreviewer.open(document.getElementById(\'input-' + type + '\'))">' +
+                        '<i class="fas fa-eye"></i> 미리보기' +
+                    '</button>' +
+                '</div>';
+        }
     }
 
     function applyPageStatus(data) {
+        console.log("현재 상태값 확인:", data.status);
         if (!data) return;
         const s = (data.status || '').toUpperCase().trim();
         updateStatusBadge(data);
@@ -831,12 +927,31 @@ to {
         const btnP = document.getElementById("btnPayTax");
         const btnPrint = document.getElementById("btnPrintCert"); 
         
-        btnS.style.display = "none";
-        btnP.style.display = "none";
+        // 초기화
+        if (btnS) btnS.style.display = "none";
+        if (btnP) btnP.style.display = "none";
         if (btnPrint) btnPrint.style.display = "none"; 
+
+        // 보완/정정 상태일 때 처리
+        if (s === 'SUPPLEMENT' || s === 'CORRECTION') {
+            if (btnS) btnS.style.display = "inline-block";
+            
+            // 버튼이 생성된 후(renderAttachments 이후)에 다시 찾아야 합니다.
+            // .edit-only-btn과 .btn-file-change를 모두 찾아 강제 표시
+            setTimeout(() => {
+                const fileBtns = document.querySelectorAll('.btn-file-change, .edit-only-btn');
+                fileBtns.forEach(btn => {
+                    btn.style.setProperty('display', 'inline-block', 'important');
+                });
+                console.log("파일 변경 버튼 강제 노출 완료 (개수: " + fileBtns.length + ")");
+            }, 100); // 0.1초 정도 여유를 주어 DOM 생성을 기다림
+
+        } else {
+            const fileBtns = document.querySelectorAll('.btn-file-change, .edit-only-btn');
+            fileBtns.forEach(btn => btn.style.display = "none");
+        }
         
-        if (s === 'SUPPLEMENT' || s === 'CORRECTION') btnS.style.display = "inline-block";
-        
+        // 관세 납부 및 필증 출력 로직 (기존과 동일)
         if (s === 'PAY_WAITING') {
             btnP.style.display = "inline-block";
             btnP.innerHTML = '<i class="fas fa-credit-card"></i> 관세 납부하기';
@@ -856,13 +971,22 @@ to {
 
     function normalizeStatusString(s) {
         const m = {
-            'BONDED_IN': '보세입고완료', 'WAITING': '심사대기', 'PHYSICAL': '현품검사중',
-            'INSPECTION_COMPLETED': '현품검사완료', 'SUPPLEMENT': '보완/정정',
-            'REVIEWING': '심사중', 'ACCEPTED': '수리', 'REJECTED': '반려',
-            'PAY_WAITING': '납부 대기', 'PAY_COMPLETED': '납부 완료',
-            'WH_IN_APPROVED': '반입승인', 'WH_IN_REJECTED': '반입차단',
-            'RELEASE_APPROVED': '반출승인', 'RELEASE_REJECTED': '반출차단',
-            'APPROVED': '통관승인', 'DELIVERED': '출고 완료'
+            'BONDED_IN': '보세입고완료',
+            'WAITING': '심사대기',
+            'PHYSICAL': '현품검사중',
+            'INSPECTION_COMPLETED': '현품검사완료',
+            'SUPPLEMENT': '보완/정정',
+            'REVIEWING': '심사중',
+            'ACCEPTED': '수리',
+            'REJECTED': '반려',
+            'PAY_WAITING': '납부 대기',
+            'PAY_COMPLETED': '납부 완료',
+            'WH_IN_APPROVED': '반입승인',
+            'WH_IN_REJECTED': '반입차단',
+            'RELEASE_APPROVED': '반출승인',
+            'RELEASE_REJECTED': '반출차단',
+            'APPROVED': '통관승인',
+            'DELIVERED': '출고 완료'
         };
         return m[s] || s;
     }
@@ -872,83 +996,100 @@ to {
         if (!badge || !data) return;
         const s = (data.status || '').toUpperCase().trim();
         const n = normalizeStatusString(s);
+        
         let cls = 'wait';
-        if (['REVIEWING', 'PHYSICAL', 'SUPPLEMENT'].indexOf(s) > -1) cls = 'ing';
-        else if (['ACCEPTED', 'PAY_WAITING', 'WH_IN_APPROVED', 'RELEASE_APPROVED'].indexOf(s) > -1) cls = 'pay';
-        else if (['PAY_COMPLETED', 'APPROVED', 'DELIVERED', 'INSPECTION_COMPLETED'].includes(s)) cls = 'done';
-        else if (['REJECTED', 'WH_IN_REJECTED', 'RELEASE_REJECTED'].includes(s)) cls = 'err';
+        if (['REVIEWING'].includes(s)) {
+            cls = 'ing';          // 파란색 (심사중)
+        } else if (['PHYSICAL'].includes(s)) {
+            cls = 'inspect';      // 청록색 (현품검사중)
+        } else if (['SUPPLEMENT', 'CORRECTION'].includes(s)) {
+            cls = 'supp';         // 주황색 (보완/정정)
+        } else if (['ACCEPTED', 'PAY_WAITING', 'WH_IN_APPROVED', 'RELEASE_APPROVED'].includes(s)) {
+            cls = 'pay';          // 보라색 (수리, 납부대기 등)
+        } else if (['PAY_COMPLETED', 'APPROVED', 'DELIVERED', 'INSPECTION_COMPLETED'].includes(s)) {
+            cls = 'done';         // 초록색 (납부완료, 승인, 출고, 검사완료)
+        } else if (['REJECTED', 'WH_IN_REJECTED', 'RELEASE_REJECTED'].includes(s)) {
+            cls = 'err';          // 빨간색 (반려, 반입/반출차단)
+        }
         
         badge.innerText = n;
         badge.className = 'badge ' + cls;
     }
 
-    // 💡 보완/정정 제출 시 Swal 적용
+    // 보완/정정 제출 시 Swal 적용
     async function handleFinalSubmit() {
-        const confirmResult = await Swal.fire({
-            title: '보완 내역 제출',
-            text: '수정된 내용과 파일을 제출하시겠습니까?',
-            icon: 'question',
-            showCancelButton: true,
-            confirmButtonColor: '#0f4c81',
-            cancelButtonColor: '#6c757d',
-            confirmButtonText: '제출',
-            cancelButtonText: '취소',
-            scrollbarPadding: false,
-            heightAuto: false
-        });
+    const confirmResult = await Swal.fire({
+        title: '보완 내역 제출',
+        text: '수정된 내용과 파일을 제출하시겠습니까?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#0f4c81',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: '제출',
+        cancelButtonText: '취소',
+        scrollbarPadding: false,
+        heightAuto: false
+    });
 
-        if (!confirmResult.isConfirmed) return;
+    if (!confirmResult.isConfirmed) return;
 
-        const btn = document.getElementById("btnSubmitAction");
-        btn.disabled = true;
-        btn.innerText = "제출 중...";
+    // 로딩 시작
+    toggleLoading(true);
 
-        try {
-            const fv = collectFormToData();
-            const sd = Object.assign({}, g_importData, fv, { status: 'REVIEWING' });
-            delete sd.fileList;
-            delete sd.logs;
-            delete sd.aiDocCheck;
-            
-            const fd = new FormData();
-            fd.append("data", new Blob([JSON.stringify(sd)], { type: 'application/json' }));
-            if (g_pendingFiles['INVOICE']) fd.append('invoiceFile', g_pendingFiles['INVOICE']);
-            if (g_pendingFiles['PACKINGLIST']) fd.append('packinglistFile', g_pendingFiles['PACKINGLIST']);
-            if (g_pendingFiles['BL']) fd.append('blFile', g_pendingFiles['BL']);
-            if (g_pendingFiles['OTHER']) fd.append('otherFile', g_pendingFiles['OTHER']);
-            
-            const res = await axios.put('/rest/import/modify', fd, { headers: { 'Content-Type': 'multipart/form-data' } });
-            
-            if (res.status === 200 || res.data > 0) {
-                // 💡 성공 시 Swal 적용
-                Swal.fire({
-                    icon: 'success',
-                    title: '제출 완료',
-                    text: '보완/정정 제출이 완료되었습니다.',
-                    confirmButtonColor: '#0f4c81',
-                    confirmButtonText: '확인',
-                    scrollbarPadding: false,
-                    heightAuto: false
-                }).then(() => {
-                    location.href = "/client/ims/status/list";
-                });
-            } else throw new Error("서버 응답 오류");
-        } catch(err) {
-            console.error(err);
-            // 💡 실패 시 Swal 적용
+    const btn = document.getElementById("btnSubmitAction");
+    btn.disabled = true;
+    btn.innerText = "제출 중...";
+
+    try {
+        const fv = collectFormToData();
+        const sd = Object.assign({}, g_importData, fv, { status: 'REVIEWING' });
+        delete sd.fileList;
+        delete sd.logs;
+        delete sd.aiDocCheck;
+        
+        const fd = new FormData();
+        fd.append("data", new Blob([JSON.stringify(sd)], { type: 'application/json' }));
+        if (g_pendingFiles['INVOICE']) fd.append('invoiceFile', g_pendingFiles['INVOICE']);
+        if (g_pendingFiles['PACKINGLIST']) fd.append('packinglistFile', g_pendingFiles['PACKINGLIST']);
+        if (g_pendingFiles['BL']) fd.append('blFile', g_pendingFiles['BL']);
+        if (g_pendingFiles['OTHER']) fd.append('otherFile', g_pendingFiles['OTHER']);
+        
+        const res = await axios.put('/rest/import/modify', fd, { headers: { 'Content-Type': 'multipart/form-data' } });
+        
+        // 로딩 종료
+        toggleLoading(false);
+
+        if (res.status === 200 || res.data > 0) {
             Swal.fire({
-                icon: 'error',
-                title: '제출 실패',
-                text: '제출 오류: ' + (err.response?.data?.message || err.message),
-                confirmButtonColor: '#dc3545',
+                icon: 'success',
+                title: '제출 완료',
+                text: '보완/정정 제출이 완료되었습니다.',
+                confirmButtonColor: '#0f4c81',
                 confirmButtonText: '확인',
                 scrollbarPadding: false,
                 heightAuto: false
+            }).then(() => {
+                location.href = "/client/ims/status/list";
             });
-            btn.disabled = false;
-            btn.innerText = "내역 제출";
-        }
+        } else throw new Error("서버 응답 오류");
+    } catch(err) {
+        // 에러 시에도 로딩 종료
+        toggleLoading(false);
+
+        console.error(err);
+        Swal.fire({
+            icon: 'error',
+            title: '제출 실패',
+            text: '제출 오류: ' + (err.response?.data?.message || err.message),
+            confirmButtonColor: '#dc3545',
+            confirmButtonText: '확인',
+            scrollbarPadding: false,
+            heightAuto: false
+        });
+        btn.disabled = false;
+        btn.innerText = "내역 제출";
     }
+}
 
     function collectFormToData() {
         const data = {};
@@ -971,11 +1112,17 @@ to {
         document.querySelectorAll('.form-table input,.form-table select,.form-table textarea').forEach(function(el) {
             if (e) {
                 el.removeAttribute('readonly');
-                if (el.tagName === 'SELECT') el.removeAttribute('disabled');
+                // SELECT뿐만 아니라 RADIO, CHECKBOX 타입도 disabled 해제
+                if (el.tagName === 'SELECT' || el.type === 'radio' || el.type === 'checkbox') {
+                    el.removeAttribute('disabled');
+                }
                 el.style.backgroundColor = "#fff";
             } else {
                 el.setAttribute('readonly', true);
-                if (el.tagName === 'SELECT') el.setAttribute('disabled', true);
+                // SELECT뿐만 아니라 RADIO, CHECKBOX 타입도 disabled 설정
+                if (el.tagName === 'SELECT' || el.type === 'radio' || el.type === 'checkbox') {
+                    el.setAttribute('disabled', true);
+                }
                 el.style.backgroundColor = "#f8f9fa";
             }
         });
@@ -1055,5 +1202,78 @@ to {
 
     function goToPaymentPage() {
         if (g_importData) location.href = '/client/pay/payment/payment?importId=' + g_importData.importId;
+    }
+    /* UI 유틸리티 - 로딩 스피너 동적 생성 */
+    function initLoadingSpinner() {
+        if (!document.getElementById('spinner-style')) {
+            const style = document.createElement('style');
+            style.id = 'spinner-style';
+            style.innerHTML = `
+                #loadingOverlay {
+                    display: none;
+                    position: fixed;
+                    top: 0; left: 0;
+                    width: 100%; height: 100%;
+                    background: rgba(0, 0, 0, 0.5);
+                    z-index: 9999;
+                    justify-content: center;
+                    align-items: center;
+                    flex-direction: column;
+                }
+                .spinner {
+                    border: 5px solid #f3f3f3;
+                    border-top: 5px solid #3498db;
+                    border-radius: 50%;
+                    width: 50px; height: 50px;
+                    animation: spin 1s linear infinite;
+                    margin-bottom: 15px;
+                }
+                .loading-text {
+                    color: white;
+                    font-weight: bold;
+                    font-size: 16px;
+                }
+                @keyframes spin {
+                    0% { transform: rotate(0deg); }
+                    100% { transform: rotate(360deg); }
+                }
+            `;
+            document.head.appendChild(style);
+        }
+
+        if (!document.getElementById('loadingOverlay')) {
+            const overlay = document.createElement('div');
+            overlay.id = 'loadingOverlay';
+            overlay.innerHTML = `
+                <div class="spinner"></div>
+                <div class="loading-text">보완 내역을 처리 중입니다...</div>
+            `;
+            document.body.appendChild(overlay);
+        }
+    }
+
+    function toggleLoading(isShow) {
+        const overlay = document.getElementById('loadingOverlay');
+        if (overlay) {
+            overlay.style.display = isShow ? 'flex' : 'none';
+        }
+    }
+	// 파일 다운로드 및 에러 처리 함수
+    function downloadFileSwal(fileId, fileName) {
+        if (!fileId) {
+            Swal.fire({
+                icon: 'warning',
+                title: '다운로드 불가',
+                text: '파일 ID가 존재하지 않습니다.',
+                confirmButtonColor: '#0f4c81',
+                confirmButtonText: '확인',
+                scrollbarPadding: false,
+                heightAuto: false
+            });
+            return;
+        }
+        
+        // 실제 다운로드 요청 URL로 이동
+        location.href = '/download/' + fileId;
     }
 </script>

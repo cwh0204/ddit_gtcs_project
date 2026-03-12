@@ -435,6 +435,38 @@ to {
 .btn-lookup:active {
 	transform: translateY(0);
 }
+/* 미리보기 버튼 디자인 */
+.btn-preview {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 8px;
+    background: #fff;
+    color: #0f4c81;
+    border: 1px solid #0f4c81;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 11px;
+    font-weight: 600;
+    transition: all 0.2s;
+    margin-left: 5px;
+    vertical-align: middle;
+}
+
+.btn-preview:hover {
+    background: #eef4f9;
+}
+
+.btn-preview i {
+    font-size: 12px;
+}
+
+/* 모달 내부 이미지가 너무 커지지 않게 제한 */
+#preview-body img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
 </style>
 
 <div class="main-content">
@@ -560,6 +592,8 @@ to {
 	</div>
 </div>
 
+<script src="/js/shipper/common/cago/preview.js"></script>
+
 <script>
     // [1] 전역 변수 설정
     let g_exportData = null;
@@ -599,6 +633,7 @@ to {
 
     document.addEventListener("DOMContentLoaded", function() {
         initPageLayout();
+        initLoadingSpinner(); // 스피너 호출
         const urlParams = new URLSearchParams(window.location.search);
         const exportId = urlParams.get('id');
 
@@ -607,13 +642,13 @@ to {
             
             if (typeof initGlobalSSE === 'function') {
                 initGlobalSSE(["EXPORT_REFRESH", "WAREHOUSE_REFRESH", "IMPORT_REFRESH"], function() {
-                    console.log("🔄 [수출 상세화면] 수입/수출/창고 상태가 변경되어 최신 데이터를 다시 불러옵니다.");
+                    console.log("[수출 상세화면] 수입/수출/창고 상태가 변경되어 최신 데이터를 다시 불러옵니다.");
                     fetchExportDetail(exportId); 
                 });
             }
             
         } else {
-            // 💡 잘못된 접근 Swal
+            // 잘못된 접근 Swal
             Swal.fire({
                 icon: 'warning',
                 title: '잘못된 접근',
@@ -628,10 +663,10 @@ to {
         }
     });
 
-    /* 수출신고 필증 출력 - iframe 백그라운드 인쇄 방식         */
+    /* 수출신고 필증 출력 - iframe 백그라운드 인쇄 방식 */
     function printExportCertificate() {
         if (!g_exportData) { 
-            // 💡 데이터 로드 전 인쇄 시도 Swal
+            // 데이터 로드 전 인쇄 시도 Swal
             Swal.fire({
                 icon: 'info',
                 title: '데이터 확인 중',
@@ -769,10 +804,10 @@ to {
     function fetchExportDetail(id) {
         axios.get(`\${API_URL}/\${id}`, { params: { memRole: 'UA' } })
             .then(response => {
-                console.log("📦 서버 응답 전체:", response);
+                console.log("서버 응답 전체:", response);
                 g_exportData = response.data;
                 if (!g_exportData) { 
-                    // 💡 상세 조회 실패 Swal
+                    // 상세 조회 실패 Swal
                     Swal.fire({
                         icon: 'error',
                         title: '조회 실패',
@@ -804,8 +839,8 @@ to {
                 }
             })
             .catch(error => {
-                console.error("❌ 상세 정보 로드 실패:", error);
-                // 💡 통신 오류 Swal
+                console.error("상세 정보 로드 실패:", error);
+                // 통신 오류 Swal
                 Swal.fire({
                     icon: 'error',
                     title: '서버 오류',
@@ -818,7 +853,6 @@ to {
             });
     }
 
-    // [3] 첨부파일 렌더링
     function renderAttachments(fileList) {
         const uiMap = {
             'INVOICE':     { viewId: 'cell-invoice', actionId: 'action-INVOICE' },
@@ -827,54 +861,59 @@ to {
             'OTHER':       { viewId: 'cell-other',   actionId: 'action-OTHER' }
         };
 
-        Object.keys(uiMap).forEach(type => {
-            const target = uiMap[type];
-            const viewCell = document.getElementById(target.viewId);
-            const actionSpan = document.getElementById(target.actionId);
+        // 1. 초기화
+        Object.keys(uiMap).forEach(function(type) {
+            var target = uiMap[type];
+            var viewCell = document.getElementById(target.viewId);
+            var actionSpan = document.getElementById(target.actionId);
             if(viewCell) {
-                viewCell.innerHTML = `<div id="view-\${type}"><span class="file-name-display" style="color:#ccc;">등록된 파일 없음</span></div>`;
+                viewCell.innerHTML = '<div id="view-' + type + '"><span style="color:#ccc;">등록된 파일 없음</span></div>';
                 viewCell.closest('td').classList.remove('file-slot-active');
             }
             if(actionSpan) actionSpan.innerHTML = '';
         });
 
+        // 2. 기존 파일 렌더링
         if (fileList && fileList.length > 0) {
-            fileList.forEach(file => {
-                let typeRaw = (file.fileType || '').toUpperCase().replace(/[\s_-]/g, '');
-                let typeKey = 'OTHER';
+            fileList.forEach(function(file) {
+                var typeRaw = (file.fileType || '').toUpperCase().replace(/[\s_-]/g, '');
+                var typeKey = 'OTHER';
                 if (typeRaw === 'INVOICE') typeKey = 'INVOICE';
                 else if (typeRaw.includes('PACKING') || typeRaw === 'PL') typeKey = 'PACKINGLIST';
                 else if (typeRaw === 'BL') typeKey = 'BL';
 
-                const fileName = file.fileName || '';
-                const iconData = getFileIcon(fileName);
-                const fileLinkHtml = `
-                    <div style="display: flex; align-items: center; gap: 10px; padding: 5px 0;">
-                        <i class="fas \${iconData.class}" style="color: \${iconData.color}; font-size: 18px;"></i>
-                        <a href="javascript:void(0);" onclick="downloadFileSwal('\${file.fileId}', '\${fileName}')" class="file-link" title="\${fileName}">\${fileName}</a>
-                    </div>
-                `;
-                if (uiMap[typeKey]) {
-                    const target = uiMap[typeKey];
-                    const viewCell = document.getElementById(target.viewId);
-                    const viewDiv = viewCell.querySelector(`#view-\${typeKey}`);
-                    if(viewDiv) viewDiv.innerHTML = fileLinkHtml;
-                    viewCell.closest('td').classList.add('file-slot-active');
-                }
+                var fileName = file.fileName || '';
+                var iconData = getFileIcon(fileName);
+                
+                // 백틱 제거 및 openById 호출부 강화
+                var fileLinkHtml = 
+			    '<div style="display: flex; align-items: center; gap: 10px; padding: 5px 0;">' +
+			        '<i class="fas ' + iconData.class + '" style="color: ' + iconData.color + '; font-size: 18px;"></i>' +
+			        '<a href="javascript:void(0);" onclick="downloadFileSwal(\'' + file.fileId + '\', \'' + fileName + '\')" class="file-link">' + fileName + '</a>' +
+			        // 핵심: onclick에 직접 openById를 연결
+			        '<button type="button" class="btn-preview" onclick="FilePreviewer.openById(\'' + file.fileId + '\', \'' + fileName + '\')">' +
+			            '<i class="fas fa-eye"></i> 미리보기' +
+			        '</button>' +
+			    '</div>';
+
+                var target = uiMap[typeKey];
+                var viewCell = document.getElementById(target.viewId);
+                var viewDiv = viewCell ? viewCell.querySelector('#view-' + typeKey) : null;
+                if(viewDiv) viewDiv.innerHTML = fileLinkHtml;
+                if(viewCell) viewCell.closest('td').classList.add('file-slot-active');
             });
         }
 
-        Object.keys(uiMap).forEach(type => {
-            const target = uiMap[type];
-            const actionSpan = document.getElementById(target.actionId);
+        // 3. 파일 변경 버튼 (수입신고 때 버튼 안 뜨던 문제 해결 코드 포함)
+        Object.keys(uiMap).forEach(function(type) {
+            var target = uiMap[type];
+            var actionSpan = document.getElementById(target.actionId);
             if (actionSpan) {
-                const accept = ".pdf,.jpg,.jpeg,.png,.xlsx,.xls";
-                actionSpan.innerHTML = `
-                    <input type="file" id="input-\${type}" style="display:none" accept="\${accept}" onchange="stageFileForUpload('\${type}', this)">
-                    <button type="button" class="btn-file-change edit-only-btn" onclick="document.getElementById('input-\${type}').click()">
-                        <i class="fas fa-folder-open"></i> \${type === 'OTHER' ? '파일 추가' : '파일 변경'}
-                    </button>
-                `;
+                actionSpan.innerHTML = 
+                    '<input type="file" id="input-' + type + '" style="display:none" onchange="stageFileForUpload(\'' + type + '\', this)">' +
+                    '<button type="button" class="btn-file-change edit-only-btn" onclick="document.getElementById(\'input-' + type + '\').click()">' +
+                        '<i class="fas fa-folder-open"></i> ' + (type === 'OTHER' ? '파일 추가' : '파일 변경') + 
+                    '</button>';
             }
         });
     }
@@ -882,7 +921,7 @@ to {
     // 파일 다운로드 에러 처리 함수
     function downloadFileSwal(fileId, fileName) {
         if (!fileId) {
-            // 💡 파일 다운로드 실패 Swal
+            // 파일 다운로드 실패 Swal
             Swal.fire({
                 icon: 'warning',
                 title: '다운로드 불가',
@@ -897,36 +936,48 @@ to {
         location.href = `/download/\${fileId}`;
     }
 
-    // [4] 파일 선택 핸들러
+ // [4] 파일 선택 핸들러 (NEW 파일 처리)
     function stageFileForUpload(type, input) {
         if (!input.files || input.files.length === 0) return;
         const file = input.files[0];
+        
+        // 용량 체크
         if (file.size > 32 * 1024 * 1024) {
-            // 💡 파일 용량 초과 Swal
             Swal.fire({
                 icon: 'warning',
                 title: '용량 초과',
                 text: '파일 크기는 32MB를 초과할 수 없습니다.',
                 confirmButtonColor: '#f59e0b',
                 confirmButtonText: '확인',
-                scrollbarPadding: false,
-                heightAuto: false
+                scrollbarPadding: false, heightAuto: false
             });
-            input.value = "";
-            return;
+            input.value = ""; return;
         }
+
         g_pendingFiles[type] = file;
         const viewIdMap = { 'INVOICE': 'cell-invoice', 'PACKINGLIST': 'cell-packing', 'BL': 'cell-bl', 'OTHER': 'cell-other' };
         const viewCell = document.getElementById(viewIdMap[type]);
+        
         if(viewCell) {
             const viewDiv = viewCell.querySelector(`#view-\${type}`);
+            // NEW 파일 레이아웃 수정 및 이벤트 연결
             viewDiv.innerHTML = `
                 <div style="display: flex; align-items: center; gap: 10px; padding: 5px 0;">
                     <span class="new-file-badge">NEW</span>
                     <span class="pending-file-text">\${file.name}</span>
-                    <span style="font-size:11px; color:#666;">(제출 시 업로드)</span>
+                    <button type="button" class="btn-preview" id="btn-pre-\${type}">
+                        <i class="fas fa-eye"></i> 미리보기
+                    </button>
                 </div>
             `;
+            
+            // 버튼 클릭 시 FilePreviewer 매니저 호출
+            const preBtn = document.getElementById(`btn-pre-\${type}`);
+            if(preBtn) {
+                preBtn.onclick = function() {
+                    FilePreviewer.open(input); 
+                };
+            }
             viewCell.closest('td').classList.add('file-slot-active');
         }
     }
@@ -957,9 +1008,8 @@ to {
         toggleFormEditable(statusRaw === 'SUPPLEMENT' || statusRaw === 'CORRECTION');
     }
 
-    // [6] 최종 제출 (보완/정정)
+ 	// [6] 최종 제출 (보완/정정) 수정본
     async function handleFinalSubmit() {
-        // 💡 보완/정정 제출 확인 Swal
         const result = await Swal.fire({
             title: '보완 내역 제출',
             text: '수정된 내용과 변경된 파일을 제출하시겠습니까?',
@@ -975,6 +1025,9 @@ to {
 
         if (!result.isConfirmed) return;
 
+        // 로딩 시작
+        toggleLoading(true);
+
         const btnSubmit = document.getElementById("btnSubmitAction");
         btnSubmit.disabled = true;
         btnSubmit.innerText = "제출 중...";
@@ -987,6 +1040,7 @@ to {
                 status: 'REVIEWING',
                 docComment: '보완/정정 자료 제출 완료 (파일 수정 포함)'
             };
+            // 데이터 정제...
             delete submissionData.fileList;
             delete submissionData.containerList;
             delete submissionData.logs;
@@ -1003,8 +1057,10 @@ to {
                 headers: { 'Content-Type': 'multipart/form-data' }
             });
 
+            // 로딩 종료
+            toggleLoading(false);
+
             if (res.status === 200 || res.data > 0) {
-                // 💡 보완/정정 제출 성공 Swal
                 Swal.fire({
                     icon: 'success',
                     title: '제출 성공',
@@ -1020,8 +1076,10 @@ to {
                 throw new Error("서버 응답 오류");
             }
         } catch (err) {
+            // 에러 발생 시에도 로딩 종료
+            toggleLoading(false);
+
             console.error("제출 오류:", err);
-            // 💡 보완/정정 제출 실패 Swal
             Swal.fire({
                 icon: 'error',
                 title: '제출 실패',
@@ -1112,11 +1170,21 @@ to {
         const s = (data.status || '').toUpperCase().trim();
         const normalized = normalizeStatusString(s);
         let cls = 'wait';
-        if (['REVIEWING', 'PHYSICAL'].includes(s)) cls = 'ing';
-        else if (s === 'SUPPLEMENT') cls = 'supp';
-        else if (['ACCEPTED', 'PAY_WAITING', 'WH_IN_APPROVED', 'RELEASE_APPROVED'].includes(s)) cls = 'pay';
-        else if (['PAY_COMPLETED', 'APPROVED', 'DELIVERED'].includes(s)) cls = 'done';
-        else if (['REJECTED', 'WH_IN_REJECTED', 'RELEASE_REJECTED'].includes(s)) cls = 'err';
+        
+        if (['REVIEWING'].includes(s)) {
+            cls = 'ing';          // 파란색 (심사중)
+        } else if (['PHYSICAL'].includes(s)) {
+            cls = 'inspect';      // 청록색 (현품검사중)
+        } else if (['SUPPLEMENT', 'CORRECTION'].includes(s)) {
+            cls = 'supp';         // 주황색 (보완/정정)
+        } else if (['ACCEPTED', 'PAY_WAITING', 'WH_IN_APPROVED', 'RELEASE_APPROVED'].includes(s)) {
+            cls = 'pay';          // 보라색 (수리, 납부대기 등)
+        } else if (['PAY_COMPLETED', 'APPROVED', 'DELIVERED', 'INSPECTION_COMPLETED'].includes(s)) {
+            cls = 'done';         // 초록색 (납부완료, 승인, 출고, 검사완료)
+        } else if (['REJECTED', 'WH_IN_REJECTED', 'RELEASE_REJECTED'].includes(s)) {
+            cls = 'err';          // 빨간색 (반려, 반입/반출차단)
+        }
+
         badge.innerText = normalized;
         badge.className = `badge \${cls}`;
     }
@@ -1237,5 +1305,60 @@ to {
             case 'zip': case '7z': icon = { class: 'fa-file-archive', color: '#8e44ad' }; break;
         }
         return icon;
+    }
+    /* UI 유틸리티 - 로딩 스피너 동적 생성 */
+    function initLoadingSpinner() {
+        if (!document.getElementById('spinner-style')) {
+            const style = document.createElement('style');
+            style.id = 'spinner-style';
+            style.innerHTML = `
+                #loadingOverlay {
+                    display: none;
+                    position: fixed;
+                    top: 0; left: 0;
+                    width: 100%; height: 100%;
+                    background: rgba(0, 0, 0, 0.5);
+                    z-index: 9999;
+                    justify-content: center;
+                    align-items: center;
+                    flex-direction: column;
+                }
+                .spinner {
+                    border: 5px solid #f3f3f3;
+                    border-top: 5px solid #3498db;
+                    border-radius: 50%;
+                    width: 50px; height: 50px;
+                    animation: spin 1s linear infinite;
+                    margin-bottom: 15px;
+                }
+                .loading-text {
+                    color: white;
+                    font-weight: bold;
+                    font-size: 16px;
+                }
+                @keyframes spin {
+                    0% { transform: rotate(0deg); }
+                    100% { transform: rotate(360deg); }
+                }
+            `;
+            document.head.appendChild(style);
+        }
+
+        if (!document.getElementById('loadingOverlay')) {
+            const overlay = document.createElement('div');
+            overlay.id = 'loadingOverlay';
+            overlay.innerHTML = `
+                <div class="spinner"></div>
+                <div class="loading-text">수출 보완 내역을 처리 중입니다...</div>
+            `;
+            document.body.appendChild(overlay);
+        }
+    }
+
+    function toggleLoading(isShow) {
+        const overlay = document.getElementById('loadingOverlay');
+        if (overlay) {
+            overlay.style.display = isShow ? 'flex' : 'none';
+        }
     }
 </script>

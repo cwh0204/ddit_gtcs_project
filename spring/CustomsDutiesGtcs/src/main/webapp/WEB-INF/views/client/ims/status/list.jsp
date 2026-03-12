@@ -73,7 +73,7 @@
 	background: #dc3545;
 }
 
-/* ▼▼▼ [추가] 커스텀 컨트롤 바 스타일 ▼▼▼ */
+/* 커스텀 컨트롤 바 스타일 */
 .custom-control-bar {
 	display: flex;
 	justify-content: space-between; /* 양 끝 정렬 */
@@ -111,8 +111,7 @@
 .btn-new-decl:hover {
 	background-color: #0a3b66;
 }
-/* ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲ */
-/* ▼▼▼ [추가] 커스텀 컨트롤 바 스타일 ▼▼▼ */
+/*커스텀 컨트롤 바 스타일*/
 .custom-control-bar {
 	display: flex;
 	justify-content: space-between;
@@ -193,7 +192,6 @@
 .btn-new-decl:hover {
 	background-color: #0a3b66;
 }
-/* ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲ */
 </style>
 
 <div class="ag-grid-container">
@@ -234,13 +232,13 @@ let myGridApi = null;
 let currentPageNum = 1;
 const currentMemId = window.USER_CONTEXT?.memId || 0;
 
-/* ★ [추가] URL 파라미터 파싱 유틸 */
+/* URL 파라미터 파싱 유틸 */
 function getUrlParam(name) {
     const params = new URLSearchParams(window.location.search);
     return params.get(name) || '';
 }
 
-// 1. 커스텀 컨트롤 바 주입 (재귀적으로 체크)
+// 1. 커스텀 컨트롤 바 주입
 const injectCustomControlBar = () => {
     const searchBox = document.getElementById(GRID_ID + '_searchBox'); 
     const template = document.getElementById('newControlBarTemplate');
@@ -269,14 +267,14 @@ const getSearchParams = (page) => {
 
 // 3. 데이터 로드 핵심 함수
 const loadPageData = (pageNum = 1, isBackground = false) => {
-    // 💡 중요: 실행 시점에 한 번 더 API를 잡아줍니다.
+    // 중요: 실행 시점에 한 번 더 API를 잡아줍니다.
     if (!myGridApi) {
         const gridEl = document.getElementById(GRID_ID);
         myGridApi = (gridEl && gridEl.gridApi) ? gridEl.gridApi : window[GRID_ID + '_api'];
     }
 
     if (!myGridApi) {
-        console.warn("⚠️ 그리드가 아직 준비되지 않아 대기합니다.");
+        console.warn("그리드가 아직 준비되지 않아 대기합니다.");
         return;
     }
 
@@ -286,7 +284,7 @@ const loadPageData = (pageNum = 1, isBackground = false) => {
     axios.get('/rest/import', { params: getSearchParams(currentPageNum) })
         .then(res => {
             const data = res.data || [];
-            console.log(isBackground ? "📥 [SSE 자동갱신] 데이터 도착" : "📥 [일반로드] 데이터 도착");
+            console.log(isBackground ? "[SSE 자동갱신] 데이터 도착" : "[일반로드] 데이터 도착");
 
             // 데이터 반영
             if (typeof myGridApi.setGridOption === 'function') {
@@ -314,36 +312,61 @@ const loadPageData = (pageNum = 1, isBackground = false) => {
 
 // 4. SSE 알림 수신 함수
 function fetchSilentData() {
-    console.log("🔔 [SSE] 신호 감지 -> 백그라운드 갱신 시도");
+    console.log("[SSE] 신호 감지 -> 백그라운드 갱신 시도");
     loadPageData(currentPageNum, true);
 }
 
 const manualRefresh = () => loadPageData(currentPageNum, false);
 
-// 5. 뱃지 및 페이징 (기존 로직 유지)
+// 5. 뱃지 및 페이징
 const normalizeStatus = (status) => {
     if (!status) return '-';
     const s = status.toString().toUpperCase().trim();
     const map = {
-        'BONDED_IN': '보세입고완료', 'WAITING': '심사대기', 'PHYSICAL': '현품검사중',
-        'SUPPLEMENT': '보완/정정', 'REVIEWING': '심사중', 'ACCEPTED': '수리', 'INSPECTION_COMPLETED': '현품검사완료',
-        'REJECTED': '반려', 'PAY_WAITING': '납부 대기', 'PAY_COMPLETED': '납부 완료',
-        'WH_IN_APPROVED': '반입승인', 'WH_IN_REJECTED': '반입차단',
-        'RELEASE_APPROVED': '반출승인', 'RELEASE_REJECTED': '반출차단',
-        'APPROVED': '통관승인', 'DELIVERED': '출고 완료'
+        'BONDED_IN': '보세입고완료',
+        'WAITING': '심사대기',
+        'PHYSICAL': '현품검사중',
+        'SUPPLEMENT': '보완/정정',
+        'REVIEWING': '심사중',
+        'ACCEPTED': '수리',
+        'INSPECTION_COMPLETED': '현품검사완료',
+        'REJECTED': '반려',
+        'PAY_WAITING': '납부 대기',
+        'PAY_COMPLETED': '납부 완료',
+        'WH_IN_APPROVED': '반입승인',
+        'WH_IN_REJECTED': '반입차단',
+        'RELEASE_APPROVED': '반출승인',
+        'RELEASE_REJECTED': '반출차단',
+        'APPROVED': '통관승인',
+        'DELIVERED': '출고 완료'
     };
     return map[s] || status;
 };
 
 const statusBadgeRenderer = (p) => {
-    const s = (p.value || '').toUpperCase().trim();
-    const txt = normalizeStatus(s);
-    let cls = 'wait';
-    if (['REVIEWING','PHYSICAL','SUPPLEMENT'].includes(s)) cls = 'ing';
-    else if (['ACCEPTED','PAY_WAITING','WH_IN_APPROVED','RELEASE_APPROVED'].includes(s)) cls = 'pay';
-    else if (['PAY_COMPLETED','APPROVED','DELIVERED','INSPECTION_COMPLETED'].includes(s)) cls = 'done';
-    else if (['REJECTED','WH_IN_REJECTED','RELEASE_REJECTED'].includes(s)) cls = 'err';
-    return '<span class="badge ' + cls + '">' + txt + '</span>';
+    const originalStatus = p.value || '';
+    const normalizedStatus = normalizeStatus(originalStatus);
+    const s = originalStatus.toString().toUpperCase().trim();
+    
+    // 기본값: 회색 (BONDED_IN, WAITING 등)
+    let cls = 'wait'; 
+    
+    // 상태별 CSS 클래스 세분화 매핑
+    if (['REVIEWING'].includes(s)) {
+        cls = 'ing';          // 파란색 (심사중)
+    } else if (['PHYSICAL'].includes(s)) {
+        cls = 'inspect';      // 청록색 (현품검사중)
+    } else if (['SUPPLEMENT'].includes(s)) {
+        cls = 'supp';         // 주황색 (보완/정정)
+    } else if (['ACCEPTED', 'PAY_WAITING', 'WH_IN_APPROVED', 'RELEASE_APPROVED'].includes(s)) {
+        cls = 'pay';          // 보라색 (수리, 납부대기, 반입/반출승인)
+    } else if (['PAY_COMPLETED', 'APPROVED', 'DELIVERED', 'INSPECTION_COMPLETED'].includes(s)) {
+        cls = 'done';         // 초록색 (납부완료, 승인, 출고, 검사완료)
+    } else if (['REJECTED', 'WH_IN_REJECTED', 'RELEASE_REJECTED'].includes(s)) {
+        cls = 'err';          // 빨간색 (반려, 반입/반출차단)
+    }
+    
+    return '<span class="badge ' + cls + '">' + normalizedStatus + '</span>';
 };
 
 const renderCustomPagination = (curr, total) => {
@@ -364,7 +387,7 @@ const renderCustomPagination = (curr, total) => {
 
 const goToNewDeclaration = () => location.href = '/client/ims/imswrite/importBase';
 
-/* ★ [추가] URL 파라미터를 검색 필드에 세팅하는 함수 */
+/* URL 파라미터를 검색 필드에 세팅하는 함수 */
 function applyUrlParamsToSearch() {
     const urlStatus = getUrlParam('status');
     const urlStartDate = getUrlParam('startDate');
@@ -377,7 +400,7 @@ function applyUrlParamsToSearch() {
         if (statusEl) {
             statusEl.value = urlStatus;
             applied = true;
-            console.log("🔍 URL 파라미터 적용 - status:", urlStatus);
+            console.log("URL 파라미터 적용 - status:", urlStatus);
         }
     }
 
@@ -386,7 +409,7 @@ function applyUrlParamsToSearch() {
         if (startEl) {
             startEl.value = urlStartDate;
             applied = true;
-            console.log("🔍 URL 파라미터 적용 - startDate:", urlStartDate);
+            console.log("URL 파라미터 적용 - startDate:", urlStartDate);
         }
     }
 
@@ -395,7 +418,7 @@ function applyUrlParamsToSearch() {
         if (endEl) {
             endEl.value = urlEndDate;
             applied = true;
-            console.log("🔍 URL 파라미터 적용 - endDate:", urlEndDate);
+            console.log("URL 파라미터 적용 - endDate:", urlEndDate);
         }
     }
 
@@ -447,12 +470,12 @@ document.addEventListener('DOMContentLoaded', () => {
     window[GRID_ID + '_customSearch'] = (p) => loadPageData(p, false);
     injectCustomControlBar();
     
-    // 💡 충분한 시간을 두고 API 연결 및 초기 로드 수행
+    // 충분한 시간을 두고 API 연결 및 초기 로드 수행
     setTimeout(() => {
         const gridEl = document.getElementById(GRID_ID);
         myGridApi = (gridEl && gridEl.gridApi) ? gridEl.gridApi : window[GRID_ID + '_api'];
         
-        /* ★ [추가] URL 파라미터가 있으면 검색 필드에 세팅 후 검색 */
+        /* URL 파라미터가 있으면 검색 필드에 세팅 후 검색 */
         applyUrlParamsToSearch();
         
         loadPageData(1); 

@@ -145,4 +145,11 @@ WHERE MEM_ID = #{memId}
 	WHERE A.MEM_ROLE = 'OFFICER'
 	ORDER BY TASK_LOAD DESC, A.MEM_NAME ASC
 </select>
+
+<!-- 회원 상세 정보 비밀번호 조회 -->
+<select id="memberPwSelect" parameterType="int" resultType="string">
+SELECT PASSWORD
+FROM MEMBER
+WHERE MEM_ID = #{memId}
+</select>
 </mapper>

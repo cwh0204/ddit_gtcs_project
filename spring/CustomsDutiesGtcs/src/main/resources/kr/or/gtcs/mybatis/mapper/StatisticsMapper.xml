@@ -198,4 +198,72 @@
         )
     </select>
 
+
+	<select id="selectAiRiskStats" resultType="java.util.Map">
+        SELECT 
+            NVL(SUM(CASE WHEN RISK_SCORE BETWEEN 0 AND 10 THEN 1 ELSE 0 END), 0) AS "score0to10",
+            NVL(SUM(CASE WHEN RISK_SCORE BETWEEN 11 AND 20 THEN 1 ELSE 0 END), 0) AS "score11to20",
+            NVL(SUM(CASE WHEN RISK_SCORE BETWEEN 21 AND 30 THEN 1 ELSE 0 END), 0) AS "score21to30",
+            NVL(SUM(CASE WHEN RISK_SCORE BETWEEN 31 AND 40 THEN 1 ELSE 0 END), 0) AS "score31to40",
+            NVL(SUM(CASE WHEN RISK_SCORE BETWEEN 41 AND 50 THEN 1 ELSE 0 END), 0) AS "score41to50",
+            NVL(SUM(CASE WHEN RISK_SCORE BETWEEN 51 AND 60 THEN 1 ELSE 0 END), 0) AS "score51to60",
+            NVL(SUM(CASE WHEN RISK_SCORE BETWEEN 61 AND 70 THEN 1 ELSE 0 END), 0) AS "score61to70",
+            NVL(SUM(CASE WHEN RISK_SCORE BETWEEN 71 AND 80 THEN 1 ELSE 0 END), 0) AS "score71to80",
+            NVL(SUM(CASE WHEN RISK_SCORE BETWEEN 81 AND 90 THEN 1 ELSE 0 END), 0) AS "score81to90",
+            NVL(SUM(CASE WHEN RISK_SCORE BETWEEN 91 AND 100 THEN 1 ELSE 0 END), 0) AS "score91to100",
+            NVL(SUM(CASE WHEN RISK_RESULT = 'RED' THEN 1 ELSE 0 END), 0) AS "redCount",
+            NVL(SUM(CASE WHEN RISK_RESULT = 'GREEN' THEN 1 ELSE 0 END), 0) AS "greenCount"
+        FROM AI_DOC_CHECK
+        WHERE 1=1
+        <if test="declType == 'IMPORT'">
+            AND DOC_NUMBER LIKE 'IMP-%'
+        </if>
+        <if test="declType == 'EXPORT'">
+            AND DOC_NUMBER LIKE 'EXP-%'
+        </if>
+        <if test="startDate != null and startDate != ''">
+            AND CHECK_DATE >= TO_DATE(#{startDate}, 'YYYY-MM-DD')
+        </if>
+        <if test="endDate != null and endDate != ''">
+            AND CHECK_DATE &lt; TO_DATE(#{endDate}, 'YYYY-MM-DD') + 1
+        </if>
+    </select>
+
+    <select id="selectTotalTaxPayment" resultType="long">
+        SELECT NVL(SUM(TOTAL_AMOUNT), 0) 
+        FROM IMPORT_TAX_PAYMENT
+    </select>
+
+    <select id="selectDelayStats" resultType="java.util.Map">
+        SELECT 
+            NVL(SUM(CASE WHEN DELAY_YN = 'Y' THEN 1 ELSE 0 END), 0) AS "delayY",
+            NVL(SUM(CASE WHEN DELAY_YN = 'N' OR DELAY_YN IS NULL THEN 1 ELSE 0 END), 0) AS "delayN"
+        FROM (
+            <trim prefixOverrides="UNION ALL">
+                <if test="declType == 'ALL' or declType == 'IMPORT'">
+                    UNION ALL
+                    SELECT DELAY_YN FROM IMPORT_MASTER
+                    WHERE 1=1
+                    <if test="startDate != null and startDate != ''">
+                        AND SUBMIT_DATE >= TO_DATE(#{startDate}, 'YYYY-MM-DD')
+                    </if>
+                    <if test="endDate != null and endDate != ''">
+                        AND SUBMIT_DATE &lt; TO_DATE(#{endDate}, 'YYYY-MM-DD') + 1
+                    </if>
+                </if>
+                <if test="declType == 'ALL' or declType == 'EXPORT'">
+                    UNION ALL
+                    SELECT DELAY_YN FROM EXPORT_MASTER
+                    WHERE 1=1
+                    <if test="startDate != null and startDate != ''">
+                        AND SUBMIT_DATE >= TO_DATE(#{startDate}, 'YYYY-MM-DD')
+                    </if>
+                    <if test="endDate != null and endDate != ''">
+                        AND SUBMIT_DATE &lt; TO_DATE(#{endDate}, 'YYYY-MM-DD') + 1
+                    </if>
+                </if>
+            </trim>
+        )
+    </select>
+
 </mapper>

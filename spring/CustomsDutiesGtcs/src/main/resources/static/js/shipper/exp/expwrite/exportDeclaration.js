@@ -1,6 +1,5 @@
 /* ========================================================================
    수출신고서 작성 페이지 JavaScript
-   (수입신고서 UX/Logic 100% 동기화 버전)
    라이브러리: Axios, SweetAlert2
    ======================================================================== */
 
@@ -67,70 +66,113 @@ const FIELD_MAPPING = {
 };
 
 /* ========================================================================
-   [추가] 필수 입력값 검증 로직 (Swal 적용 및 스크롤 밀림 방지)
+   [완성형] 전 항목 유효성 검사 로직
    ======================================================================== */
 function validateExportData(data) {
-	const missingFields = [];
+    const missingFields = [];
+    const formatErrors = [];
 
-	// 1. 텍스트 및 선택 필드 검증 대상 정의
-	const requiredFields = {
-		'exporterName': '수출자 상호',
-		'repName': '대표자 성명',
-		'bizRegNo': '사업자등록번호',
-		'customsId': '통관고유부호',
-		'buyerName': '구매자 상호',
-		'destCountry': '목적국',
-		'loadingPort': '적재항',
-		'incoterms': '인코텀즈',
-		'currencyCode': '통화코드',
-		'payAmount': '결제금액',
-		'hsCode': 'HS Code',
-		'itemNameDeclared': '수출물품명',
-		'qty': '수량',
-		'unitPrice': '단가'
-	};
+    // 1. [섹션 1] 거래당사자 및 기본신고 정보
+    const section1Fields = {
+        'exporterName': '수출자 상호',
+        'repName': '대표자 성명',
+        'bizRegNo': '사업자등록번호',
+        'customsId': '통관고유부호',
+        'buyerName': '구매자 상호',
+        'dclType': '신고구분',
+        'transMode': '거래구분',
+        'destCountry': '도착국(목적국)',
+        'loadingPort': '적재항'
+    };
 
-	// 필드 값 체크
-	for (const [key, label] of Object.entries(requiredFields)) {
-		if (!data[key] || data[key].toString().trim() === "" || data[key] === "0") {
-			missingFields.push(label);
-		}
-	}
+    // 2. [섹션 2] 결제 및 운송 정보
+    const section2Fields = {
+        'currencyCode': '결제통화',
+        'payAmount': '결제금액',
+        'incoterms': '인도조건',
+        'vesselName': '선기명',
+        'cargoMgmtNo': '화물관리번호'
+    };
 
-	// 2. 필수 첨부파일 체크
-	const essentialFiles = {
-		'fileInvoice': '인보이스 (Invoice)',
-		'filePackingList': '패킹리스트 (Packing List)',
-		'fileBL': '선하증권 (B/L)'
-	};
+    // 3. [섹션 3] 물품 정보
+    const section3Fields = {
+        'hsCode': 'HS Code',
+        'itemNameDeclared': '수출물품명(영문)',
+        'brandName': '상표명',
+    	'modelName': '모델(규격)',
+        'qty': '수량',
+        'qtyUnit': '수량단위',
+        'unitPrice': '단가',
+        'totalWeight': '총 중량',
+        'originCountry': '원산지국가'
+    };
 
-	for (const [id, label] of Object.entries(essentialFiles)) {
-		const fileInput = document.getElementById(id);
-		if (!fileInput || !fileInput.files || fileInput.files.length === 0) {
-			missingFields.push(label);
-		}
-	}
+    // --- 필수값 체크 통합 실행 ---
+    const allRequired = { ...section1Fields, ...section2Fields, ...section3Fields };
+    for (const [key, label] of Object.entries(allRequired)) {
+        const val = data[key] ? data[key].toString().trim() : "";
+        if (val === "" || val === "0") {
+            missingFields.push(label);
+        }
+    }
 
-	if (missingFields.length > 0) {
-        // 기존 alert 대신 Swal 적용 (줄바꿈 및 정렬 맞춤 + 사이드바 밀림 방지)
+    // --- 데이터 형식(포맷) 정밀 검사 ---
+    if (data.bizRegNo && !/^\d{10}$/.test(data.bizRegNo.replace(/-/g, ''))) {
+        formatErrors.push('사업자등록번호는 숫자 10자리여야 합니다.');
+    }
+    if (data.customsId && data.customsId.length !== 13) {
+        formatErrors.push('통관고유부호는 13자리여야 합니다.');
+    }
+    if (data.hsCode && !/^\d{4}\.?\d{2}\.?\d{4}$/.test(data.hsCode)) {
+        formatErrors.push('HS Code 형식이 올바르지 않습니다. (예: 8517.13.0000)');
+    }
+    if (data.cargoMgmtNo && data.cargoMgmtNo.length < 10) {
+        formatErrors.push('화물관리번호가 너무 짧습니다.');
+    }
+
+    // 4. [섹션 4] 필수 첨부파일 체크
+    const essentialFiles = {
+        'fileInvoice': '인보이스 (Invoice)',
+        'filePackingList': '패킹리스트 (Packing List)',
+        'fileBL': '선하증권 (B/L)'
+    };
+    for (const [id, label] of Object.entries(essentialFiles)) {
+        const fileInput = document.getElementById(id);
+        if (!fileInput || !fileInput.files || fileInput.files.length === 0) {
+            missingFields.push(label);
+        }
+    }
+
+    // --- 결과 출력 (SweetAlert2) ---
+    if (missingFields.length > 0 || formatErrors.length > 0) {
+        let errorHtml = '<div style="text-align: left; font-size: 14px;">';
+        
+        if (missingFields.length > 0) {
+            errorHtml += `<b style="color: #e11d48;">[누락 항목]</b><br>- ${missingFields.join('<br>- ')}<br><br>`;
+        }
+        if (formatErrors.length > 0) {
+            errorHtml += `<b style="color: #f59e0b;">[형식 오류]</b><br>- ${formatErrors.join('<br>- ')}`;
+        }
+        errorHtml += '</div>';
+
         Swal.fire({
-            icon: 'warning',
-            title: '필수 항목 누락',
-            html: `다음 필수 항목을 입력하거나 첨부해주세요:<br><br>
-                   <div style="text-align: left; display: inline-block; color: #dc3545; font-weight: bold;">
-                     - ${missingFields.join("<br>- ")}
-                   </div>`,
+            icon: 'error',
+            title: '입력 데이터 확인 필요',
+            html: errorHtml,
             confirmButtonColor: '#0f4c81',
-            confirmButtonText: '확인',
-            scrollbarPadding: false, // 💡 사이드바 밀림 방지
-            heightAuto: false        // 💡 화면 덜컹거림 방지
+            confirmButtonText: '수정하기',
+            scrollbarPadding: false,
+            heightAuto: false
         }).then(() => {
-            focusFirstMissingField(missingFields[0]);
+            // 첫 번째 에러가 발생한 필드로 포커스 이동
+            const firstLabel = missingFields[0] || "";
+            if (firstLabel) focusFirstMissingField(firstLabel);
         });
-		return false;
-	}
+        
+        return false;
+    }
 
-	return true;
+    return true;
 }
 
 // 누락된 필드가 속한 탭을 찾아 활성화해주는 함수
@@ -370,7 +412,8 @@ function validateFile(file) {
                 title: '형식 오류',
                 text: `확장자가 없는 파일은 업로드할 수 없습니다.\n파일명: ${fileName}`,
                 confirmButtonColor: '#0f4c81',
-                scrollbarPadding: false, heightAuto: false // 추가
+                scrollbarPadding: false, 
+                heightAuto: false // 추가
             });
             return false;
         }
@@ -443,7 +486,7 @@ function validateFile(file) {
             const file = input.files[0];
 
             if (!validateFile(file)) {
-                console.warn('❌ 필수 파일 유효성 검사 실패:', file.name);
+                console.warn('필수 파일 유효성 검사 실패:', file.name);
                 input.value = ''; 
                 displaySpan.textContent = '파일 형식이 올바르지 않습니다.';
                 displaySpan.classList.remove('selected');
@@ -638,7 +681,9 @@ async function submitDeclaration(type) {
             icon: 'error',
             title: '전송 실패',
             text: `처리 중 오류가 발생했습니다.\n[${errMsg}]`,
-            confirmButtonColor: '#dc3545'
+            confirmButtonColor: '#dc3545',
+            scrollbarPadding: false,
+            heightAuto: false
         });
     }
 }
@@ -781,7 +826,7 @@ function initLoadingSpinner() {
 }
 
 /* ========================================================================
-   [Part 7] 전체 폼 초기화 (삭제) 버튼 - Swal 적용 (새로고침 없음)
+   [Part 7] 전체 폼 초기화 (삭제) 버튼 - Swal 적용
    ======================================================================== */
 function resetDeclaration() {
     Swal.fire({
@@ -798,7 +843,7 @@ function resetDeclaration() {
 
     }).then((result) => {
         if (result.isConfirmed) {
-            // 💡 1. 모든 입력 폼(input, select, textarea) 값 비우기
+            // 1. 모든 입력 폼(input, select, textarea) 값 비우기
             document.querySelectorAll('input:not([type="button"]):not([type="submit"]), select, textarea').forEach(function(element) {
                 if (element.type === 'checkbox' || element.type === 'radio') {
                     element.checked = false;
@@ -809,7 +854,7 @@ function resetDeclaration() {
                 }
             });
             
-            // 💡 2. 필수 파일 업로드 영역 표시 초기화
+            // 2. 필수 파일 업로드 영역 표시 초기화
             ['nameInvoice', 'namePacking', 'nameBL'].forEach(function(id) {
                 var span = document.getElementById(id);
                 if (span) {
@@ -818,7 +863,7 @@ function resetDeclaration() {
                 }
             });
 
-            // 💡 3. 기타 첨부파일(FileManager) 리스트 비우기
+            // 3. 기타 첨부파일(FileManager) 리스트 비우기
             if (typeof FileManager !== 'undefined' && FileManager.getOtherFiles) {
                 // 편법: 강제로 전체 선택 후 삭제 함수 호출
                 const masterChk = document.querySelector('input[onclick*="FileManager.toggleAll"]');
@@ -830,7 +875,7 @@ function resetDeclaration() {
                 if (tbody) tbody.innerHTML = '<tr id="emptyFileRow"><td colspan="6" style="text-align: center; padding: 20px; color: #999;">등록된 기타 첨부파일이 없습니다.</td></tr>';
             }
 
-            // 💡 4. 컨테이너 리스트 초기화
+            // 4. 컨테이너 리스트 초기화
             if (typeof ContainerManager !== 'undefined') {
                 const tbody = document.getElementById('containerListBody');
                 if (tbody) tbody.innerHTML = '';
@@ -860,7 +905,7 @@ function toggleLoading(isShow) {
         overlay.style.display = isShow ? 'flex' : 'none';
     }
 }
-
+/* 자동 심사중 처리용 자동 함수 */
 function autoFillExport() {
     console.log("수출신고서 자동 입력 시작 (JSP 섹션 최적화)");
 
@@ -905,26 +950,26 @@ function autoFillExport() {
         'selGoodsType': 'N',            
         'selRefundApplicant': '1',      
 
-        'txtExchangeRate': '1345.89',   
+        'txtExchangeRate': '1345.89',
         'selExchangeCurr': 'USD',
         'selCurrencyCode': 'USD',
         'txtPaymentAmount': '25000',
         'txtFreightKRW': '850000',
         'txtInsuranceKRW': '35000',
-        'selContainerInd': 'Y',         
-        'txtCargoMgmtNo': '26EXP' + Math.floor(Math.random() * 100000),
+        'selContainerInd': 'Y',
+        'txtCargoMgmtNo': '26EXP' + String(Math.floor(Math.random() * 1000000000)).padStart(9, '0'),
         'txtBondedReporter': '김관세사',
-        'txtCarrierCode': 'HMM',        
+        'txtCarrierCode': 'HMM',
         'txtVesselName': 'PACIFIC STAR',
         'txtLoadBondedArea': '03077005',
+        
+        'txtBrandName': '루이비똥',             // 상표명
+    	'txtModelSpec': '트레이닝 바지',       // 모델명
 
         'txtInvoiceNo': 'INV-2026-02-20',
-        'txtHsCode': '8517.13.0000',
-        'txtQty': '50',
         'selQtyUnit': 'EA',
         'txtUnitPrice': '500',
         'txtAmount': '25000',
-        'txtNetWeight': '125.75',       
         'txtPackageQty': '5.2',         
         'txtOriginCountry': 'KR',
         'selOriginCriteria': 'X',       
@@ -944,11 +989,18 @@ document.addEventListener("DOMContentLoaded", function() {
             const memId = (window.USER_CONTEXT && window.USER_CONTEXT.memId) || 0;
             
             if (memId === 0) {
-                alert("로그인 정보를 확인할 수 없습니다.");
+                Swal.fire({
+				    icon: 'warning',
+				    title: '로그인 정보 조회 실패',
+				    text: '로그인 정보를 확인할 수 없습니다.',
+				    confirmButtonColor: '#3478f6',
+				    confirmButtonText: '확인',
+				    heightAuto: false // 사이드바 레이아웃 보호
+				});
                 return;
             }
 
-            console.log("🔥 [수출] 내 정보 자동완성 API 호출 - memId:", memId);
+            console.log("[수출] 내 정보 자동완성 API 호출 - memId:", memId);
 
             // 2. 백엔드 API 호출
             axios.get(`/member/selectMem?memId=${memId}`)
@@ -956,7 +1008,14 @@ document.addEventListener("DOMContentLoaded", function() {
                     const data = response.data;
                     
                     if (!data) {
-                        alert("회원 정보를 불러올 수 없습니다.");
+                        Swal.fire({
+						    icon: 'error',
+						    title: '데이터 로드 실패',
+						    text: '회원 정보를 불러올 수 없습니다.',
+						    confirmButtonColor: '#3478f6',
+						    confirmButtonText: '확인',
+						    heightAuto: false // 사이드바 레이아웃 짤림 방지 핵심 옵션
+						});
                         return;
                     }
 
@@ -964,7 +1023,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     // 3. 실제 수출신고서 JSP ID에 맞춰서 데이터 꽂아넣기
                     // ==========================================
                     
-                    // 💡 수출자 기업명 (txtExporterName)
+                    // 수출자 기업명 (txtExporterName)
                     const exporterName = document.getElementById('txtExporterName');
                     if(exporterName) {
                         exporterName.value = data.companyName || ''; 
@@ -972,11 +1031,11 @@ document.addEventListener("DOMContentLoaded", function() {
                         exporterName.dispatchEvent(new Event('change', { bubbles: true }));
                     }
                     
-                    // 💡 수출자 대표자명 (txtExporterRep)
+                    // 수출자 대표자명 (txtExporterRep)
                     const repName = document.getElementById('txtExporterRep');
                     if(repName) repName.value = data.memName || '';
 
-                    // 💡 사업자등록번호 (txtBizRegNo) - 하이픈 제거
+                    // 사업자등록번호 (txtBizRegNo) - 하이픈 제거
                     const bizRegNo = document.getElementById('txtBizRegNo');
                     if(bizRegNo) {
                         let rawBizNo = data.businessNo || data.bizRegNo || data.memBizNo || ''; 
@@ -985,7 +1044,7 @@ document.addEventListener("DOMContentLoaded", function() {
                         bizRegNo.dispatchEvent(new Event('change', { bubbles: true }));
                     }
 
-                    // 💡 통관고유부호 (txtExporterCustomsCode)
+                    // 통관고유부호 (txtExporterCustomsCode)
                     const customsId = document.getElementById('txtExporterCustomsCode');
                     if(customsId) {
                         customsId.value = data.customsIdNo || ''; 
@@ -998,20 +1057,26 @@ document.addEventListener("DOMContentLoaded", function() {
                         Swal.fire({
                             icon: 'success',
                             title: '불러오기 완료',
-                            text: '수출화주 기본정보가 폼에 채워졌습니다.',
+                            text: '수출화주 기본정보 자동입력 완료.',
                             confirmButtonColor: '#0f4c81',
                             timer: 1500,
                             scrollbarPadding: false,
                             heightAuto: false
                         });
                     } else {
-                        alert("수출화주 기본정보가 성공적으로 입력되었습니다!");
+                        alert("수출화주 기본정보가 성공적으로 입력되었습니다");
                     }
                     
                 })
                 .catch(function(error) {
-                    console.error("❌ 회원 정보 조회 실패:", error);
-                    alert("서버와 통신 중 오류가 발생했습니다.");
+                    console.error("회원 정보 조회 실패:", error);
+                    Swal.fire({
+				        icon: 'error',
+				        title: '오류 발생',
+				        text: msg || '서버와 통신 중 오류가 발생했습니다.',
+				        confirmButtonColor: '#3478f6',
+				        heightAuto: false
+				    });
                 });
         });
     }

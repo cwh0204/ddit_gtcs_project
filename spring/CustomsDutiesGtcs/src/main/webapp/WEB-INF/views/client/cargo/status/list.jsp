@@ -418,7 +418,7 @@ const applyFiltersAndRender = (isBackground) => {
   const rawDateFrom = document.getElementById('s-dateFrom').value;
   const rawDateTo   = document.getElementById('s-dateTo').value;
   
-  // 💡 1. 검색할 시간을 Date 객체(밀리초 숫자)로 변환
+  // 1. 검색할 시간을 Date 객체(밀리초 숫자)로 변환
   const fromTime = rawDateFrom ? new Date(rawDateFrom).getTime() : null;
   const toTime   = rawDateTo   ? new Date(rawDateTo).getTime() : null;
 
@@ -433,7 +433,7 @@ const applyFiltersAndRender = (isBackground) => {
       // 2. 화물 유형(수입/수출 등) 필터
       if (currentCargoType !== 'all' && getCargoType(item) !== currentCargoType) return false;
       
-      // 💡 3. 일시(Datetime) 숫자 비교 로직
+      // 3. 일시(Datetime) 숫자 비교 로직
       if (fromTime || toTime) {
           // regDate가 없는 경우 필터링에서 제외
           if (!item.regDate) return false;
@@ -442,7 +442,7 @@ const applyFiltersAndRender = (isBackground) => {
           const safeRegDate = item.regDate.replace(' ', 'T');
           const itemTime = new Date(safeRegDate).getTime();
           
-          // 숫자로 변환된 시간끼리 정확하게 비교!
+          // 숫자로 변환된 시간끼리 정확하게 비교
           if (fromTime && itemTime < fromTime) return false;
           if (toTime   && itemTime > toTime)   return false;
       }
@@ -461,6 +461,10 @@ const applyFiltersAndRender = (isBackground) => {
           if (!target.includes(keyword)) return false;
       }
       return true;
+  });
+  
+  filtered.forEach((item, index) => {
+      item.listNo = index + 1;
   });
 
   // 그리드 데이터 반영
@@ -513,53 +517,62 @@ const loadPageData = (isBackground) => {
 // [7] SSE 수신 함수
 // =========================================================
 function fetchSilentData() {
-    console.log("🔔 [SSE] 신호 감지 -> 화물 백그라운드 갱신 시도");
+    console.log("[SSE] 신호 감지 -> 화물 백그라운드 갱신 시도");
     loadPageData(true);
 }
 
-// =========================================================
-// [8] 초기화
-// =========================================================
+//=========================================================
+//[8] 초기화
+//=========================================================
 document.addEventListener('DOMContentLoaded', () => {
 
-    const colDefs = [
-        { headerName: '컨테이너 번호', field: 'contNo', width: 180, pinned: 'left', cellClass: 'cell-left' },
-        { headerName: '신고 상태', width: 145, cellRenderer: cargoStatusRenderer, valueGetter: p => getStatus(p.data) },
-        { headerName: '신고번호', field: 'declNo', width: 195 },
-        { headerName: '창고', field: 'warehouseId', width: 120, valueGetter: p => p.data.warehouseId || '-' },
-        { headerName: '구역', field: 'positionArea', width: 110, valueGetter: p => {
-                const v = p.data.positionArea || '';
-                if (v === 'BONDED') return '보세구역';
-                if (v === 'LOCAL')  return '국내구역';
-                return v || '-';
-        }},
-        { headerName: '품명', field: 'itemName', flex: 1, minWidth: 180, cellClass: 'cell-left' },
-        { headerName: '화주', width: 150, valueGetter: p => {
-                const type = getCargoType(p.data);
-                if (type === 'import') return (p.data.importMaster && p.data.importMaster.companyName) || p.data.repName || '-';
-                if (type === 'export') return (p.data.exportMaster && p.data.exportMaster.exporterName) || p.data.repName || '-';
-                return p.data.repName || '-';
-        }},
-        { headerName: '수량/중량', width: 130, valueGetter: p => (p.data.qty || 0) + ' / ' + (p.data.grossWeight || 0) + 'kg' },
-        { headerName: '최초등록일시', field: 'regDate', width: 160, valueGetter: p => p.data.regDate || '-' }
-    ];
+ const colDefs = [
+	 { 
+         headerName: 'No.', 
+         field: 'listNo',
+         width: 70, 
+         pinned: 'left', 
+         sortable: false,
+         filter: false,
+         cellStyle: { textAlign: 'center' } 
+     },
+     { headerName: '컨테이너 번호', field: 'contNo', width: 180, pinned: 'left', cellClass: 'cell-left' },
+     { headerName: '신고 상태', width: 145, cellRenderer: cargoStatusRenderer, valueGetter: p => getStatus(p.data) },
+     { headerName: '신고번호', field: 'declNo', width: 195 },
+     { headerName: '창고', field: 'warehouseId', width: 120, valueGetter: p => p.data.warehouseId || '-' },
+     { headerName: '구역', field: 'positionArea', width: 110, valueGetter: p => {
+             const v = p.data.positionArea || '';
+             if (v === 'BONDED') return '보세구역';
+             if (v === 'LOCAL')  return '국내구역';
+             return v || '-';
+     }},
+     { headerName: '품명', field: 'itemName', flex: 1, minWidth: 180, cellClass: 'cell-left' },
+     { headerName: '화주', width: 150, valueGetter: p => {
+             const type = getCargoType(p.data);
+             if (type === 'import') return (p.data.importMaster && p.data.importMaster.companyName) || p.data.repName || '-';
+             if (type === 'export') return (p.data.exportMaster && p.data.exportMaster.companyName) || p.data.repName || '-';
+             return p.data.repName || '-';
+     }},
+     { headerName: '수량/중량', width: 130, valueGetter: p => `\${p.data.qty || 0}EA / \${p.data.grossWeight || 0}kg` },
+     { headerName: '최초등록일시', field: 'regDate', width: 160, valueGetter: p => p.data.regDate || '-' }
+ ];
 
-    initAgGrid(GRID_ID, {
-        columnDefs: colDefs,
-        rowData:    [],
-        pageSize:   10,
-        onRowClicked: e => {
-            if (e.data && e.data.stockId) {
-                location.href = '/client/cargo/status/detail?stockNo=' + e.data.stockId;
-            }
-        }
-    });
-
-    loadPageData(false);
-    
-    // 리스트 화면도 수입/수출/창고 3가지 상태 변화를 모두 감지해서 표를 조용히 새로고침
-    if (typeof initGlobalSSE === 'function') {
-        initGlobalSSE(["WAREHOUSE_REFRESH", "IMPORT_REFRESH", "EXPORT_REFRESH"], fetchSilentData);
-    }
+ initAgGrid(GRID_ID, {
+     columnDefs: colDefs,
+     rowData:    [],
+     pageSize:   10,
+     
+     onRowClicked: e => {
+         if (e.data && e.data.stockId) {
+             location.href = '/client/cargo/status/detail?stockNo=' + e.data.stockId;
+         }
+     }
+ });
+ 
+ loadPageData(false);
+ 
+ if (typeof initGlobalSSE === 'function') {
+     initGlobalSSE(["WAREHOUSE_REFRESH", "IMPORT_REFRESH", "EXPORT_REFRESH"], fetchSilentData);
+ }
 });
 </script>

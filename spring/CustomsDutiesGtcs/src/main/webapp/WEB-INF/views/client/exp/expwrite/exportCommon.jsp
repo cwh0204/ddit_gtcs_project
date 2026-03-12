@@ -16,7 +16,6 @@
 			<td>
 				<div class="flex-row">
 					<input type="text" id="txtExporterName" name="exporterName" class="flex-grow" />
-					<button type="button" class="btn-search"><i class="fa-solid fa-magnifying-glass"></i></button>
 				</div>
 			</td>
 			<th class="required">대표자명</th>
@@ -35,7 +34,6 @@
 			<td>
 				<div class="flex-row">
 					<input type="text" id="txtExporterCustomsCode" name="customsId" class="flex-grow" />
-					<button type="button" class="btn-search"><i class="fa-solid fa-magnifying-glass"></i></button>
 				</div>
 			</td>
 			<th></th>
@@ -57,7 +55,6 @@
 			<td>
 				<div class="flex-row">
 					<input type="text" id="txtBuyerName" name="buyerName" class="flex-grow" />
-					<button type="button" class="btn-search"><i class="fa-solid fa-magnifying-glass"></i></button>
 				</div>
 			</td>
 			<th>구매업체 주소</th>
@@ -114,11 +111,10 @@
 					<option value="EXW">EXW</option>
 				</select>
 			</td>
-			<th class="required">도착국</th>
+			<th class="required">목적국</th>
 			<td>
 				<div class="flex-row">
 					<input type="text" id="txtDestCountry" name="destCountry" class="flex-grow" />
-					<button type="button" class="btn-search"><i class="fa-solid fa-magnifying-glass"></i></button>
 				</div>
 			</td>
 		</tr>
@@ -127,7 +123,6 @@
 			<td>
 				<div class="flex-row">
 					<input type="text" id="txtLoadPort" name="loadingPort" class="flex-grow" />
-					<button type="button" class="btn-search"><i class="fa-solid fa-magnifying-glass"></i></button>
 				</div>
 			</td>
 			<th>운송수단</th>
@@ -151,7 +146,6 @@
 			<td>
 				<div class="flex-row">
 					<input type="text" id="txtGoodsLoc" name="goodsLoc" class="flex-grow" />
-					<button type="button" class="btn-search"><i class="fa-solid fa-magnifying-glass"></i></button>
 				</div>
 			</td>
 		</tr>

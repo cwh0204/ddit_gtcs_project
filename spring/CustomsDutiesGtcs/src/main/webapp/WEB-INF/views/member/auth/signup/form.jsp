@@ -500,6 +500,24 @@ pageEncoding="UTF-8"%> <%@ taglib uri="jakarta.tags.core" prefix="c" %>
           transform: scale(1) rotate(0deg);
         }
       }
+      
+  .btn-autofill {
+  display: block;
+  margin: 0 0 20px auto;
+  padding: 5px 12px;
+  background-color: #bdc3c7;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-autofill:hover {
+  background-color: #a0a8ae;
+}
     </style>
   </head>
 
@@ -515,6 +533,8 @@ pageEncoding="UTF-8"%> <%@ taglib uri="jakarta.tags.core" prefix="c" %>
         </a>
         <h1>G-TCS 회원가입</h1>
       </div>
+      
+      <button type="button" class="btn-autofill" onclick="autoFill()">자동완성</button>
 
       <!-- 회원가입 폼 -->
       <form id="registerForm">
@@ -1209,6 +1229,20 @@ pageEncoding="UTF-8"%> <%@ taglib uri="jakarta.tags.core" prefix="c" %>
       function goToLogin() {
         window.location.href = "/member/auth/session/login";
       }
+      
+      // 자동입력
+      function autoFill() {
+    	  document.querySelector("#loginId").value = "csc5090";
+    	  document.querySelector("#customsIdNo").value = "P123456789015";
+    	  document.querySelector("#bizRegNo").value = "740-13-12345";
+    	  document.querySelector("#repName").value = "최상철";
+    	  document.querySelector("#repTelNo").value = "02-1234-5678";
+    	  document.querySelector("#hpNo").value = "010-5566-5090";
+    	  document.querySelector("#emergencyContact").value = "043-255-5090";
+    	  
+    	  IdCheck = true;
+    	  EmailAuthCode = true;
+    	}
     </script>
   </body>
 </html>

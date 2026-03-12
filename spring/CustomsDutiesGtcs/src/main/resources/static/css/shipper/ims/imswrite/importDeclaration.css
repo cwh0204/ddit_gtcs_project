@@ -811,3 +811,29 @@ input[style*="text-align: right"] {
 .btn-preview i {
     margin-right: 4px;
 }
+
+/* [심사중 케이스] 기본 및 마우스 오버 스타일 */
+.footer-btn-group .btn.btn-case-normal {
+    background-color: #007bff !important;
+    color: white !important;
+    border: none !important;
+}
+
+.footer-btn-group .btn.btn-case-normal:hover {
+    background-color: #0056b3 !important; /* 더 진한 파랑 */
+    color: white !important;             /* 글자색 흰색 유지 */
+    transform: translateY(-1px);
+}
+
+/* [반려 케이스] 기본 및 마우스 오버 스타일 */
+.footer-btn-group .btn.btn-case-reject {
+    background-color: #dc3545 !important;
+    color: white !important;
+    border: none !important;
+}
+
+.footer-btn-group .btn.btn-case-reject:hover {
+    background-color: #a71d2a !important; /* 더 진한 빨강 */
+    color: white !important;             /* 글자색 흰색 유지 */
+    transform: translateY(-1px);
+}

@@ -109,7 +109,7 @@
                     window.axios.defaults.headers.common['Authorization'] = 'Bearer ' + token;
                 }
                 
-                console.log("🌐 헤더 업데이트 완료:", window.USER_CONTEXT);
+                console.log("헤더 업데이트 완료:", window.USER_CONTEXT);
                 return;
             }
         }
@@ -121,14 +121,14 @@
     // 3. 페이지 로드 시 실행
     document.addEventListener('DOMContentLoaded', window.updateHeaderUI);
 
-    // 🌟 추가 1: 다른 탭/창에서 토큰이 변경되었을 때 즉시 감지 (기존 기능)
+    // 추가 1: 다른 탭/창에서 토큰이 변경되었을 때 즉시 감지
     window.addEventListener('storage', function(e) {
         if (e.key === 'accessToken') {
             window.updateHeaderUI();
         }
     });
 
-    // 🌟 추가 2: "같은 창"에서 토큰이 변경되었을 때 즉시 감지하는 특수 코드
+    // 추가 2: "같은 창"에서 토큰이 변경되었을 때 즉시 감지하는 특수 코드
     const originalSetItem = localStorage.setItem;
     localStorage.setItem = function(key, value) {
         originalSetItem.apply(this, arguments); // 원래의 저장 기능 먼저 실행
@@ -141,7 +141,7 @@
     // 특수 코드에서 발생시킨 이벤트를 듣고 있다가 헤더 새로고침
     window.addEventListener('local-storage-changed', function(e) {
         if (e.detail.key === 'accessToken') {
-            console.log("⚡ 같은 창 내 토큰 변경 감지! 헤더 즉시 갱신");
+            console.log("같은 창 내 토큰 변경 감지 헤더 즉시 갱신");
             window.updateHeaderUI();
         }
     });
@@ -214,7 +214,7 @@ const initGlobalSSE = (eventNames, callbackFunction) => {
 
     events.forEach(eventName => {
         eventSource.addEventListener(eventName, (event) => {
-            console.log(`🔥 [공통 SSE 감지] ${eventName} 데이터 변경이 감지되었습니다.`);
+            console.log(`[공통 SSE 감지] ${eventName} 데이터 변경이 감지되었습니다.`);
             setTimeout(() => {
                 if (typeof callbackFunction === 'function') {
                     callbackFunction(); 
@@ -226,7 +226,7 @@ const initGlobalSSE = (eventNames, callbackFunction) => {
     eventSource.addEventListener('CONNECT', (event) => {});
     
     eventSource.addEventListener('SHUTDOWN', (event) => {
-        console.log("🛑 [SSE] 서버 셧다운 감지! 브라우저의 자동 재연결을 차단합니다.");
+        console.log("[SSE] 서버 셧다운 감지! 브라우저의 자동 재연결을 차단합니다.");
         eventSource.close(); 
     });
     

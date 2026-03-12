@@ -23,6 +23,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+<script type="text/javascript" src="http://dapi.kakao.com/v2/maps/sdk.js?appkey=423ff4e622802939da1f2eb930591d44"></script>
 <style>
 /* ========================================================================
    관세청 행정시스템 통합 스타일시트
@@ -1512,17 +1513,210 @@ body {
 	}
 }
 
+/* ========== 네 번째 페이지: 찾아오시는 길 ========== */
+.fourth-page {
+	background: linear-gradient(180deg, 
+		#f0f5fa 0%,
+		#e8f0f8 30%,
+		#d4e4f4 100%);
+	min-height: 100vh;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	position: relative;
+	overflow: hidden;
+	padding: 80px 0;
+}
+
+/* 배경 장식 오브 */
+.fourth-page::before {
+	content: '';
+	position: absolute;
+	top: -5%;
+	right: -8%;
+	width: 600px;
+	height: 600px;
+	border-radius: 50%;
+	background: radial-gradient(circle, 
+		rgba(0, 102, 204, 0.08) 0%,
+		transparent 70%);
+	filter: blur(70px);
+	pointer-events: none;
+}
+
+.fourth-page::after {
+	content: '';
+	position: absolute;
+	bottom: -8%;
+	left: -5%;
+	width: 650px;
+	height: 650px;
+	border-radius: 50%;
+	background: radial-gradient(circle, 
+		rgba(26, 84, 144, 0.06) 0%,
+		transparent 70%);
+	filter: blur(75px);
+	pointer-events: none;
+}
+
+/* 네 번째 페이지 상단 그라데이션 바 */
+.fourth-page-top-bar {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	height: 4px;
+	background: linear-gradient(90deg, 
+		transparent 0%, 
+		var(--primary-navy) 15%, 
+		var(--accent-blue) 50%,
+		var(--primary-navy) 85%, 
+		transparent 100%);
+	opacity: 0.25;
+	box-shadow: 0 2px 15px rgba(0, 102, 204, 0.2);
+}
+
+.location-container {
+	max-width: 1400px;
+	width: 92%;
+	margin: 0 auto;
+	position: relative;
+	z-index: 2;
+}
+
+.location-title {
+	text-align: center;
+	font-size: 42px;
+	color: var(--primary-navy);
+	margin-bottom: 60px;
+	font-weight: 700;
+	letter-spacing: -1px;
+}
+
+/* 네 번째 페이지 레이아웃 수정 */
+/* ========== 네 번째 페이지: 지도 강조 및 정보 최적화 ========== */
+.fourth-page {
+    background: #f0f5fa;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 0; /* 패딩 제거하여 공간 확보 */
+}
+
+.location-container {
+    max-width: 1200px;
+    width: 92%;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 20px; /* 요소 간 간격 최적화 */
+}
+
+.location-title {
+    text-align: center;
+    font-size: 32px;
+    color: var(--primary-navy);
+    margin-top: 20px;  
+    margin-bottom: 0;
+    font-weight: 700;
+}
+
+/* 지도 세로 길이를 55vh로 대폭 키움 (화면의 절반 이상) */
+.location-map-box {
+    width: 100%;
+    height: 55vh; 
+    border: 1px solid #eee;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    margin-bottom: 30px;
+}
+
+/* 정보 섹션 - 부피 축소 */
+.location-info-wrapper {
+    background: none;
+    padding: 0;
+}
+
+/* 주소 및 연락처 행 - 높이와 간격을 줄임 */
+.info-main-row {
+    display: flex;
+    justify-content: flex-start;
+    gap: 60px; /* 간격 축소 */
+    border-top: 2px solid #333;
+    border-bottom: 1px solid #eee;
+    padding: 30px 0; /* 패딩 축소 */
+    margin-bottom: 25px; /* 하단 여백 축소 */
+}
+
+.info-item h4 {
+    font-size: 15px; /* 제목 크기 줄임 */
+    font-weight: 800;
+    color: #1a1a1a;
+    margin-bottom: 5px; /* 간격 축소 */
+}
+
+.info-item p {
+    font-size: 14px; /* 글씨 크기 줄임 */
+    color: #555;
+    line-height: 1.4;
+}
+
+/* 교통수단 그리드 - 높이 효율을 위해 폰트 및 아이콘 크기 미세 조정 */
+.transport-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 25px;
+}
+
+.transport-item {
+    display: flex;
+    align-items: center; /* 아이콘과 텍스트 수직 중앙 정렬 */
+    gap: 15px;
+}
+
+.transport-icon {
+    width: 50px; /* 아이콘 크기 미세 축소 */
+    height: 50px;
+    background-color: #d9c8b0;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    color: #fff;
+    font-size: 20px;
+}
+
+.transport-text h5 {
+    font-size: 15px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 3px;
+}
+
+.transport-text p {
+    font-size: 13px;
+    color: #777;
+    line-height: 1.4;
+    word-break: keep-all;
+}
+
+
 
 </style>
 </head>
 
 <body>
 	<div class="scroll-indicator">
-		<div class="scroll-track-fill" id="scrollTrackFill"></div>
-		<div class="scroll-dot active" data-label="메인" data-section="0"></div>
-		<div class="scroll-dot" data-label="G-TCS" data-section="1"></div>
-		<div class="scroll-dot" data-label="환율" data-section="2"></div>
-	</div>
+	<div class="scroll-track-fill" id="scrollTrackFill"></div>
+	<div class="scroll-dot active" data-label="메인" data-section="0"></div>
+	<div class="scroll-dot" data-label="G-TCS" data-section="1"></div>
+	<div class="scroll-dot" data-label="환율" data-section="2"></div>
+	<div class="scroll-dot" data-label="지도" data-section="3"></div>
+</div>
 
 	<header class="global-header">
 		<div class="header-center-group">
@@ -1756,6 +1950,56 @@ body {
 				</div>
 				</div>
 			</div>
+			
+			<div class="fourth-page snap-section" data-section="3">
+    <div class="fourth-page-top-bar"></div>
+    <div class="location-container">
+        <h2 class="location-title"><img src="/images/map.png" alt="지도" style="width: 35px; height: 35px; vertical-align: middle; margin-right: 8px;">오시는 길</h2>
+        
+        <div class="location-content">
+            <div class="location-map-box">
+                <div id="map" style="width:100%; height:100%;"></div>
+            </div>
+
+            <div class="location-info-wrapper">
+                <div class="info-main-row">
+                    <div class="info-item">
+                        <h4>주소</h4>
+                        <p>34908 대전광역시 중구 계룡로 846, 3층</p>
+                    </div>
+                    <div class="info-item">
+                        <h4>연락처</h4>
+                        <p>Tel: 042-222-8202 | Fax: 042-222-8203 | Email: admin@gtcs.com</p>
+                    </div>
+                </div>
+
+                <div class="transport-grid">
+                    <div class="transport-item">
+                        <div class="transport-icon"><i class="fas fa-walking"></i></div>
+                        <div class="transport-text">
+                            <h5>도보</h5>
+                            <p>서대전네거리역 5번 출구 방향 200m</p>
+                        </div>
+                    </div>
+                    <div class="transport-item">
+                        <div class="transport-icon"><i class="fas fa-car"></i></div>
+                        <div class="transport-text">
+                            <h5>자차</h5>
+                            <p>서대전네거리에서 계룡로 방향 진입</p>
+                        </div>
+                    </div>
+                    <div class="transport-item">
+                        <div class="transport-icon"><i class="fas fa-bus"></i></div>
+                        <div class="transport-text">
+                            <h5>버스</h5>
+                            <p>서대전네거리역 정류장 하차 후 도보 3분</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 		</main>
 	</div>
 
@@ -1765,6 +2009,24 @@ body {
 		    padding: '1.5rem',
 		    confirmButtonColor: '#0f4c81'
 		};
+	
+	// ========== 카카오맵 초기화 ==========
+	   function initMap() {
+	       var container = document.getElementById('map');
+	       var options = {
+	           center: new kakao.maps.LatLng(36.324887, 127.408661),
+	           level: 3
+	       };
+	       
+	       var map = new kakao.maps.Map(container, options);
+	       
+	       // 마커 생성
+	       var markerPosition = new kakao.maps.LatLng(36.324887, 127.408661);
+	       var marker = new kakao.maps.Marker({
+	           position: markerPosition
+	       });
+	       marker.setMap(map);
+	   }
 	
    function parseJwt(token) {
         try {
@@ -1895,6 +2157,14 @@ function updateUserUI() {
      createParticles();
      // 파티클 생성
      fetchExchangeRates();
+     
+     // 카카오맵 초기화
+     if (typeof kakao !== 'undefined' && kakao.maps) {
+         initMap();
+     } else {
+         console.error('카카오맵 API가 로드되지 않았습니다.');
+     }
+     
      const protectedLinks = [
     	    'link-dashboard', 'link-import', 'link-export',
     	    'link-cargo', 'link-damage',

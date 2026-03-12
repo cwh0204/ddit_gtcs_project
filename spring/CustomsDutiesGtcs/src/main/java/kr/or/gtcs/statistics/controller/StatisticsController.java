@@ -78,4 +78,20 @@ public class StatisticsController {
         return statisticsService.findMasterDashboardStats(startDate, endDate, declType);
     }
     
+    
+    /**
+     * SLA 대시보드 통합 통계 데이터 조회 (AI 위험도, 세액, 지연율 등)
+     * @param startDate 필터 시작일
+     * @param endDate 필터 종료일
+     * @param declType 수입/수출 필터 (기본값 ALL)
+     * @return 가공 완료된 SLA JSON 데이터
+     */
+    @GetMapping("/dashboard/sla-stats")
+    public Map<String, Object> getSlaDashboardStats(
+            @RequestParam(value = "startDate", required = false) String startDate,
+            @RequestParam(value = "endDate", required = false) String endDate,
+            @RequestParam(value = "declType", required = false, defaultValue = "ALL") String declType
+    ) {
+        return statisticsService.findSlaDashboardStats(startDate, endDate, declType);
+    }
 }
